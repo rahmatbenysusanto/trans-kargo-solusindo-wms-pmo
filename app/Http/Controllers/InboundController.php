@@ -13,6 +13,12 @@ class InboundController extends Controller
         return view('inbound.purchaseOrder.index', compact('title'));
     }
 
+    public function create(): View
+    {
+        $title = 'Purchase Order';
+        return view('inbound.purchaseOrder.create', compact('title'));
+    }
+
     public function putAway(): View
     {
         $title = 'Put Away';

@@ -16,4 +16,9 @@ class AuthController extends Controller
     {
 
     }
+
+    public function logout(): View
+    {
+        return view('auth.index');
+    }
 }

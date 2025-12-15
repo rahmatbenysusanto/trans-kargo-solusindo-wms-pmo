@@ -18,7 +18,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-end">
-                    <a class="btn btn-primary mb-3">Create Purchase Order</a>
+                    <a href="{{ route('inbound.purchaseOrder.create') }}" class="btn btn-primary mb-3">Create Purchase Order</a>
                 </div>
                 <div class="card">
                     <div class="card-header">

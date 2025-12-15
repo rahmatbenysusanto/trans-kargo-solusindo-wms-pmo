@@ -436,7 +436,7 @@
                     <ul class="navbar-nav" id="navbar-nav">
 
                         <li class="menu-title"><span data-key="t-menu">Dashboard</span></li>
-                        <li class="nav-item">
+                        <li class="nav-item {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client']) ? 'active' : '' }}">
                             <a class="nav-link menu-link"
                                href="#sidebarDashboard" data-bs-toggle="collapse" role="button"
                                aria-expanded="false" aria-controls="sidebarDashboard">
@@ -444,10 +444,19 @@
                                 <span data-key="t-widgets">Dashboard</span>
                             </a>
 
-                            <div class="collapse menu-dropdown" id="sidebarDashboard">
+                            <div class="collapse menu-dropdown {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client']) ? 'show' : '' }}" id="sidebarDashboard">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link {{ $title == 'Dashboard' ? 'active' : '' }}" data-key="t-analytics"> Main </a>
+                                        <a href="{{ route('dashboard') }}" class="nav-link {{ $title == 'Dashboard' ? 'active' : '' }}" data-key="t-analytics"> Main </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('stockAvailability') }}" class="nav-link {{ $title == 'Dashboard stockAvailability' ? 'active' : '' }}" data-key="t-analytics"> Stock Availability </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('inboundVsReturn') }}" class="nav-link {{ $title == 'Dashboard Inbound vs Return Trend' ? 'active' : '' }}" data-key="t-analytics"> Inbound vs Return Trend </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('topDevices') }}" class="nav-link {{ $title == 'Dashboard Top Devices by Client' ? 'active' : '' }}" data-key="t-analytics"> Top Devices by Client </a>
                                     </li>
                                 </ul>
                             </div>
@@ -501,29 +510,18 @@
 
                         <!-- Outbound -->
                         <li class="nav-item">
-                            <a class="nav-link menu-link" href="#outbound" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="outbound">
+                            <a class="nav-link menu-link {{ $title == 'Outbound' ? 'active' : '' }}" href="{{ route('outbound.index') }}">
                                 <i class="mdi mdi-truck-fast-outline"></i>
-                                <span data-key="t-widgets">Outbound</span>
+                                <span data-key="t-user"> Outbound </span>
                             </a>
-                            <div class="collapse menu-dropdown" id="outbound">
-                                <ul class="nav nav-sm flex-column">
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link {{ $title == 'Picking' ? 'active' : '' }}" data-key="t-analytics">
-                                            <i class="mdi mdi-hand-back-right-outline me-2"></i> Picking
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link {{ $title == 'Packing' ? 'active' : '' }}" data-key="t-analytics">
-                                            <i class="mdi mdi-package-variant-closed me-2"></i> Packing
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="#" class="nav-link {{ $title == 'Shipping' ? 'active' : '' }}" data-key="t-analytics">
-                                            <i class="mdi mdi-truck-delivery-outline me-2"></i> Shipping
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                        </li>
+
+                        <!-- Return -->
+                        <li class="nav-item">
+                            <a class="nav-link menu-link {{ $title == 'Return' ? 'active' : '' }}" href="{{ route('return.index') }}">
+                                <i class="mdi mdi-undo-variant"></i>
+                                <span data-key="t-user"> Return To Client </span>
+                            </a>
                         </li>
 
                         <li class="menu-title"><span data-key="t-menu">Warehouse</span></li>

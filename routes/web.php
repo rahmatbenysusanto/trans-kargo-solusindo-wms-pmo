@@ -1,15 +1,24 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InboundController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OutboundController;
+use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\StorageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthController::class, 'login'])->name('login');
 Route::post('/', [AuthController::class, 'loginPost'])->name('login.post');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::prefix('/dashboard')->controller(DashboardController::class)->group(function () {
+    Route::get('/', 'dashboard')->name('dashboard');
+    Route::get('/stock-availability', 'stockAvailability')->name('stockAvailability');
+    Route::get('/inbound-vs-return', 'inboundVsReturn')->name('inboundVsReturn');
+    Route::get('/top-devices', 'topDevices')->name('topDevices');
+});
 
 Route::prefix('/inbound')->controller(InboundController::class)->group(function () {
     Route::prefix('/purchase-order')->group(function () {
@@ -33,10 +42,14 @@ Route::prefix('/inventory')->controller(InventoryController::class)->group(funct
 });
 
 Route::prefix('/outbound')->controller(OutboundController::class)->group(function () {
-    Route::get('/', 'index')->name('inbound.outbound.index');
-    Route::get('/create', 'create')->name('inbound.outbound.create');
-    Route::post('/store', 'store')->name('inbound.outbound.store');
-    Route::get('/detail', 'detail')->name('inbound.outbound.detail');
+    Route::get('/', 'index')->name('outbound.index');
+    Route::get('/create', 'create')->name('outbound.create');
+    Route::post('/store', 'store')->name('outbound.store');
+    Route::get('/detail', 'detail')->name('outbound.detail');
+});
+
+Route::prefix('/return')->controller(ReturnController::class)->group(function () {
+    Route::get('/', 'index')->name('return.index');
 });
 
 Route::prefix('/storage')->controller(StorageController::class)->group(function () {
