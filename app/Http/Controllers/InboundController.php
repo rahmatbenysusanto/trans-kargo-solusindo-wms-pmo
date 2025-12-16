@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -15,8 +16,10 @@ class InboundController extends Controller
 
     public function create(): View
     {
+        $client = Client::all();
+
         $title = 'Purchase Order';
-        return view('inbound.purchaseOrder.create', compact('title'));
+        return view('inbound.purchaseOrder.create', compact('title', 'client'));
     }
 
     public function putAway(): View

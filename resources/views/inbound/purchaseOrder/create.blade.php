@@ -28,7 +28,10 @@
                             <div class="mb-3">
                                 <label class="form-label">Client</label>
                                 <select class="form-select" name="client">
-                                    <option>-- Choose Client --</option>
+                                    <option value="">-- Choose Client --</option>
+                                    @foreach($client as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -46,8 +49,16 @@
                             <div class="mb-3">
                                 <label class="form-label">Ownership Status</label>
                                 <select class="form-select" name="ownership_status">
-                                    <option>-- Choose Ownership Status --</option>
+                                    <option value="">-- Choose Ownership Status --</option>
+                                    <option>Milik Client</option>
+                                    <option>Titipan</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label">Site Location</label>
+                                <textarea class="form-control" name="site_location"></textarea>
                             </div>
                         </div>
                     </div>
@@ -62,7 +73,7 @@
                         <h4 class="card-title mb-0">Product Inbound</h4>
                         <div class="d-flex gap-2">
                             <a class="btn btn-secondary btn-sm">Import Excel</a>
-                            <a class="btn btn-primary btn-sm">Add Product</a>
+                            <a class="btn btn-primary btn-sm" onclick="addProductModal()">Add Product</a>
                         </div>
                     </div>
                 </div>
@@ -72,8 +83,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>SKU</th>
-                                    <th>Name</th>
+                                    <th>Part Name</th>
                                     <th>Part Number</th>
                                     <th>Serial Number</th>
                                     <th>Condition</th>
@@ -89,4 +99,33 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Product Modals -->
+    <div id="addProductModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Add Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary ">Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('js')
+    <script>
+        localStorage.clear();
+
+        function addProductModal() {
+            $('#addProductModal').modal('show');
+        }
+    </script>
 @endsection
