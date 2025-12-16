@@ -61,6 +61,12 @@
                                 <textarea class="form-control" name="site_location"></textarea>
                             </div>
                         </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label class="form-label">Remarks</label>
+                                <textarea class="form-control" name="remarks"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,7 +78,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">Product Inbound</h4>
                         <div class="d-flex gap-2">
-                            <a class="btn btn-secondary btn-sm">Import Excel</a>
+                            <a href="{{ asset('assets/Template Inbound.xlsx') }}" download class="btn btn-success btn-sm">Download File Excel</a>
+                            <a class="btn btn-secondary btn-sm" onclick="importExcelModal()">Import Excel</a>
                             <a class="btn btn-primary btn-sm" onclick="addProductModal()">Add Product</a>
                         </div>
                     </div>
@@ -93,6 +100,9 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                            <tbody id="listProducts">
+
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -109,11 +119,65 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
                 </div>
                 <div class="modal-body">
-
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Part Name</label>
+                                <input type="text" class="form-control" id="add_part_name" placeholder="Part Name ...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Serial Number</label>
+                                <input type="text" class="form-control" id="add_serial_number" placeholder="Serial Number ...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Manufacture Date</label>
+                                <input type="date" class="form-control" id="add_manufacture_date">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">EOS Date</label>
+                                <input type="date" class="form-control" id="add_eos_date">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Part Number</label>
+                                <input type="text" class="form-control" id="add_part_number" placeholder="Part Number ...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Condition</label>
+                                <select class="form-control" id="add_condition">
+                                    <option>-- Choose Condition --</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Warranty End Date</label>
+                                <input type="date" class="form-control" id="add_warranty_end_date">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary ">Add Product</button>
+                    <button type="button" class="btn btn-primary" onclick="addProduct()">Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Excel Modals -->
+    <div id="importExcelModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Import Product Excel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+                </div>
+                <div class="modal-body">
+                    <input type="file" class="form-control" accept=".xls,.xlsx" id="fileExcel">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="importProducts()">Import Product By Excel</button>
                 </div>
             </div>
         </div>
@@ -121,11 +185,144 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="{{ asset('assets/js/xlsx.full.min.js') }}"></script>
+
     <script>
         localStorage.clear();
 
         function addProductModal() {
             $('#addProductModal').modal('show');
         }
+
+        function addProduct() {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+
+            products.push({
+                partName: document.getElementById('add_part_name').value,
+                partNumber: document.getElementById('add_part_number').value,
+                serialNumber: document.getElementById('add_serial_number').value,
+                condition: document.getElementById('add_condition').value,
+                manufactureDate: document.getElementById('add_manufacture_date').value,
+                warrantyEndDate: document.getElementById('add_warranty_end_date').value,
+                eosDate: document.getElementById('add_eos_date').value
+            });
+
+            localStorage.setItem('products', JSON.stringify(products));
+            viewProducts();
+
+            document.getElementById('add_part_name').value = '';
+            document.getElementById('add_part_number').value = '';
+            document.getElementById('add_serial_number').value = '';
+            document.getElementById('add_condition').value = '';
+            document.getElementById('add_manufacture_date').value = '';
+            document.getElementById('add_warranty_end_date').value = '';
+            document.getElementById('add_eos_date').value = '';
+            $('#addProductModal').modal('hide');
+        }
+
+        function viewProducts() {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+
+            let html = '';
+
+            products.forEach((product, index) => {
+                html += `
+                    <tr>
+                        <td>${ index + 1 }</td>
+                        <td>${ product.partName }</td>
+                        <td>${ product.partNumber }</td>
+                        <td>${ product.serialNumber }</td>
+                        <td>${ product.condition }</td>
+                        <td>${ product.manufactureDate }</td>
+                        <td>${ product.warrantyEndDate }</td>
+                        <td>${ product.eosDate }</td>
+                        <td><a class="btn btn-danger btn-sm" onclick="deleteProduct('${index}')">Delete</a></td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('listProducts').innerHTML = html;
+        }
+
+        function deleteProduct(index) {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+            products.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+            viewProducts();
+        }
+
+        function importExcelModal() {
+            $('#importExcelModal').modal('show');
+        }
+
+        function importProducts() {
+            const EXCEL_MAX_SIZE_MB = 10;
+
+            const fileInput = document.getElementById('fileExcel');
+            const file = fileInput?.files?.[0];
+
+            if (!file) {
+                Swal.fire({
+                    title: 'Warning',
+                    text: 'Pilih file Excel terlebih dahulu.',
+                    icon: 'warning',
+                });
+                return false;
+            }
+            const allowedExt = ['.xls', '.xlsx'];
+            const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+            if (!allowedExt.includes(ext)) {
+                Swal.fire({
+                    title: 'Warning',
+                    text: 'Hanya boleh .xls atau .xlsx',
+                    icon: 'warning',
+                });
+                return false;
+            }
+            const maxBytes = EXCEL_MAX_SIZE_MB * 1024 * 1024;
+            if (file.size > maxBytes) {
+                Swal.fire({
+                    title: 'Warning',
+                    text: `Ukuran file melebihi ${EXCEL_MAX_SIZE_MB} MB`,
+                    icon: 'warning',
+                });
+                return false;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                    defval: "",
+                    range: 1
+                });
+
+                const products = JSON.parse(localStorage.getItem('products')) ?? [];
+                jsonData.forEach((item) => {
+                    products.push({
+                        partName: item['Part Name'],
+                        partNumber: item['Part Number'],
+                        serialNumber: item['Serial Number'],
+                        condition: item['Condition'],
+                        manufactureDate: item['Manufacture Date'],
+                        warrantyEndDate: item['Warranty End Date'],
+                        eosDate: item['EOS Date']
+                    });
+                });
+                localStorage.setItem('products', JSON.stringify(products));
+                viewProducts();
+            };
+
+            reader.readAsArrayBuffer(file);
+            document.getElementById('fileExcel').value = '';
+            $('#importExcelModal').modal('hide');
+        }
+
     </script>
 @endsection
