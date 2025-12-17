@@ -3,15 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Inbound;
+use App\Models\InboundDetail;
+use App\Models\Product;
+use App\Models\StorageArea;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Throwable;
 
 class InboundController extends Controller
 {
     public function index(): View
     {
+        $inbound = Inbound::latest()->paginate(10);
+
         $title = 'Purchase Order';
-        return view('inbound.purchaseOrder.index', compact('title'));
+        return view('inbound.purchaseOrder.index', compact('title', 'inbound'));
     }
 
     public function create(): View
@@ -22,9 +30,77 @@ class InboundController extends Controller
         return view('inbound.purchaseOrder.create', compact('title', 'client'));
     }
 
+    /**
+     * @throws Throwable
+     */
+    public function store(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $inbound = Inbound::create([
+                'number'        => '',
+                'client_id'     => $request->post('client'),
+                'site_location' => $request->post('siteLocation'),
+                'inbound_type'  => $request->post('inboundType'),
+                'owner_status'  => $request->post('ownershipStatus'),
+                'quantity'      => 0,
+                'status'        => 'new',
+                'remarks'       => $request->post('remarks'),
+                'created_by'    => 1
+            ]);
+
+            foreach ($request->post('products') as $product) {
+                $checkProduct = Product::where('part_name', $product['partName'])->first();
+                if ($checkProduct != null) {
+                    $productId = $checkProduct->id;
+                } else {
+                    $createProduct = Product::create(['part_name' => $product['partName']]);
+                    $productId = $createProduct->id;
+                }
+
+                InboundDetail::create([
+                    'inbound_id'    => $inbound->id,
+                    'product_id'    => $productId,
+                    'qty'           => 1,
+                    'qty_pa'        => 0,
+                    'part_name'     => $product['partName'],
+                    'part_number'   => $product['partNumber'],
+                    'serial_number' => $product['serialNumber'],
+                    'condition'     => $product['condition'],
+                    'manufacture_date'  => $product['manufactureDate'],
+                    'warranty_end_date' => $product['warrantyEndDate'],
+                    'eos_date'          => $product['eosDate']
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => true
+            ]);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false
+            ]);
+        }
+    }
+
     public function putAway(): View
     {
+        $inbound = Inbound::where('status', 'open')->pagination(10);
+
         $title = 'Put Away';
-        return view('inbound.put-away.index', compact('title'));
+        return view('inbound.put-away.index', compact('title', 'inbound'));
+    }
+
+    public function detailPutAway(Request $request): View
+    {
+        $inbound = Inbound::find($request->query('id'));
+        $inboundDetail = InboundDetail::where('inbound_id', $request->query('id'))->get();
+        $storage = StorageArea::all();
+
+        $title = 'Put Away';
+        return view('inbound.put-away.process', compact('title', 'inbound', 'inboundDetail', 'storage'));
     }
 }

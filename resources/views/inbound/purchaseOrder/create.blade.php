@@ -17,7 +17,7 @@
         </div>
 
         <div class="d-flex justify-content-end mb-3">
-            <a class="btn btn-primary">Create Inbound</a>
+            <a class="btn btn-primary" onclick="createInbound()">Create Inbound</a>
         </div>
 
         <div class="col-12">
@@ -27,7 +27,7 @@
                         <div class="col-4">
                             <div class="mb-3">
                                 <label class="form-label">Client</label>
-                                <select class="form-select" name="client">
+                                <select class="form-select" name="client" id="client">
                                     <option value="">-- Choose Client --</option>
                                     @foreach($client as $item)
                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
@@ -38,7 +38,7 @@
                         <div class="col-4">
                             <div class="mb-3">
                                 <label class="form-label">Inbound Type</label>
-                                <select class="form-select" name="inbound_type">
+                                <select class="form-select" name="inbound_type" id="inbound_type">
                                     <option>-- Choose Type --</option>
                                     <option>Dismantle</option>
                                     <option>Relocation</option>
@@ -48,7 +48,7 @@
                         <div class="col-4">
                             <div class="mb-3">
                                 <label class="form-label">Ownership Status</label>
-                                <select class="form-select" name="ownership_status">
+                                <select class="form-select" name="ownership_status" id="ownership_status">
                                     <option value="">-- Choose Ownership Status --</option>
                                     <option>Milik Client</option>
                                     <option>Titipan</option>
@@ -58,13 +58,13 @@
                         <div class="col-4">
                             <div class="mb-3">
                                 <label class="form-label">Site Location</label>
-                                <textarea class="form-control" name="site_location"></textarea>
+                                <textarea class="form-control" name="site_location" id="site_location"></textarea>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
                                 <label class="form-label">Remarks</label>
-                                <textarea class="form-control" name="remarks"></textarea>
+                                <textarea class="form-control" name="remarks" id="remarks"></textarea>
                             </div>
                         </div>
                     </div>
@@ -322,6 +322,57 @@
             reader.readAsArrayBuffer(file);
             document.getElementById('fileExcel').value = '';
             $('#importExcelModal').modal('hide');
+        }
+
+        function createInbound() {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Create Inbound",
+                icon: "warning",
+                showCancelButton: true,
+                customClass: {
+                    confirmButton: "btn btn-primary w-xs me-2 mt-2",
+                    cancelButton: "btn btn-danger w-xs mt-2"
+                },
+                confirmButtonText: "Yes, Create it!",
+                buttonsStyling: false,
+                showCloseButton: true
+            }).then(async (t)=> {
+                if (t.value) {
+
+                    $.ajax({
+                        url: '{{ route('inbound.purchaseOrder.store') }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            products: JSON.parse(localStorage.getItem('products')) ?? [],
+                            client: document.getElementById('client'),value,
+                            inboundType: document.getElementById('inbound_type').value,
+                            ownershipStatus: document.getElementById('ownership_status').value,
+                            siteLocation: document.getElementById('site_location').value,
+                            remarks: document.getElementById('remarks').value
+                        },
+                        success: (res) => {
+                            if (res.status) {
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: 'Create Inbound Success',
+                                    icon: 'success'
+                                }).then((i) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Create Inbound Failed',
+                                    icon: 'error'
+                                });
+                            }
+                        }
+                    });
+
+                }
+            });
         }
 
     </script>
