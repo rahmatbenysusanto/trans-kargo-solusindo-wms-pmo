@@ -89,7 +89,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <a class="btn btn-primary btn-sm">Detail</a>
+                                                <a href="{{ route('inbound.purchaseOrder.detail', ['number' => $item->number]) }}" class="btn btn-primary btn-sm">Detail</a>
                                                 @if($item->status == 'new')
                                                     <a class="btn btn-secondary btn-sm" onclick="processPO('{{ $item->number }}')">Process PO</a>
                                                     <a class="btn btn-danger btn-sm" onclick="cancelPO('{{ $item->number }}')">Cancel PO</a>

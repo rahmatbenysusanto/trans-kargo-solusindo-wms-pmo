@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Inbound;
 use App\Models\InboundDetail;
+use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\StorageArea;
 use Illuminate\Http\Request;
@@ -20,6 +21,15 @@ class InboundController extends Controller
 
         $title = 'Purchase Order';
         return view('inbound.purchaseOrder.index', compact('title', 'inbound'));
+    }
+
+    public function detail(Request $request): View
+    {
+        $inbound = Inbound::where('number', $request->query('number'))->first();
+        $inboundDetail = InboundDetail::where('inbound_id', $inbound->id)->get();
+
+        $title = 'Purchase Order';
+        return view('inbound.purchaseOrder.detail', compact('title', 'inbound', 'inboundDetail'));
     }
 
     public function create(): View
@@ -136,5 +146,48 @@ class InboundController extends Controller
 
         $title = 'Put Away';
         return view('inbound.put-away.process', compact('title', 'inbound', 'inboundDetail', 'storageArea'));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function putAwayStore(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->post('productPA') as $product) {
+                InboundDetail::where('id', $product['id'])->update([
+                    'qty_pa'    => 1
+                ]);
+
+                $inboundDetail = InboundDetail::find($product['id']);
+                Inventory::create([
+                    'product_id'        => $inboundDetail->product_id,
+                    'inbound_detail_id' => $inboundDetail->id,
+                    'bin_id'            => $request->post('binId'),
+                    'qty'               => 1,
+                    'status'            => '',
+                    'part_name'         => $inboundDetail->part_name,
+                    'part_number'       => $inboundDetail->part_number,
+                    'serial_number'     => $inboundDetail->serial_number,
+                    'manufacture_date'  => $inboundDetail->manufacture_date,
+                    'warranty_end_date' => $inboundDetail->warranty_end_date,
+                    'eos_date'          => $inboundDetail->eos_date,
+                    'pic'               => '',
+                    'condition'         => ''
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => true
+            ]);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false
+            ]);
+        }
     }
 }

@@ -106,4 +106,13 @@ class StorageController extends Controller
 
         return back()->with('success', 'Created Bin Successfully');
     }
+
+    public function binFind(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $bin = StorageBin::where('storage_lantai_id', $request->get('lantaiId'))->get();
+
+        return response()->json([
+            'data' => $bin,
+        ]);
+    }
 }

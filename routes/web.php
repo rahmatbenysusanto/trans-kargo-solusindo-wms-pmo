@@ -73,5 +73,6 @@ Route::prefix('/storage')->controller(StorageController::class)->group(function 
     Route::prefix('/bin')->group(function () {
         Route::get('/', 'bin')->name('storage.bin');
         Route::post('/store', 'binStore')->name('storage.bin.store');
+        Route::get('/find', 'binFind')->name('storage.bin.find');
     });
 });
