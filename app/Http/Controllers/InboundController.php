@@ -127,4 +127,14 @@ class InboundController extends Controller
         $title = 'Put Away';
         return view('inbound.put-away.process', compact('title', 'inbound', 'inboundDetail', 'storage'));
     }
+
+    public function putAwayProcess(Request $request): View
+    {
+        $inbound = Inbound::with('client')->where('number', $request->query('number'))->first();
+        $inboundDetail = InboundDetail::where('inbound_id', $inbound->id)->get();
+        $storageArea = StorageArea::all();
+
+        $title = 'Put Away';
+        return view('inbound.put-away.process', compact('title', 'inbound', 'inboundDetail', 'storageArea'));
+    }
 }

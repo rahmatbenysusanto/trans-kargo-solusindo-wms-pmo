@@ -88,7 +88,7 @@
                                             <div class="d-flex gap-2">
                                                 <a class="btn btn-primary btn-sm">Detail</a>
                                                 @if($item->status == 'open')
-                                                    <a class="btn btn-secondary btn-sm">Process Put Away</a>
+                                                    <a href="{{ route('inbound.putAway.process', ['number' => $item->number]) }}" class="btn btn-secondary btn-sm">Process Put Away</a>
                                                 @endif
                                             </div>
                                         </td>
