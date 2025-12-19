@@ -147,6 +147,9 @@
                                 <label class="form-label">Condition</label>
                                 <select class="form-control" id="add_condition">
                                     <option>-- Choose Condition --</option>
+                                    <option>Good</option>
+                                    <option>Used</option>
+                                    <option>Defective</option>
                                 </select>
                             </div>
                             <div class="mb-3">
@@ -346,7 +349,7 @@
                         data: {
                             _token: '{{ csrf_token() }}',
                             products: JSON.parse(localStorage.getItem('products')) ?? [],
-                            client: document.getElementById('client'),value,
+                            client: document.getElementById('client').value,
                             inboundType: document.getElementById('inbound_type').value,
                             ownershipStatus: document.getElementById('ownership_status').value,
                             siteLocation: document.getElementById('site_location').value,

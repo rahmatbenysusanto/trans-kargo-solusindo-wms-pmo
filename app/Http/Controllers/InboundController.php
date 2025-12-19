@@ -16,7 +16,7 @@ class InboundController extends Controller
 {
     public function index(): View
     {
-        $inbound = Inbound::latest()->paginate(10);
+        $inbound = Inbound::with('client', 'user')->latest()->paginate(10);
 
         $title = 'Purchase Order';
         return view('inbound.purchaseOrder.index', compact('title', 'inbound'));
@@ -30,6 +30,19 @@ class InboundController extends Controller
         return view('inbound.purchaseOrder.create', compact('title', 'client'));
     }
 
+    private function inboundNumber()
+    {
+        $prefix = 'INB-' . date('Ym') . '-';
+
+        $last = Inbound::where('number', 'like', $prefix.'%')
+            ->orderBy('number', 'desc')
+            ->first();
+
+        $nextNumber = $last ? str_pad((int)substr($last->number, -4) + 1, 4, '0', STR_PAD_LEFT) : '0001';
+
+        return $prefix . $nextNumber;
+    }
+
     /**
      * @throws Throwable
      */
@@ -39,12 +52,12 @@ class InboundController extends Controller
             DB::beginTransaction();
 
             $inbound = Inbound::create([
-                'number'        => '',
+                'number'        => $this->inboundNumber(),
                 'client_id'     => $request->post('client'),
                 'site_location' => $request->post('siteLocation'),
                 'inbound_type'  => $request->post('inboundType'),
                 'owner_status'  => $request->post('ownershipStatus'),
-                'quantity'      => 0,
+                'quantity'      => count($request->post('products')),
                 'status'        => 'new',
                 'remarks'       => $request->post('remarks'),
                 'created_by'    => 1
@@ -86,9 +99,20 @@ class InboundController extends Controller
         }
     }
 
+    public function changeStatus(Request $request)
+    {
+        Inbound::where('number', $request->post('number'))->update([
+            'status' => $request->post('status')
+        ]);
+
+        return response()->json([
+            'status' => true
+        ]);
+    }
+
     public function putAway(): View
     {
-        $inbound = Inbound::where('status', 'open')->pagination(10);
+        $inbound = Inbound::where('status', 'open')->paginate(10);
 
         $title = 'Put Away';
         return view('inbound.put-away.index', compact('title', 'inbound'));
