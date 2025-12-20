@@ -87,7 +87,7 @@
                                     <td>{{ $item->received_by }}</td>
                                     <td>{{ $item->user->name }}</td>
                                     <td>
-                                        <a class="btn btn-secondary btn-sm">Detail</a>
+                                        <a href="{{ route('outbound.detail', ['id' => $item->id]) }}" class="btn btn-secondary btn-sm">Detail</a>
                                     </td>
                                 </tr>
                             @endforeach

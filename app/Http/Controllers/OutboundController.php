@@ -22,6 +22,15 @@ class OutboundController extends Controller
         return view('outbound.index', compact('title', 'outbound'));
     }
 
+    public function detail(Request $request): View
+    {
+        $outbound = Outbound::with('client', 'user')->where('id', $request->query('id'))->first();
+        $outboundDetail = OutboundDetail::with('inventory')->where('outbound_id', $request->query('id'))->get();
+
+        $title = "Outbound";
+        return view('outbound.detail', compact('title', 'outbound', 'outboundDetail'));
+    }
+
     public function create(): View
     {
         $client = Client::all();
