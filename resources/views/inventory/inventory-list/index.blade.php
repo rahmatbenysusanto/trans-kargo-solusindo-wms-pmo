@@ -106,7 +106,7 @@
                                     </td>
                                     <td>{{ $product->inboundDetail->inbound->client->name }}</td>
                                     <td>
-                                        <a class="btn btn-secondary btn-sm">History</a>
+                                        <a href="{{ route('inbound.inventory.history', ['id' => $product->id]) }}" class="btn btn-secondary btn-sm">History</a>
                                     </td>
                                 </tr>
                             @endforeach

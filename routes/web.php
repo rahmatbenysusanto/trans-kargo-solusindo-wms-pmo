@@ -39,6 +39,7 @@ Route::prefix('/inbound')->controller(InboundController::class)->group(function 
 
 Route::prefix('/inventory')->controller(InventoryController::class)->group(function () {
     Route::get('/', 'index')->name('inbound.inventory.index');
+    Route::get('/history', 'history')->name('inbound.inventory.history');
 });
 
 Route::prefix('/outbound')->controller(OutboundController::class)->group(function () {
