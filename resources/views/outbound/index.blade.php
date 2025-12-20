@@ -15,7 +15,7 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2 mb-3">
-            <a class="btn btn-secondary">Create Outbound</a>
+            <a href="{{ route('outbound.create') }}" class="btn btn-secondary">Create Outbound</a>
         </div>
 
         <div class="col-12">
@@ -61,9 +61,10 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Number</th>
                                     <th>Client Name</th>
                                     <th>Site Location</th>
-                                    <th>QTY Items</th>
+                                    <th class="text-center">QTY</th>
                                     <th>Delivery Date</th>
                                     <th>Courier</th>
                                     <th>AWB</th>
@@ -72,6 +73,25 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                            <tbody>
+                            @foreach($outbound as $index => $item)
+                                <tr>
+                                    <td>{{ $outbound->firstItem() + $index }}</td>
+                                    <td>{{ $item->number }}</td>
+                                    <td>{{ $item->client->name }}</td>
+                                    <td>{{ $item->site_location }}</td>
+                                    <td class="text-center fw-bold">{{ number_format($item->qty) }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($item->delivery_date)->translatedFormat('d F Y') }}</td>
+                                    <td>{{ $item->courier }}</td>
+                                    <td>{{ $item->tracking_number }}</td>
+                                    <td>{{ $item->received_by }}</td>
+                                    <td>{{ $item->user->name }}</td>
+                                    <td>
+                                        <a class="btn btn-secondary btn-sm">Detail</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
