@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InboundDetail extends Model
 {
@@ -20,4 +21,9 @@ class InboundDetail extends Model
         'warranty_end_date',
         'eos_date'
     ];
+
+    public function inbound(): BelongsTo
+    {
+        return $this->belongsTo(Inbound::class, 'inbound_id');
+    }
 }

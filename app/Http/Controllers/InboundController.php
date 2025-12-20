@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Inbound;
 use App\Models\InboundDetail;
 use App\Models\Inventory;
+use App\Models\InventoryHistory;
 use App\Models\Product;
 use App\Models\StorageArea;
 use Illuminate\Http\Request;
@@ -162,7 +163,7 @@ class InboundController extends Controller
                 ]);
 
                 $inboundDetail = InboundDetail::find($product['id']);
-                Inventory::create([
+                $inventory = Inventory::create([
                     'product_id'        => $inboundDetail->product_id,
                     'inbound_detail_id' => $inboundDetail->id,
                     'bin_id'            => $request->post('binId'),
@@ -176,6 +177,20 @@ class InboundController extends Controller
                     'eos_date'          => $inboundDetail->eos_date,
                     'pic'               => '',
                     'condition'         => ''
+                ]);
+
+                InventoryHistory::create([
+                    'inventory_id'      => $inventory->id,
+                    'type'              => 'inbound',
+                    'description'       => 'Inbound Process',
+                ]);
+            }
+
+            // Cek apakah semua product sudah di PA
+            $checkPO = InboundDetail::where('inbound_id', $request->post('inboundId'))->where('qty_pa', 0)->count();
+            if ($checkPO == 0) {
+                Inbound::where('id', $request->post('inboundId'))->update([
+                    'status' => 'close'
                 ]);
             }
 

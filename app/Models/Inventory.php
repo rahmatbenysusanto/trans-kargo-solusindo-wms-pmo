@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
@@ -22,4 +23,14 @@ class Inventory extends Model
         'eos_date',
         'pic'
     ];
+
+    public function bin(): BelongsTo
+    {
+        return $this->belongsTo(StorageBin::class, 'bin_id');
+    }
+
+    public function inboundDetail(): BelongsTo
+    {
+        return $this->belongsTo(InboundDetail::class, 'inbound_detail_id');
+    }
 }

@@ -488,14 +488,14 @@
 
                         <!-- Inventory -->
                         <li class="nav-item">
-                            <a class="nav-link menu-link" href="#inventory" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="inventory">
+                            <a class="nav-link menu-link {{ in_array($title, ['Inventory List', 'Inventory']) ? 'active' : '' }}" href="#inventory" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="inventory">
                                 <i class="mdi mdi-warehouse"></i>
                                 <span data-key="t-widgets">Inventory</span>
                             </a>
-                            <div class="collapse menu-dropdown" id="inventory">
+                            <div class="collapse menu-dropdown {{ in_array($title, ['Inventory List', 'Inventory']) ? 'show' : '' }}" id="inventory">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link {{ $title == 'Inventory List' ? 'active' : '' }}" data-key="t-analytics">
+                                        <a href="{{ route('inbound.inventory.index') }}" class="nav-link {{ $title == 'Inventory List' ? 'active' : '' }}" data-key="t-analytics">
                                             <i class="mdi mdi-format-list-bulleted me-2"></i> Inventory List
                                         </a>
                                     </li>

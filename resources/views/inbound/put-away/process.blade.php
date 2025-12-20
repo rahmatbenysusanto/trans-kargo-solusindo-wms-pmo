@@ -330,7 +330,8 @@
                         data: {
                             _token: '{{ csrf_token() }}',
                             productPA: JSON.parse(localStorage.getItem('productPA')) ?? [],
-                            binId: document.getElementById('bin').value
+                            binId: document.getElementById('bin').value,
+                            inboundId: '{{ $inbound->id }}'
                         },
                         success: (res) => {
                             if (res.status) {
