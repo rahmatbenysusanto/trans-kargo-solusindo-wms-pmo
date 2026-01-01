@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
+use App\Models\StorageArea;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -26,5 +27,20 @@ class InventoryController extends Controller
 
         $title = 'Inventory List';
         return view('inventory.inventory-list.history', compact('title', 'inventory', 'history'));
+    }
+
+    public function stockMovement(): View
+    {
+        $title = 'Stock Movement';
+        return view('inventory.stock-movement.index', compact('title'));
+    }
+
+    public function create(): View
+    {
+        $storageArea = StorageArea::all();
+        $products = Inventory::where('qty', 1)->select('id', 'part_name', 'part_number', 'serial_number')->get();
+
+        $title = 'Stock Movement';
+        return view('inventory.stock-movement.create', compact('title', 'storageArea', 'products'));
     }
 }

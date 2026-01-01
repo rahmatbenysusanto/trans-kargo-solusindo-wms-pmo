@@ -113,6 +113,40 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="d-flex justify-content-end mt-2">
+                        @if ($inventory->hasPages())
+                            <ul class="pagination">
+                                @if ($inventory->onFirstPage())
+                                    <li class="disabled"><span>&laquo; Previous</span></li>
+                                @else
+                                    <li><a href="{{ $inventory->previousPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="prev">&laquo; Previous</a></li>
+                                @endif
+
+                                @foreach ($inventory->links()->elements as $element)
+                                    @if (is_string($element))
+                                        <li class="disabled"><span>{{ $element }}</span></li>
+                                    @endif
+
+                                    @if (is_array($element))
+                                        @foreach ($element as $page => $url)
+                                            @if ($page == $inventory->currentPage())
+                                                <li class="active"><span>{{ $page }}</span></li>
+                                            @else
+                                                <li><a href="{{ $url }}&per_page={{ request('per_page', 10) }}">{{ $page }}</a></li>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                @endforeach
+
+                                @if ($inventory->hasMorePages())
+                                    <li><a href="{{ $inventory->nextPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="next">Next &raquo;</a></li>
+                                @else
+                                    <li class="disabled"><span>Next &raquo;</span></li>
+                                @endif
+                            </ul>
+                        @endif
+
+                    </div>
                 </div>
             </div>
         </div>

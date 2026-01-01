@@ -1,15 +1,15 @@
 @extends('layout.index')
-@section('title', 'Create Purchase Order')
+@section('title', 'Create Receiving')
 
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Create Purchase Order</h4>
+                <h4 class="mb-sm-0">Create Receiving</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a>Inbound</a></li>
-                        <li class="breadcrumb-item">Purchase Order</li>
+                        <li class="breadcrumb-item">Receiving</li>
                         <li class="breadcrumb-item active">Create</li>
                     </ol>
                 </div>
@@ -303,7 +303,6 @@
 
                 const jsonData = XLSX.utils.sheet_to_json(worksheet, {
                     defval: "",
-                    range: 1
                 });
 
                 const products = JSON.parse(localStorage.getItem('products')) ?? [];
@@ -344,17 +343,21 @@
                 if (t.value) {
 
                     $.ajax({
-                        url: '{{ route('inbound.purchaseOrder.store') }}',
+                        url: '{{ route('inbound.receiving.store') }}',
                         method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            products: JSON.parse(localStorage.getItem('products')) ?? [],
+                        contentType: 'application/json',
+                        processData: false,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        data: JSON.stringify({
                             client: document.getElementById('client').value,
                             inboundType: document.getElementById('inbound_type').value,
                             ownershipStatus: document.getElementById('ownership_status').value,
                             siteLocation: document.getElementById('site_location').value,
-                            remarks: document.getElementById('remarks').value
-                        },
+                            remarks: document.getElementById('remarks').value,
+                            products: JSON.parse(localStorage.getItem('products')) ?? []
+                        }),
                         success: (res) => {
                             if (res.status) {
                                 Swal.fire({

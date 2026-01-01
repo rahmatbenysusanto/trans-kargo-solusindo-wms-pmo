@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('inventory', function (Blueprint $table) {
             $table->id();
             $table->integer('product_id');
+            $table->integer('client_id');
             $table->integer('inbound_detail_id');
             $table->integer('bin_id');
             $table->integer('qty')->default(0);

@@ -1,15 +1,16 @@
 @extends('layout.index')
-@section('title', 'Create Outbound')
+@section('title', 'Create Return To Client')
 
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Create Outbound</h4>
+                <h4 class="mb-sm-0">Create Return To Client</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a>Outbound</a></li>
-                        <li class="breadcrumb-item active"><a>Create</a></li>
+                        <li class="breadcrumb-item"><a>Return</a></li>
+                        <li class="breadcrumb-item">Return To Client</li>
+                        <li class="breadcrumb-item active">Create</li>
                     </ol>
                 </div>
             </div>
@@ -19,8 +20,8 @@
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">Outbound Data</h4>
-                        <a class="btn btn-secondary btn-sm" onclick="createOutbound()">Create Outbound</a>
+                        <h4 class="card-title mb-0">Return To Client Data</h4>
+                        <a class="btn btn-primary btn-sm" onclick="createReturn()">Create Return To Client</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -43,8 +44,8 @@
                             <input type="text" class="form-control" id="receivedBy" placeholder="Received By ...">
                         </div>
                         <div class="col-3 mb-3">
-                            <label class="form-label">Delivery Date</label>
-                            <input type="date" class="form-control" id="deliveryDate" value="{{ date('Y-m-d') }}">
+                            <label class="form-label">Return Date</label>
+                            <input type="date" class="form-control" id="returnDate" value="{{ date('Y-m-d') }}">
                         </div>
                         <div class="col-3 mb-3">
                             <label class="form-label">Courier</label>
@@ -59,8 +60,13 @@
                             <input type="text" class="form-control" id="remarks">
                         </div>
                         <div class="col-3 mb-3">
-                            <label class="form-label">QTY Product</label>
-                            <input type="number" class="form-control" id="qtyProduct" placeholder="0" readonly>
+                            <label class="form-label">Condition</label>
+                            <select class="form-control" id="condition">
+                                <option value="">-- Choose Condition --</option>
+                                <option>Good</option>
+                                <option>Scrape</option>
+                                <option>Repair Needed</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -74,15 +80,15 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="tableListProducts" class="table table-striped align-middle">
+                        <table id="tableProductsOutbound" class="table table-striped align-middle">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Product</th>
-                                    <th>Serial Number</th>
-                                    <th>Client</th>
-                                    <th>Action</th>
-                                </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>Serial Number</th>
+                                <th>Client</th>
+                                <th>Action</th>
+                            </tr>
                             </thead>
                             <tbody id="listProducts">
 
@@ -96,19 +102,19 @@
         <div class="col-6">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Products Outbound</h4>
+                    <h4 class="card-title mb-0">Products Return To Client</h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="tableProductsOutbound" class="table table-striped align-middle">
+                        <table id="tableListProducts" class="table table-striped align-middle">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Product</th>
-                                    <th>Serial Number</th>
-                                    <th>Client</th>
-                                    <th>Action</th>
-                                </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>Serial Number</th>
+                                <th>Client</th>
+                                <th>Action</th>
+                            </tr>
                             </thead>
                             <tbody id="productsOutbound">
 
@@ -224,7 +230,6 @@
                 `;
             });
 
-            document.getElementById('qtyProduct').value = productsOutbound.length;
             document.getElementById('productsOutbound').innerHTML = html;
         }
 
@@ -244,10 +249,10 @@
             viewProductsOutbound();
         }
 
-        function createOutbound() {
+        function createReturn() {
             Swal.fire({
                 title: "Are you sure?",
-                text: "Create Outbound",
+                text: "Create Return To Client",
                 icon: "warning",
                 showCancelButton: true,
                 customClass: {
@@ -261,7 +266,7 @@
                 if (t.value) {
 
                     $.ajax({
-                        url: '{{ route('outbound.store') }}',
+                        url: '{{ route('return.store') }}',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
@@ -272,6 +277,7 @@
                             courier: document.getElementById('courier').value,
                             trackingNumber: document.getElementById('trackingNumber').value,
                             remarks: document.getElementById('remarks').value,
+                            condition: document.getElementById('condition').value,
                             products: JSON.parse(localStorage.getItem('productsOutbound')) ?? []
                         },
                         success: (res) => {

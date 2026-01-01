@@ -70,6 +70,7 @@
                                     <th>AWB</th>
                                     <th>Received By</th>
                                     <th>Processed By</th>
+                                    <th>Doc</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -87,12 +88,56 @@
                                     <td>{{ $item->received_by }}</td>
                                     <td>{{ $item->user->name }}</td>
                                     <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="" class="btn btn-success btn-sm">
+                                                <i class="mdi mdi-file-excel" style="font-size: 14px;"></i>
+                                            </a>
+                                            <a href="" class="btn btn-pdf btn-sm text-white" target="_blank">
+                                                <i class="mdi mdi-file-pdf-box" style="font-size: 14px;"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <a href="{{ route('outbound.detail', ['id' => $item->id]) }}" class="btn btn-secondary btn-sm">Detail</a>
                                     </td>
                                 </tr>
                             @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div class="d-flex justify-content-end mt-2">
+                        @if ($outbound->hasPages())
+                            <ul class="pagination">
+                                @if ($outbound->onFirstPage())
+                                    <li class="disabled"><span>&laquo; Previous</span></li>
+                                @else
+                                    <li><a href="{{ $outbound->previousPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="prev">&laquo; Previous</a></li>
+                                @endif
+
+                                @foreach ($outbound->links()->elements as $element)
+                                    @if (is_string($element))
+                                        <li class="disabled"><span>{{ $element }}</span></li>
+                                    @endif
+
+                                    @if (is_array($element))
+                                        @foreach ($element as $page => $url)
+                                            @if ($page == $outbound->currentPage())
+                                                <li class="active"><span>{{ $page }}</span></li>
+                                            @else
+                                                <li><a href="{{ $url }}&per_page={{ request('per_page', 10) }}">{{ $page }}</a></li>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                @endforeach
+
+                                @if ($outbound->hasMorePages())
+                                    <li><a href="{{ $outbound->nextPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="next">Next &raquo;</a></li>
+                                @else
+                                    <li class="disabled"><span>Next &raquo;</span></li>
+                                @endif
+                            </ul>
+                        @endif
+
                     </div>
                 </div>
             </div>

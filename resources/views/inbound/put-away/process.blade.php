@@ -70,7 +70,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
+                        <table id="tableListProducts" class="table table-striped align-middle">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -134,7 +134,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
+                        <table id="tableListProductPA" class="table table-striped align-middle">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -156,9 +156,31 @@
 @endsection
 
 @section('js')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
     <script>
         localStorage.clear();
         loadProducts();
+
+        $(document).ready(function () {
+            $('#tableListProductPA').DataTable({
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+            });
+
+            $('#tableListProducts').DataTable({
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+            });
+        });
 
         function loadProducts() {
             const dataProducts = @json($inboundDetail);

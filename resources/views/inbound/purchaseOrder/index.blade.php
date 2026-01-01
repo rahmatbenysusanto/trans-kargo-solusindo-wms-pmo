@@ -1,15 +1,15 @@
 @extends('layout.index')
-@section('title', 'Purchase Order')
+@section('title', 'Receiving')
 
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Purchase Order</h4>
+                <h4 class="mb-sm-0">Receiving</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a>Inbound</a></li>
-                        <li class="breadcrumb-item active">Purchase Order</li>
+                        <li class="breadcrumb-item active">Receiving</li>
                     </ol>
                 </div>
             </div>
@@ -18,7 +18,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('inbound.purchaseOrder.create') }}" class="btn btn-primary mb-3">Create Purchase Order</a>
+                    <a href="{{ route('inbound.receiving.create') }}" class="btn btn-primary mb-3">Create Receiving</a>
                 </div>
                 <div class="card">
                     <div class="card-header">
@@ -62,6 +62,7 @@
                                         <th>Received By</th>
                                         <th>Ownership Status</th>
                                         <th class="text-center">Status</th>
+                                        <th>Doc</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -89,7 +90,17 @@
                                         </td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <a href="{{ route('inbound.purchaseOrder.detail', ['number' => $item->number]) }}" class="btn btn-primary btn-sm">Detail</a>
+                                                <a href="" class="btn btn-success btn-sm">
+                                                    <i class="mdi mdi-file-excel" style="font-size: 14px;"></i>
+                                                </a>
+                                                <a href="" class="btn btn-pdf btn-sm text-white" target="_blank">
+                                                    <i class="mdi mdi-file-pdf-box" style="font-size: 14px;"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <a href="{{ route('inbound.receiving.detail', ['number' => $item->number]) }}" class="btn btn-primary btn-sm">Detail</a>
                                                 @if($item->status == 'new')
                                                     <a class="btn btn-secondary btn-sm" onclick="processPO('{{ $item->number }}')">Process PO</a>
                                                     <a class="btn btn-danger btn-sm" onclick="cancelPO('{{ $item->number }}')">Cancel PO</a>
@@ -100,6 +111,40 @@
                                 @endforeach
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="d-flex justify-content-end mt-2">
+                            @if ($inbound->hasPages())
+                                <ul class="pagination">
+                                    @if ($inbound->onFirstPage())
+                                        <li class="disabled"><span>&laquo; Previous</span></li>
+                                    @else
+                                        <li><a href="{{ $inbound->previousPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="prev">&laquo; Previous</a></li>
+                                    @endif
+
+                                    @foreach ($inbound->links()->elements as $element)
+                                        @if (is_string($element))
+                                            <li class="disabled"><span>{{ $element }}</span></li>
+                                        @endif
+
+                                        @if (is_array($element))
+                                            @foreach ($element as $page => $url)
+                                                @if ($page == $inbound->currentPage())
+                                                    <li class="active"><span>{{ $page }}</span></li>
+                                                @else
+                                                    <li><a href="{{ $url }}&per_page={{ request('per_page', 10) }}">{{ $page }}</a></li>
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    @endforeach
+
+                                    @if ($inbound->hasMorePages())
+                                        <li><a href="{{ $inbound->nextPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="next">Next &raquo;</a></li>
+                                    @else
+                                        <li class="disabled"><span>Next &raquo;</span></li>
+                                    @endif
+                                </ul>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -127,7 +172,7 @@
                 if (t.value) {
 
                     $.ajax({
-                        url: '{{ route('inbound.purchaseOrder.changeStatus') }}',
+                        url: '{{ route('inbound.receiving.changeStatus') }}',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
@@ -166,7 +211,7 @@
                 if (t.value) {
 
                     $.ajax({
-                        url: '{{ route('inbound.purchaseOrder.changeStatus') }}',
+                        url: '{{ route('inbound.receiving.changeStatus') }}',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',

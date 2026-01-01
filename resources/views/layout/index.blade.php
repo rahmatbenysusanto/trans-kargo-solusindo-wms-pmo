@@ -473,8 +473,8 @@
                             <div class="collapse menu-dropdown {{ in_array($title, ['Purchase Order', 'Put Away']) ? 'show' : '' }}" id="inbound">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
-                                        <a href="{{ route('inbound.purchaseOrder.index') }}" class="nav-link {{ $title == 'Purchase Order' ? 'active' : '' }}" data-key="t-analytics">
-                                            <i class="mdi mdi-file-document-edit-outline me-2"></i> Purchase Order
+                                        <a href="{{ route('inbound.receiving.index') }}" class="nav-link {{ $title == 'Purchase Order' ? 'active' : '' }}" data-key="t-analytics">
+                                            <i class="mdi mdi-file-document-edit-outline me-2"></i> Receiving
                                         </a>
                                     </li>
                                     <li class="nav-item">
@@ -488,11 +488,11 @@
 
                         <!-- Inventory -->
                         <li class="nav-item">
-                            <a class="nav-link menu-link {{ in_array($title, ['Inventory List', 'Inventory']) ? 'active' : '' }}" href="#inventory" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="inventory">
+                            <a class="nav-link menu-link {{ in_array($title, ['Inventory List', 'Stock Movement']) ? 'active' : '' }}" href="#inventory" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="inventory">
                                 <i class="mdi mdi-warehouse"></i>
                                 <span data-key="t-widgets">Inventory</span>
                             </a>
-                            <div class="collapse menu-dropdown {{ in_array($title, ['Inventory List', 'Inventory']) ? 'show' : '' }}" id="inventory">
+                            <div class="collapse menu-dropdown {{ in_array($title, ['Inventory List', 'Stock Movement']) ? 'show' : '' }}" id="inventory">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a href="{{ route('inbound.inventory.index') }}" class="nav-link {{ $title == 'Inventory List' ? 'active' : '' }}" data-key="t-analytics">
@@ -500,7 +500,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link {{ $title == 'Stock Movement' ? 'active' : '' }}" data-key="t-analytics">
+                                        <a href="{{ route('inventory.stockMovement.index') }}" class="nav-link {{ $title == 'Stock Movement' ? 'active' : '' }}" data-key="t-analytics">
                                             <i class="mdi mdi-arrow-decision-auto me-2"></i> Stock Movement
                                         </a>
                                     </li>

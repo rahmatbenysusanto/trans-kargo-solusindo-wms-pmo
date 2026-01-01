@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\StorageArea;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
@@ -91,10 +92,10 @@ class InboundController extends Controller
                     'part_name'     => $product['partName'],
                     'part_number'   => $product['partNumber'],
                     'serial_number' => $product['serialNumber'],
-                    'condition'     => $product['condition'],
-                    'manufacture_date'  => $product['manufactureDate'],
-                    'warranty_end_date' => $product['warrantyEndDate'],
-                    'eos_date'          => $product['eosDate']
+                    'condition'     => $product['condition'] ?? null,
+                    'manufacture_date'  => $product['manufactureDate'] ?? null,
+                    'warranty_end_date' => $product['warrantyEndDate'] ?? null,
+                    'eos_date'          => $product['eosDate'] ?? null,
                 ]);
             }
 
@@ -104,6 +105,7 @@ class InboundController extends Controller
             ]);
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::info($e->getMessage());
             return response()->json([
                 'status' => false
             ]);
@@ -142,7 +144,7 @@ class InboundController extends Controller
     public function putAwayProcess(Request $request): View
     {
         $inbound = Inbound::with('client')->where('number', $request->query('number'))->first();
-        $inboundDetail = InboundDetail::where('inbound_id', $inbound->id)->get();
+        $inboundDetail = InboundDetail::where('inbound_id', $inbound->id)->where('qty_pa', 0)->get();
         $storageArea = StorageArea::all();
 
         $title = 'Put Away';
@@ -168,7 +170,7 @@ class InboundController extends Controller
                     'inbound_detail_id' => $inboundDetail->id,
                     'bin_id'            => $request->post('binId'),
                     'qty'               => 1,
-                    'status'            => '',
+                    'status'            => 'available',
                     'part_name'         => $inboundDetail->part_name,
                     'part_number'       => $inboundDetail->part_number,
                     'serial_number'     => $inboundDetail->serial_number,
@@ -176,7 +178,7 @@ class InboundController extends Controller
                     'warranty_end_date' => $inboundDetail->warranty_end_date,
                     'eos_date'          => $inboundDetail->eos_date,
                     'pic'               => '',
-                    'condition'         => ''
+                    'condition'         => 'good'
                 ]);
 
                 InventoryHistory::create([

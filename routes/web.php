@@ -22,12 +22,12 @@ Route::prefix('/dashboard')->controller(DashboardController::class)->group(funct
 
 Route::prefix('/inbound')->controller(InboundController::class)->group(function () {
     Route::prefix('/purchase-order')->group(function () {
-        Route::get('/', 'index')->name('inbound.purchaseOrder.index');
-        Route::get('/create', 'create')->name('inbound.purchaseOrder.create');
-        Route::post('/store', 'store')->name('inbound.purchaseOrder.store');
-        Route::get('/detail', 'detail')->name('inbound.purchaseOrder.detail');
+        Route::get('/', 'index')->name('inbound.receiving.index');
+        Route::get('/create', 'create')->name('inbound.receiving.create');
+        Route::post('/store', 'store')->name('inbound.receiving.store');
+        Route::get('/detail', 'detail')->name('inbound.receiving.detail');
 
-        Route::post('/change-status', 'changeStatus')->name('inbound.purchaseOrder.changeStatus');
+        Route::post('/change-status', 'changeStatus')->name('inbound.receiving.changeStatus');
     });
 
     Route::prefix('/put-away')->group(function () {
@@ -40,6 +40,12 @@ Route::prefix('/inbound')->controller(InboundController::class)->group(function 
 Route::prefix('/inventory')->controller(InventoryController::class)->group(function () {
     Route::get('/', 'index')->name('inbound.inventory.index');
     Route::get('/history', 'history')->name('inbound.inventory.history');
+
+    Route::prefix('/stock-movement')->group(function () {
+        Route::get('/', 'stockMovement')->name('inventory.stockMovement.index');
+        Route::get('/create', 'create')->name('inventory.stockMovement.create');
+        Route::post('/store', 'store')->name('inventory.stockMovement.store');
+    });
 });
 
 Route::prefix('/outbound')->controller(OutboundController::class)->group(function () {
@@ -51,6 +57,9 @@ Route::prefix('/outbound')->controller(OutboundController::class)->group(functio
 
 Route::prefix('/return')->controller(ReturnController::class)->group(function () {
     Route::get('/', 'index')->name('return.index');
+    Route::get('/create', 'create')->name('return.create');
+    Route::post('/store', 'store')->name('return.store');
+    Route::get('/detail', 'detail')->name('return.detail');
 });
 
 Route::prefix('/storage')->controller(StorageController::class)->group(function () {

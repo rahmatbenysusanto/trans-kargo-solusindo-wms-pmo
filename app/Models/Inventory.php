@@ -10,6 +10,7 @@ class Inventory extends Model
     protected $table = 'inventory';
     protected $fillable = [
         'product_id',
+        'client_id',
         'inbound_detail_id',
         'bin_id',
         'qty',
