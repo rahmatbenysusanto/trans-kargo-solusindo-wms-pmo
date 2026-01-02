@@ -165,8 +165,10 @@ class InboundController extends Controller
                 ]);
 
                 $inboundDetail = InboundDetail::find($product['id']);
+                $inbound = Inbound::find($inboundDetail->inbound_id);
                 $inventory = Inventory::create([
                     'product_id'        => $inboundDetail->product_id,
+                    'client_id'         => $inbound->client_id,
                     'inbound_detail_id' => $inboundDetail->id,
                     'bin_id'            => $request->post('binId'),
                     'qty'               => 1,

@@ -18,6 +18,7 @@ Route::prefix('/dashboard')->controller(DashboardController::class)->group(funct
     Route::get('/stock-availability', 'stockAvailability')->name('stockAvailability');
     Route::get('/inbound-vs-return', 'inboundVsReturn')->name('inboundVsReturn');
     Route::get('/top-devices', 'topDevices')->name('topDevices');
+    Route::get('/lifecycle-status-distributor', 'lifecycleStatusDistributor')->name('lifecycleStatusDistributor');
 });
 
 Route::prefix('/inbound')->controller(InboundController::class)->group(function () {

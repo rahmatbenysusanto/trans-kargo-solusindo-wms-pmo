@@ -436,7 +436,7 @@
                     <ul class="navbar-nav" id="navbar-nav">
 
                         <li class="menu-title"><span data-key="t-menu">Dashboard</span></li>
-                        <li class="nav-item {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client']) ? 'active' : '' }}">
+                        <li class="nav-item {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor']) ? 'active' : '' }}">
                             <a class="nav-link menu-link"
                                href="#sidebarDashboard" data-bs-toggle="collapse" role="button"
                                aria-expanded="false" aria-controls="sidebarDashboard">
@@ -444,13 +444,16 @@
                                 <span data-key="t-widgets">Dashboard</span>
                             </a>
 
-                            <div class="collapse menu-dropdown {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client']) ? 'show' : '' }}" id="sidebarDashboard">
+                            <div class="collapse menu-dropdown {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor']) ? 'show' : '' }}" id="sidebarDashboard">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a href="{{ route('dashboard') }}" class="nav-link {{ $title == 'Dashboard' ? 'active' : '' }}" data-key="t-analytics"> Main </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('stockAvailability') }}" class="nav-link {{ $title == 'Dashboard stockAvailability' ? 'active' : '' }}" data-key="t-analytics"> Stock Availability </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('lifecycleStatusDistributor') }}" class="nav-link {{ $title == 'Lifecycle Status Distributor' ? 'active' : '' }}" data-key="t-analytics"> Lifecycle Status </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('inboundVsReturn') }}" class="nav-link {{ $title == 'Dashboard Inbound vs Return Trend' ? 'active' : '' }}" data-key="t-analytics"> Inbound vs Return Trend </a>

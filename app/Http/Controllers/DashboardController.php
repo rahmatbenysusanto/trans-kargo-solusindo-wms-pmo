@@ -104,4 +104,31 @@ class DashboardController extends Controller
         $title = "Dashboard Top Devices by Client";
         return view('dashboard.top-device', compact('title', 'client', 'inventory'));
     }
+
+    public function lifecycleStatusDistributor(): View
+    {
+        $data = DB::table('inventory')
+            ->whereNot('qty', 0)
+            ->selectRaw("
+                SUM(CASE WHEN eos_date IS NULL THEN 1 ELSE 0 END) AS unknown,
+                SUM(CASE
+                    WHEN eos_date > DATE_ADD(CURDATE(), INTERVAL 6 MONTH)
+                    THEN 1 ELSE 0
+                END) AS active,
+                SUM(CASE
+                    WHEN eos_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 6 MONTH)
+                    THEN 1 ELSE 0
+                END) AS near_eos,
+                SUM(CASE
+                    WHEN eos_date < CURDATE()
+                    THEN 1 ELSE 0
+                END) AS eos
+            ")
+            ->first();
+
+        $chart = [(int)$data->active, (int)$data->near_eos, (int)$data->eos, (int)$data->unknown];
+
+        $title = "Lifecycle Status Distributor";
+        return view('dashboard.lifecycle-status-distributor', compact('title', 'data', 'chart'));
+    }
 }
