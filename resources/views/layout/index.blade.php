@@ -571,7 +571,7 @@
 
                         <!-- User -->
                         <li class="nav-item">
-                            <a class="nav-link menu-link {{ $title == 'User' ? 'active' : '' }}" href="#">
+                            <a class="nav-link menu-link {{ $title == 'User' ? 'active' : '' }}" href="{{ route('user.index') }}">
                                 <i class="mdi mdi-account-circle"></i>
                                 <span data-key="t-user"> User </span>
                             </a>
