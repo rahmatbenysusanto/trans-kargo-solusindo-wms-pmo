@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('warranty_end_date')->nullable();
             $table->string('eos_date')->nullable();
             $table->string('pic');
+            $table->text('remark')->nullable();
             $table->timestamps();
         });
     }

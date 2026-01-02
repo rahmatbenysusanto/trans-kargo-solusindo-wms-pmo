@@ -511,6 +511,14 @@
                             </div>
                         </li>
 
+                        <!-- Asset Lifecycle -->
+                        <li class="nav-item">
+                            <a class="nav-link menu-link {{ $title == 'Asset Lifecycle' ? 'active' : '' }}" href="{{ route('assetLifecycle.index') }}">
+                                <i class="mdi mdi-data-matrix-edit"></i>
+                                <span data-key="t-user"> Asset Lifecycle </span>
+                            </a>
+                        </li>
+
                         <!-- Outbound -->
                         <li class="nav-item">
                             <a class="nav-link menu-link {{ $title == 'Outbound' ? 'active' : '' }}" href="{{ route('outbound.index') }}">

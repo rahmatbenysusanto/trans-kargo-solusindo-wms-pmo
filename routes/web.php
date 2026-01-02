@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssetLifecycleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InboundController;
@@ -47,6 +48,12 @@ Route::prefix('/inventory')->controller(InventoryController::class)->group(funct
         Route::get('/create', 'create')->name('inventory.stockMovement.create');
         Route::post('/store', 'store')->name('inventory.stockMovement.store');
     });
+});
+
+Route::prefix('/asset-lifecycle')->controller(AssetLifecycleController::class)->group(function () {
+    Route::get('/', 'index')->name('assetLifecycle.index');
+    Route::get('/detail', 'detail')->name('assetLifecycle.detail');
+    Route::post('/update', 'update')->name('assetLifecycle.update');
 });
 
 Route::prefix('/outbound')->controller(OutboundController::class)->group(function () {

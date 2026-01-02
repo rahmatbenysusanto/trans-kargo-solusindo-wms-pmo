@@ -22,7 +22,8 @@ class Inventory extends Model
         'manufacture_date',
         'warranty_end_date',
         'eos_date',
-        'pic'
+        'pic',
+        'remark'
     ];
 
     public function bin(): BelongsTo
