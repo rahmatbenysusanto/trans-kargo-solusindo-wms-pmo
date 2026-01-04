@@ -33,6 +33,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
             Route::get('/detail', 'detail')->name('inbound.receiving.detail');
 
             Route::post('/change-status', 'changeStatus')->name('inbound.receiving.changeStatus');
+
+            Route::get('/download-excel', 'downloadExcel')->name('inbound.receiving.downloadExcel');
+            Route::get('/download-pdf', 'downloadPDF')->name('inbound.receiving.downloadPDF');
         });
 
         Route::prefix('/put-away')->group(function () {

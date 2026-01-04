@@ -90,10 +90,10 @@
                                         </td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <a href="" class="btn btn-success btn-sm">
+                                                <a href="{{ route('inbound.receiving.downloadExcel', ['id' => $item->id]) }}" class="btn btn-success btn-sm">
                                                     <i class="mdi mdi-file-excel" style="font-size: 14px;"></i>
                                                 </a>
-                                                <a href="" class="btn btn-pdf btn-sm text-white" target="_blank">
+                                                <a href="{{ route('inbound.receiving.downloadPDF', ['id' => $item->id]) }}" class="btn btn-pdf btn-sm text-white" target="_blank">
                                                     <i class="mdi mdi-file-pdf-box" style="font-size: 14px;"></i>
                                                 </a>
                                             </div>

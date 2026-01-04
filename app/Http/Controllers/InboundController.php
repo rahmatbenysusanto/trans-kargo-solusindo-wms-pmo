@@ -9,10 +9,13 @@ use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use App\Models\Product;
 use App\Models\StorageArea;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Throwable;
 
 class InboundController extends Controller
@@ -208,5 +211,67 @@ class InboundController extends Controller
                 'status' => false
             ]);
         }
+    }
+
+    public function downloadExcel(Request $request)
+    {
+        $inbound = Inbound::with('client', 'user')->where('id', $request->query('id'))->first();
+        $inboundDetail = InboundDetail::where('inbound_id', $request->query('id'))->get();
+
+        $spreadsheet = new Spreadsheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet();
+        $activeWorksheet->setCellValue('A1', 'Number');
+        $activeWorksheet->setCellValue('A2', 'Client');
+        $activeWorksheet->setCellValue('A3', 'Site Location');
+        $activeWorksheet->setCellValue('A4', 'Inbound Type');
+        $activeWorksheet->setCellValue('A5', 'Owner Status');
+        $activeWorksheet->setCellValue('A6', 'Date');
+
+        $activeWorksheet->setCellValue('B1', $inbound->number);
+        $activeWorksheet->setCellValue('B2', $inbound->client->name);
+        $activeWorksheet->setCellValue('B3', $inbound->site_location);
+        $activeWorksheet->setCellValue('B4', $inbound->inbound_type);
+        $activeWorksheet->setCellValue('B5', $inbound->owner_status);
+        $activeWorksheet->setCellValue('B6', $inbound->created_at);
+
+        $activeWorksheet->setCellValue('A8', 'Part Name');
+        $activeWorksheet->setCellValue('B8', 'Part Number');
+        $activeWorksheet->setCellValue('C8', 'Serial Number');
+        $activeWorksheet->setCellValue('D8', 'Condition');
+        $activeWorksheet->setCellValue('E8', 'Manufacture Date');
+        $activeWorksheet->setCellValue('F8', 'Warranty End Date');
+        $activeWorksheet->setCellValue('G8', 'EOS Date');
+
+        $column = 9;
+        foreach ($inboundDetail as $product) {
+            $activeWorksheet->setCellValue('A'.$column, $product->part_name);
+            $activeWorksheet->setCellValue('B'.$column, $product->part_number);
+            $activeWorksheet->setCellValue('C'.$column, $product->serial_number);
+            $activeWorksheet->setCellValue('D'.$column, $product->condition);
+            $activeWorksheet->setCellValue('E'.$column, $product->manufacture_date);
+            $activeWorksheet->setCellValue('F'.$column, $product->warranty_end_date);
+            $activeWorksheet->setCellValue('G'.$column, $product->eos_date);
+
+            $column++;
+        }
+
+        $fileName = 'Inbound ' . $inbound->number . '.xlsx';
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function downloadPDF(Request $request)
+    {
+        $inbound = Inbound::with('client', 'user')->where('id', $request->query('id'))->first();
+        $inboundDetail = InboundDetail::where('inbound_id', $request->query('id'))->get();
+
+        $pdf = Pdf::loadView('pdf.inbound', compact('inbound', 'inboundDetail'))->setPaper('A4', 'landscape');
+        $fileName = 'Inbound ' . $inbound->number . '.pdf';
+        return $pdf->stream($fileName);
     }
 }
