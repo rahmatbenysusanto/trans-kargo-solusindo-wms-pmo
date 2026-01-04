@@ -54,6 +54,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
             Route::get('/create', 'create')->name('inventory.stockMovement.create');
             Route::post('/store', 'store')->name('inventory.stockMovement.store');
         });
+
+        Route::get('/download-excel', 'downloadExcel')->name('inventory.downloadExcel');
+        Route::get('/download-pdf', 'downloadPDF')->name('inventory.downloadPDF');
     });
 
     Route::prefix('/asset-lifecycle')->controller(AssetLifecycleController::class)->group(function () {

@@ -6,8 +6,11 @@ use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use App\Models\StorageArea;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class InventoryController extends Controller
 {
@@ -42,5 +45,52 @@ class InventoryController extends Controller
 
         $title = 'Stock Movement';
         return view('inventory.stock-movement.create', compact('title', 'storageArea', 'products'));
+    }
+
+    public function downloadExcel(Request $request)
+    {
+        $spreadsheet = new Spreadsheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet();
+        $activeWorksheet->setCellValue('A1', 'Storage');
+        $activeWorksheet->setCellValue('B1', 'Client');
+        $activeWorksheet->setCellValue('C1', 'Part Name');
+        $activeWorksheet->setCellValue('D1', 'Part Number');
+        $activeWorksheet->setCellValue('E1', 'Serial Number');
+        $activeWorksheet->setCellValue('F1', 'Owner Status');
+        $activeWorksheet->setCellValue('G1', 'PIC');
+        $activeWorksheet->setCellValue('H1', 'Status');
+        $activeWorksheet->setCellValue('I1', 'Remarks');
+
+        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')->whereNot('qty', 0)->get();
+        $column = 2;
+        foreach ($inventory as $product) {
+            $activeWorksheet->setCellValue('A'. $column, $product->bin->storageArea->name.' - '.$product->bin->storageRak->name.' - '.$product->bin->storageLantai->name.' - '.$product->bin->name);
+            $activeWorksheet->setCellValue('B'. $column, $product->inboundDetail->inbound->client->name);
+            $activeWorksheet->setCellValue('C'. $column, $product->part_name);
+            $activeWorksheet->setCellValue('D'. $column, $product->part_number);
+            $activeWorksheet->setCellValue('E'. $column, $product->serial_number);
+            $activeWorksheet->setCellValue('F'. $column, $product->inboundDetail->inbound->owner_status);
+            $activeWorksheet->setCellValue('G'. $column, $product->pic);
+            $activeWorksheet->setCellValue('H'. $column, $product->status);
+            $activeWorksheet->setCellValue('I'. $column, $product->remark);
+
+            $column++;
+        }
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, 'Report Inventory.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function downloadPDF(Request $request)
+    {
+        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')->whereNot('qty', 0)->get();
+
+        $pdf = Pdf::loadView('pdf.inventory', compact('inventory'))->setPaper('A4', 'landscape');
+        $fileName = 'Inventory.pdf';
+        return $pdf->stream($fileName);
     }
 }

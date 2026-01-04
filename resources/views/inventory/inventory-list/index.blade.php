@@ -16,6 +16,15 @@
         </div>
 
         <div class="col-12">
+            <div class="mb-3 d-flex justify-content-end gap-2">
+                <a class="btn btn-success btn-sm" href="{{ route('inventory.downloadExcel', ['status' => request()->get('status'), 'status' => request()->get('status')]) }}">
+                    Download Excel <i class="mdi mdi-file-excel" style="font-size: 14px;"></i>
+                </a>
+                <a class="btn btn-pdf btn-sm text-white" target="_blank" href="{{ route('inventory.downloadPDF', ['status' => request()->get('status'), 'status' => request()->get('status')]) }}">
+                    Download PDF <i class="mdi mdi-file-pdf-box" style="font-size: 14px;"></i>
+                </a>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <form action="{{ url()->current() }}" method="GET">
