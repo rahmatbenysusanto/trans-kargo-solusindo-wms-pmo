@@ -14,9 +14,33 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class InventoryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')->paginate(10);
+        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')
+            ->when($request->query('partName'), function ($query) use ($request) {
+                return $query->where('part_name', 'like', '%' . $request->query('partName') . '%');
+            })
+            ->when($request->query('partNumber'), function ($query) use ($request) {
+                return $query->where('part_number', 'like', '%' . $request->query('partNumber') . '%');
+            })
+            ->when($request->query('serialNumber'), function ($query) use ($request) {
+                return $query->where('serial_number', 'like', '%' . $request->query('serialNumber') . '%');
+            })
+            ->when($request->query('client'), function ($query) use ($request) {
+                return $query->where('client_id', $request->query('client'));
+            })
+            ->when($request->query('status'), function ($query) use ($request) {
+                return $query->where('status', 'like', '%' . $request->query('status') . '%');
+            })
+            ->paginate(10)
+            ->appends([
+                'partName'      => $request->query('partName'),
+                'partNumber'    => $request->query('partNumber'),
+                'serialNumber'  => $request->query('serialNumber'),
+                'client'        => $request->query('client'),
+                'status'        => $request->query('status'),
+            ]);
+
         $client = Client::all();
 
         $title = 'Inventory List';

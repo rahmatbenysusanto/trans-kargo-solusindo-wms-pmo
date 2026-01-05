@@ -46,7 +46,7 @@
                                 <select class="form-control" name="client">
                                     <option value="">-- Choose Client --</option>
                                     @foreach($client as $item)
-                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                        <option value="{{ $item->id }}" {{ request()->get('client') == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -54,10 +54,10 @@
                                 <label class="form-label">Status</label>
                                 <select class="form-control" name="status">
                                     <option value="">-- Choose Status --</option>
-                                    <option value="available">Available</option>
-                                    <option value="reserved">Reserved</option>
-                                    <option value="in use">In Use</option>
-                                    <option value="defective">Defective</option>
+                                    <option value="available" {{ request()->get('status') == 'available' ? 'selected' : '' }}>Available</option>
+                                    <option value="reserved" {{ request()->get('status') == '' ? 'selected' : 'reserved' }}>Reserved</option>
+                                    <option value="in use" {{ request()->get('status') == '' ? 'selected' : 'in use' }}>In Use</option>
+                                    <option value="defective" {{ request()->get('status') == '' ? 'selected' : 'defective' }}>Defective</option>
                                 </select>
                             </div>
                             <div class="col-2">
