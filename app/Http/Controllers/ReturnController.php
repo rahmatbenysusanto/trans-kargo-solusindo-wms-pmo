@@ -7,10 +7,13 @@ use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use App\Models\Outbound;
 use App\Models\OutboundDetail;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Throwable;
 
 class ReturnController extends Controller
@@ -101,5 +104,68 @@ class ReturnController extends Controller
                 'status' => false,
             ]);
         }
+    }
+
+    public function downloadExcel(Request $request)
+    {
+        $outbound = Outbound::with('client', 'user')->where('id', $request->query('id'))->first();
+        $outboundDetail = OutboundDetail::with('inventory')->where('outbound_id', $request->query('id'))->get();
+
+        $spreadsheet = new Spreadsheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet();
+        $activeWorksheet->setCellValue('A1', 'Number');
+        $activeWorksheet->setCellValue('A2', 'Client');
+        $activeWorksheet->setCellValue('A3', 'Site Location');
+        $activeWorksheet->setCellValue('A4', 'Type');
+        $activeWorksheet->setCellValue('A5', 'Delivery Date');
+        $activeWorksheet->setCellValue('A6', 'Received By');
+        $activeWorksheet->setCellValue('A7', 'Courier');
+        $activeWorksheet->setCellValue('A8', 'Tracking Number');
+        $activeWorksheet->setCellValue('A9', 'Remarks');
+        $activeWorksheet->setCellValue('A10', 'Created By');
+        $activeWorksheet->setCellValue('B1', $outbound->number);
+        $activeWorksheet->setCellValue('B2', $outbound->client->name);
+        $activeWorksheet->setCellValue('B3', $outbound->site_location);
+        $activeWorksheet->setCellValue('B4', $outbound->type);
+        $activeWorksheet->setCellValue('B5', $outbound->delivery_date);
+        $activeWorksheet->setCellValue('B6', $outbound->received_date);
+        $activeWorksheet->setCellValue('B7', $outbound->courier);
+        $activeWorksheet->setCellValue('B8', $outbound->tracking_number);
+        $activeWorksheet->setCellValue('B9', $outbound->remarks);
+        $activeWorksheet->setCellValue('B10', $outbound->user->name);
+
+        $activeWorksheet->setCellValue('A12', 'Part Name');
+        $activeWorksheet->setCellValue('B12', 'Part Number');
+        $activeWorksheet->setCellValue('C12', 'Serial Number');
+        $activeWorksheet->setCellValue('D12', 'Condition');
+
+        $column = 13;
+        foreach ($outboundDetail as $product) {
+            $activeWorksheet->setCellValue('A'.$column, $product->inventory->part_name);
+            $activeWorksheet->setCellValue('B'.$column, $product->inventory->part_number);
+            $activeWorksheet->setCellValue('C'.$column, ' '.$product->inventory->serial_number);
+            $activeWorksheet->setCellValue('C'.$column, $product->condition);
+
+            $column++;
+        }
+
+        $fileName = 'Return '.$outbound->number.'.xlsx';
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function downloadPDF(Request $request)
+    {
+        $outbound = Outbound::with('client', 'user')->where('id', $request->query('id'))->first();
+        $outboundDetail = OutboundDetail::with('inventory')->where('outbound_id', $request->query('id'))->get();
+
+        $pdf = Pdf::loadView('pdf.return', compact('outbound', 'outboundDetail'))->setPaper('A4', 'landscape');
+        $fileName = 'Return'.$outbound->number.'.pdf';
+        return $pdf->stream($fileName);
     }
 }

@@ -63,6 +63,7 @@
                                     <th>QTY</th>
                                     <th>Return Date</th>
                                     <th>Process By</th>
+                                    <th>Doc</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -76,6 +77,16 @@
                                     <td>{{ $item->qty }}</td>
                                     <td>{{ $item->delivery_date }}</td>
                                     <td>{{ $item->user->name }}</td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ route('return.downloadExcel', ['id' => $item->id]) }}" class="btn btn-success btn-sm">
+                                                <i class="mdi mdi-file-excel" style="font-size: 14px;"></i>
+                                            </a>
+                                            <a href="{{ route('return.downloadPDF', ['id' => $item->id]) }}" class="btn btn-pdf btn-sm text-white" target="_blank">
+                                                <i class="mdi mdi-file-pdf-box" style="font-size: 14px;"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                     <td>
                                         <a class="btn btn-secondary btn-sm">Detail</a>
                                     </td>

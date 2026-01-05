@@ -80,6 +80,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/create', 'create')->name('return.create');
         Route::post('/store', 'store')->name('return.store');
         Route::get('/detail', 'detail')->name('return.detail');
+
+        Route::get('/download-excel', 'downloadExcel')->name('return.downloadExcel');
+        Route::get('/download-pdf', 'downloadPDF')->name('return.downloadPDF');
     });
 
     Route::prefix('/storage')->controller(StorageController::class)->group(function () {

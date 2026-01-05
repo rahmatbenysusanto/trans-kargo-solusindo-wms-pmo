@@ -65,7 +65,7 @@
                                 <option value="">-- Choose Condition --</option>
                                 <option>Good</option>
                                 <option>Scrape</option>
-                                <option>Repair Needed</option>
+                                <option>Damage</option>
                             </select>
                         </div>
                     </div>
