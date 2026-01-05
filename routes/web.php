@@ -70,6 +70,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/create', 'create')->name('outbound.create');
         Route::post('/store', 'store')->name('outbound.store');
         Route::get('/detail', 'detail')->name('outbound.detail');
+
+        Route::get('/download-excel', 'downloadExcel')->name('outbound.downloadExcel');
+        Route::get('/download-pdf', 'downloadPDF')->name('outbound.downloadPDF');
     });
 
     Route::prefix('/return')->controller(ReturnController::class)->group(function () {
