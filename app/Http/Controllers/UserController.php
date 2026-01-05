@@ -39,6 +39,33 @@ class UserController extends Controller
         return redirect()->action([UserController::class, 'index']);
     }
 
+    public function edit(Request $request): View
+    {
+        $user = User::find($request->query('id'));
+
+        $title = "User";
+        return view('user.edit', compact('title', 'user'));
+    }
+
+    public function update(Request $request)
+    {
+        User::where('id', $request->post('id'))->update([
+            'username'  => $request->post('username'),
+            'name'      => $request->post('name'),
+            'no_hp'     => $request->post('no_hp'),
+            'email'     => $request->post('email'),
+            'status'    => $request->post('status'),
+        ]);
+
+        if ($request->post('password') == '********') {
+            User::where('id', $request->post('id'))->update([
+                'password'  => Hash::make($request->post('password')),
+            ]);
+        }
+
+        return redirect()->action([UserController::class, 'index']);
+    }
+
     public function menu(Request $request): View
     {
         $user = User::find($request->query('id'));

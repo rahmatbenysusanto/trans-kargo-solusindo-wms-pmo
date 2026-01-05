@@ -111,6 +111,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/', 'index')->name('user.index');
         Route::get('/create', 'create')->name('user.create');
         Route::post('/store', 'store')->name('user.store');
+        Route::get('/edit', 'edit')->name('user.edit');
+        Route::post('/update', 'update')->name('user.update');
 
         Route::prefix('/menu')->group(function () {
             Route::get('/', 'menu')->name('user.menu');

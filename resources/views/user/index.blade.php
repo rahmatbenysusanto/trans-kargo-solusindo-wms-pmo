@@ -58,7 +58,7 @@
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2">
-                                            <a class="btn btn-secondary btn-sm">Edit</a>
+                                            <a href="{{ route('user.edit', ['id' => $item->id]) }}" class="btn btn-secondary btn-sm">Edit</a>
                                         </div>
                                     </td>
                                 </tr>
