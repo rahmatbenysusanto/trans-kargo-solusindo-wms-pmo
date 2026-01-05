@@ -55,9 +55,9 @@
                                 <select class="form-control" name="status">
                                     <option value="">-- Choose Status --</option>
                                     <option value="available" {{ request()->get('status') == 'available' ? 'selected' : '' }}>Available</option>
-                                    <option value="reserved" {{ request()->get('status') == '' ? 'selected' : 'reserved' }}>Reserved</option>
-                                    <option value="in use" {{ request()->get('status') == '' ? 'selected' : 'in use' }}>In Use</option>
-                                    <option value="defective" {{ request()->get('status') == '' ? 'selected' : 'defective' }}>Defective</option>
+                                    <option value="reserved" {{ request()->get('status') == 'reserved' ? 'selected' : '' }}>Reserved</option>
+                                    <option value="in use" {{ request()->get('status') == 'in use' ? 'selected' : '' }}>In Use</option>
+                                    <option value="defective" {{ request()->get('status') == 'defective' ? 'selected' : '' }}>Defective</option>
                                 </select>
                             </div>
                             <div class="col-2">
