@@ -152,9 +152,36 @@ class InboundController extends Controller
         ]);
     }
 
-    public function putAway(): View
+    public function putAway(Request $request): View
     {
-        $inbound = Inbound::where('status', 'open')->paginate(10);
+        $inbound = Inbound::with('client', 'user')
+            ->when($request->query('number'), function ($query, $value) {
+                $query->where('number', $value);
+            })
+            ->when($request->query('ownership'), function ($query, $value) {
+                $query->where('ownership_status', $value);
+            })
+            ->when($request->query('inbound_type'), function ($query, $value) {
+                $query->where('inbound_type', $value);
+            })
+            ->when($request->query('received'), function ($query, $value) {
+                $query->whereDate('received_at', $value);
+            })
+            ->whereHas('client', function ($query) use ($request) {
+                if ($request->query('client') != null) {
+                    $query->where('name', $request->query('client'));
+                }
+            })
+            ->where('status', 'open')
+            ->latest()
+            ->paginate(10)
+            ->appends([
+                'number'        => $request->query('number'),
+                'ownership'     => $request->query('ownership'),
+                'inbound_type'  => $request->query('inbound_type'),
+                'received'      => $request->query('received'),
+                'client'        => $request->query('client'),
+            ]);
 
         $title = 'Put Away';
         return view('inbound.put-away.index', compact('title', 'inbound'));
