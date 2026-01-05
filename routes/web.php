@@ -111,5 +111,10 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/', 'index')->name('user.index');
         Route::get('/create', 'create')->name('user.create');
         Route::post('/store', 'store')->name('user.store');
+
+        Route::prefix('/menu')->group(function () {
+            Route::get('/', 'menu')->name('user.menu');
+            Route::post('/store', 'menuStore')->name('user.menu.store');
+        });
     });
 });

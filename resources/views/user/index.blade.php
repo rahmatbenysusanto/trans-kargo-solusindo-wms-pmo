@@ -54,7 +54,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a class="btn btn-secondary btn-sm">Menu</a>
+                                        <a href="{{ route('user.menu', ['id' => $item->id]) }}" class="btn btn-secondary btn-sm">Menu</a>
                                     </td>
                                     <td>
                                         <div class="d-flex gap-2">

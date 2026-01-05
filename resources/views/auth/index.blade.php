@@ -66,8 +66,7 @@
                                     </div>
 
                                     <div class="mt-4">
-{{--                                        <button class="btn btn-primary w-100" type="submit">Login</button>--}}
-                                        <a href="{{ route('inbound.receiving.index') }}" class="btn btn-primary w-100">Login</a>
+                                        <button class="btn btn-primary w-100" type="submit">Login</button>
                                     </div>
                                 </form>
                             </div>

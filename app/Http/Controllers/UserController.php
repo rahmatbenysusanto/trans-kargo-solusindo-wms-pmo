@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
 use App\Models\User;
+use App\Models\UserHasMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -35,5 +37,35 @@ class UserController extends Controller
         ]);
 
         return redirect()->action([UserController::class, 'index']);
+    }
+
+    public function menu(Request $request): View
+    {
+        $user = User::find($request->query('id'));
+
+        $userHasMenu = Menu::with(['userHasMenu' => function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        }])->get();
+
+        $title = "User";
+        return view('user.menu', compact('title', 'user', 'userHasMenu'));
+    }
+
+    public function menuStore(Request $request): \Illuminate\Http\JsonResponse
+    {
+        if ($request->post('type') == 'disable') {
+            UserHasMenu::where('menu_id', $request->post('menuId'))
+                ->where('user_id', $request->post('userId'))
+                ->delete();
+        } else {
+            UserHasMenu::create([
+                'user_id' => $request->post('userId'),
+                'menu_id' => $request->post('menuId'),
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }
