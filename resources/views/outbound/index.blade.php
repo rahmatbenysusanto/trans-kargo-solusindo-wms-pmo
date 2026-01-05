@@ -27,23 +27,26 @@
                                 <label class="form-label">Client</label>
                                 <select class="form-control" name="client">
                                     <option value="">-- Choose Client --</option>
+                                    @foreach($client as $item)
+                                        <option value="{{ $item->id }}" {{ request()->get('client') == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-2">
                                 <label class="form-label">Delivery Date</label>
-                                <input type="date" class="form-control" name="delivery_date">
+                                <input type="date" class="form-control" value="{{ request()->get('delivery_date') }}" name="delivery_date">
                             </div>
                             <div class="col-2">
                                 <label class="form-label">Courier</label>
-                                <input type="text" class="form-control" name="courier" placeholder="Courier ...">
+                                <input type="text" class="form-control" value="{{ request()->get('courier') }}" name="courier" placeholder="Courier ...">
                             </div>
                             <div class="col-2">
                                 <label class="form-label">AWB</label>
-                                <input type="text" class="form-control" name="awb" placeholder="AWB ...">
+                                <input type="text" class="form-control" value="{{ request()->get('awb') }}" name="awb" placeholder="AWB ...">
                             </div>
                             <div class="col-2">
                                 <label class="form-label">Received By</label>
-                                <input type="text" class="form-control" name="awb" placeholder="Received By ...">
+                                <input type="text" class="form-control" value="{{ request()->get('received_by') }}" name="awb" placeholder="Received By ...">
                             </div>
                             <div class="col-2">
                                 <label class="form-label text-white">-</label>
