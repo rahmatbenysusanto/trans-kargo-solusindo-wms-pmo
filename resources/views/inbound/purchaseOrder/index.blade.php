@@ -33,11 +33,23 @@
                             </div>
                             <div class="col-2">
                                 <label class="form-label">Received Date</label>
-                                <input type="date" class="form-control" name="client" value="{{ request()->get('client') }}">
+                                <input type="date" class="form-control" name="received" value="{{ request()->get('received') }}">
                             </div>
                             <div class="col-2">
                                 <label class="form-label">Ownership Status</label>
-                                <input type="text" class="form-control" name="client" value="{{ request()->get('client') }}">
+                                <select class="form-control" name="ownership">
+                                    <option value="">-- Choose Ownership Status --</option>
+                                    <option {{ request()->get('ownership') == 'Milik Client' ? 'selected' : ''}}>Milik Client</option>
+                                    <option {{ request()->get('ownership') == 'Titipan' ? 'selected' : ''}}>Titipan</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <label class="form-label">Inbound Type</label>
+                                <select class="form-control" name="inbound_type">
+                                    <option value="">-- Choose Inbound Type --</option>
+                                    <option {{ request()->get('inbound_type') == 'Dismantle' ? 'selected' : ''}}>Dismantle</option>
+                                    <option {{ request()->get('inbound_type') == 'Relocation' ? 'selected' : ''}}>Relocation</option>
+                                </select>
                             </div>
                             <div class="col-2">
                                 <label class="form-label text-white">-</label>
