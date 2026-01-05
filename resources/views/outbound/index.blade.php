@@ -21,7 +21,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <form>
+                    <form action="{{ url()->current() }}" method="GET">
                         <div class="row">
                             <div class="col-2">
                                 <label class="form-label">Client</label>

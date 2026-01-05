@@ -18,9 +18,35 @@ use Throwable;
 
 class ReturnController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $outbound = Outbound::with('client', 'user')->where('type', 'return')->latest()->paginate(10);
+        $outbound = Outbound::with('client', 'user')
+            ->where('type', 'return')
+            ->when($request->query('client'), function ($query) use ($request) {
+                return $query->where('client_id', $request->query('client'));
+            })
+            ->when($request->query('delivery_date'), function ($query) use ($request) {
+                return $query->whereDate('delivery_date', $request->query('delivery_date'));
+            })
+            ->when($request->query('courier'), function ($query) use ($request) {
+                return $query->where('courier', $request->query('courier'));
+            })
+            ->when($request->query('awb'), function ($query) use ($request) {
+                return $query->where('tracking_number', 'LIKE', '%'.$request->query('awb').'%');
+            })
+            ->when($request->query('received_by'), function ($query) use ($request) {
+                return $query->where('received_by', $request->query('received_by'));
+            })
+            ->latest()
+            ->paginate(10)
+            ->appends([
+                'client'        => $request->query('client'),
+                'delivery_date' => $request->query('delivery_date'),
+                'courier'       => $request->query('courier'),
+                'awb'           => $request->query('awb'),
+                'received_by'   => $request->query('received_by'),
+            ]);
+
         $client = Client::all();
 
         $title = 'Return';
