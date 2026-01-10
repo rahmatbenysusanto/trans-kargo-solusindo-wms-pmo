@@ -8,9 +8,11 @@ use App\Models\InventoryHistory;
 use App\Models\StorageArea;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Throwable;
 
 class InventoryController extends Controller
 {
@@ -65,10 +67,35 @@ class InventoryController extends Controller
     public function create(): View
     {
         $storageArea = StorageArea::all();
-        $products = Inventory::where('qty', 1)->select('id', 'part_name', 'part_number', 'serial_number')->get();
+        $inventory = Inventory::with('inboundDetail.inbound.client:id,name')
+            ->whereNot('qty', 0)
+            ->select('id', 'part_name', 'part_number', 'serial_number', 'inbound_detail_id')
+            ->get();
 
         $title = 'Stock Movement';
-        return view('inventory.stock-movement.create', compact('title', 'storageArea', 'products'));
+        return view('inventory.stock-movement.create', compact('title', 'storageArea', 'inventory'));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function store(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            
+
+            DB::commit();
+            return response()->json([
+                'status' => true,
+            ]);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+            ]);
+        }
     }
 
     public function downloadExcel(Request $request)

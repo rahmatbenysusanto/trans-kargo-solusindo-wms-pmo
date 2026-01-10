@@ -23,7 +23,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
+                        <table class="table table-striped align-middle" id="tableProductsOutbound">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -33,6 +33,9 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                            <tbody id="listProducts">
+
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -42,7 +45,10 @@
         <div class="col-6">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Product Change Storage</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Product Change Storage</h4>
+                        <a class="btn btn-primary btn-sm" onclick="changeProductStorage()">Change Product Storage</a>
+                    </div>
                 </div>
 
                 <div class="card-body">
@@ -83,16 +89,19 @@
 
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
+                        <table class="table table-striped align-middle" id="tableListProducts">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Product</th>
-                                    <th>Storage</th>
+                                    <th>Serial Number</th>
                                     <th>Client</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                            <tbody id="productsOutbound">
+
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -102,7 +111,173 @@
 @endsection
 
 @section('js')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script>
+        localStorage.clear();
+        loadProduct();
+
+        $(document).ready(function () {
+            $('#tableProductsOutbound').DataTable({
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+            });
+
+            $('#tableListProducts').DataTable({
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+            });
+        });
+
+        function loadProduct() {
+            const dataProducts = @json($inventory);
+            const products = [];
+
+            dataProducts.forEach((product) => {
+                products.push({
+                    id: product.id,
+                    partName: product.part_name,
+                    partNumber: product.part_number,
+                    serialNumber: product.serial_number,
+                    client: product.inbound_detail.inbound.client.name,
+                    select: 0
+                });
+            });
+
+            localStorage.setItem('products', JSON.stringify(products));
+            viewProducts();
+        }
+
+        function viewProducts() {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+            let html = '';
+
+            products.forEach((product, index) => {
+                if (product.select === 0) {
+                    html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                <div class="fw-bold">${product.partName}</div>
+                                <div>${product.partNumber}</div>
+                            </td>
+                            <td>${product.serialNumber}</td>
+                            <td>${product.client}</td>
+                            <td><a class="btn btn-secondary btn-sm" onclick="selectProduct('${index}')">Select</a></td>
+                        </tr>
+                    `;
+                }
+            });
+
+            document.getElementById('listProducts').innerHTML = html;
+        }
+
+        function selectProduct(index) {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+            const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
+
+            products[index].select = 1;
+            productsOutbound.push(products[index]);
+
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('productsOutbound', JSON.stringify(productsOutbound));
+
+            viewProducts();
+            viewProductsOutbound();
+        }
+
+        function viewProductsOutbound() {
+            const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
+            let html = '';
+
+            productsOutbound.forEach((product, index) => {
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <div class="fw-bold">${product.partName}</div>
+                            <div>${product.partNumber}</div>
+                        </td>
+                        <td>${product.serialNumber}</td>
+                        <td>${product.client}</td>
+                        <td><a class="btn btn-danger btn-sm" onclick="deleteProduct('${index}')">Delete</a></td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('productsOutbound').innerHTML = html;
+        }
+
+        function deleteProduct(index) {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+            const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
+            const findProductOutbound = productsOutbound[index];
+            const findProduct = products.find((i) => i.id === findProductOutbound.id);
+
+            productsOutbound.splice(index, 1);
+            findProduct.select = 0;
+
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('productsOutbound', JSON.stringify(productsOutbound));
+
+            viewProducts();
+            viewProductsOutbound();
+        }
+
+        function changeProductStorage() {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Change Product Storage",
+                icon: "warning",
+                showCancelButton: true,
+                customClass: {
+                    confirmButton: "btn btn-primary w-xs me-2 mt-2",
+                    cancelButton: "btn btn-danger w-xs mt-2"
+                },
+                confirmButtonText: "Yes, Process it!",
+                buttonsStyling: false,
+                showCloseButton: true
+            }).then(async (t)=> {
+                if (t.value) {
+
+                    $.ajax({
+                        url: '{{ route('inventory.stockMovement.store') }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            bin: document.getElementById('bin').value,
+                            products: JSON.parse(localStorage.getItem('productsOutbound')) ?? []
+                        },
+                        success: (res) => {
+                            if (res.status) {
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: 'Change Product Storage Success',
+                                    icon: 'success'
+                                }).then((i) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Change Product Storage Failed',
+                                    icon: 'error'
+                                });
+                            }
+                        }
+                    });
+
+                }
+            });
+        }
+
         function changeStorageArea(valueArea) {
             $.ajax({
                 url: '{{ route('storage.rak.find') }}',

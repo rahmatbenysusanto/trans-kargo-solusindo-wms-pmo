@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Inbound;
 use App\Models\InboundDetail;
 use App\Models\Inventory;
+use App\Models\Outbound;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,28 @@ class DashboardController extends Controller
 {
     public function dashboard(): View
     {
+        $inboundDismantle = Inbound::where('inbound_type', 'Dismantle')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('quantity');
+
+        $inboundRelocation = Inbound::where('inbound_type', 'Relocation')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('quantity');
+
+        $outbound = Outbound::where('type', 'outbound')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('qty');
+
+        $return = Outbound::where('type', 'return')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('qty');
+
         $title = "Dashboard";
-        return view('dashboard.index', compact('title'));
+        return view('dashboard.index', compact('title', 'inboundDismantle', 'inboundRelocation', 'outbound', 'return'));
     }
 
     public function stockAvailability(): View
