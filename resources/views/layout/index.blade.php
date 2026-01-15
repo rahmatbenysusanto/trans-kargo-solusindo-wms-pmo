@@ -568,6 +568,14 @@
                             </div>
                         </li>
 
+                        <!-- Client -->
+                        <li class="nav-item">
+                            <a class="nav-link menu-link {{ $title == 'Client' ? 'active' : '' }}" href="{{ route('client.index') }}">
+                                <i class="mdi mdi-account-cowboy-hat"></i>
+                                <span data-key="t-user"> Client </span>
+                            </a>
+                        </li>
+
                         <!-- User -->
                         <li class="nav-item">
                             <a class="nav-link menu-link {{ $title == 'User' ? 'active' : '' }}" href="{{ route('user.index') }}">

@@ -2,9 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ClientController extends Controller
 {
-    //
+    public function index(): View
+    {
+        $client = Client::all();
+
+        $title = 'Client';
+        return view('client.index', compact('title', 'client'));
+    }
+
+    public function store(Request $request)
+    {
+        Client::create([
+            'name' => $request->post('name'),
+        ]);
+
+        return back()->with('success', 'Client added successfully');
+    }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssetLifecycleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InboundController;
 use App\Http\Controllers\InventoryController;
@@ -121,5 +122,10 @@ Route::middleware([AuthMiddleware::class])->group(function () {
             Route::get('/', 'menu')->name('user.menu');
             Route::post('/store', 'menuStore')->name('user.menu.store');
         });
+    });
+
+    Route::prefix('/client')->controller(ClientController::class)->group(function () {
+        Route::get('/', 'index')->name('client.index');
+        Route::post('/store', 'store')->name('client.store');
     });
 });
