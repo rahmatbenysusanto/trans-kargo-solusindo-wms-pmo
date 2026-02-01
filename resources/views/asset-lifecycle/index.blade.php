@@ -46,6 +46,7 @@
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-primary">Search</button>
                                     <a href="{{ url()->current() }}" class="btn btn-danger">Clear</a>
+                                    <a href="{{ route('assetLifecycle.massEdit') }}" class="btn btn-secondary">Mass Edit</a>
                                 </div>
                             </div>
                         </div>

@@ -64,6 +64,10 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/', 'index')->name('assetLifecycle.index');
         Route::get('/detail', 'detail')->name('assetLifecycle.detail');
         Route::post('/update', 'update')->name('assetLifecycle.update');
+        Route::get('/mass-edit', 'massEdit')->name('assetLifecycle.massEdit');
+        Route::get('/mass-edit/download-template', 'downloadTemplate')->name('assetLifecycle.downloadTemplate');
+        Route::post('/mass-edit/upload-excel', 'uploadExcel')->name('assetLifecycle.uploadExcel');
+        Route::post('/mass-edit/process', 'processMassEdit')->name('assetLifecycle.processMassEdit');
     });
 
     Route::prefix('/outbound')->controller(OutboundController::class)->group(function () {
