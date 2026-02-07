@@ -29,7 +29,7 @@
                                 <label class="form-label">Client</label>
                                 <select class="form-select" name="client" id="client">
                                     <option value="">-- Choose Client --</option>
-                                    @foreach($client as $item)
+                                    @foreach ($client as $item)
                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
                                     @endforeach
                                 </select>
@@ -78,7 +78,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">Product Inbound</h4>
                         <div class="d-flex gap-2">
-                            <a href="{{ asset('assets/Template Inbound.xlsx') }}" download class="btn btn-success btn-sm">Download File Excel</a>
+                            <a href="{{ asset('assets/Template Inbound.xlsx') }}" download
+                                class="btn btn-success btn-sm">Download File Excel</a>
                             <a class="btn btn-secondary btn-sm" onclick="importExcelModal()">Import Excel</a>
                             <a class="btn btn-primary btn-sm" onclick="addProductModal()">Add Product</a>
                         </div>
@@ -111,7 +112,8 @@
     </div>
 
     <!-- Add Product Modals -->
-    <div id="addProductModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div id="addProductModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true"
+        style="display: none;">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -127,7 +129,8 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Serial Number</label>
-                                <input type="text" class="form-control" id="add_serial_number" placeholder="Serial Number ...">
+                                <input type="text" class="form-control" id="add_serial_number"
+                                    placeholder="Serial Number ...">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Manufacture Date</label>
@@ -141,7 +144,8 @@
                         <div class="col-6">
                             <div class="mb-3">
                                 <label class="form-label">Part Number</label>
-                                <input type="text" class="form-control" id="add_part_number" placeholder="Part Number ...">
+                                <input type="text" class="form-control" id="add_part_number"
+                                    placeholder="Part Number ...">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Condition</label>
@@ -168,7 +172,8 @@
     </div>
 
     <!-- Import Excel Modals -->
-    <div id="importExcelModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div id="importExcelModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true"
+        style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -180,7 +185,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="importProducts()">Import Product By Excel</button>
+                    <button type="button" class="btn btn-primary" onclick="importProducts()">Import Product By
+                        Excel</button>
                 </div>
             </div>
         </div>
@@ -236,7 +242,13 @@
                         <td>${ product.partName }</td>
                         <td>${ product.partNumber }</td>
                         <td>${ product.serialNumber }</td>
-                        <td>${ product.condition }</td>
+                        <td>
+                            <select class="form-select" onchange="updateProductCondition(${index}, this.value)">
+                                <option value="Good" ${product.condition === 'Good' ? 'selected' : ''}>Good</option>
+                                <option value="Used" ${product.condition === 'Used' ? 'selected' : ''}>Used</option>
+                                <option value="Defective" ${product.condition === 'Defective' ? 'selected' : ''}>Defective</option>
+                            </select>
+                        </td>
                         <td>${ product.manufactureDate }</td>
                         <td>${ product.warrantyEndDate }</td>
                         <td>${ product.eosDate }</td>
@@ -246,6 +258,14 @@
             });
 
             document.getElementById('listProducts').innerHTML = html;
+        }
+
+        function updateProductCondition(index, value) {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+            if (products[index]) {
+                products[index].condition = value;
+                localStorage.setItem('products', JSON.stringify(products));
+            }
         }
 
         function deleteProduct(index) {
@@ -294,9 +314,11 @@
             }
 
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
+                const workbook = XLSX.read(data, {
+                    type: 'array'
+                });
 
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
@@ -308,10 +330,10 @@
                 const products = JSON.parse(localStorage.getItem('products')) ?? [];
                 jsonData.forEach((item) => {
                     products.push({
-                        partName: item['Part Name'],
+                        partName: item['Part Number'],
                         partNumber: item['Part Number'],
                         serialNumber: item['Serial Number'],
-                        condition: item['Condition'],
+                        condition: 'Good',
                         manufactureDate: item['Manufacture Date'],
                         warrantyEndDate: item['Warranty End Date'],
                         eosDate: item['EOS Date']
@@ -339,7 +361,7 @@
                 confirmButtonText: "Yes, Create it!",
                 buttonsStyling: false,
                 showCloseButton: true
-            }).then(async (t)=> {
+            }).then(async (t) => {
                 if (t.value) {
 
                     $.ajax({
@@ -380,6 +402,5 @@
                 }
             });
         }
-
     </script>
 @endsection
