@@ -56,11 +56,11 @@
                                 </select>
                             </div>
                             <div class="col-md-2 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary flex-grow-1">
-                                    <i class="ri-search-line align-bottom me-1"></i> Filter
+                                <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
+                                    <i class="bx bx-slider-alt align-middle me-1"></i> Filter
                                 </button>
                                 <a href="{{ url()->current() }}" class="btn btn-soft-danger px-3">
-                                    <i class="ri-refresh-line"></i>
+                                    <i class="bx bx-refresh"></i>
                                 </a>
                             </div>
                         </div>
@@ -97,7 +97,7 @@
                                         <td class="text-muted">{{ $inbound->firstItem() + $index }}</td>
                                         <td>
                                             <div class="fw-semibold text-primary mb-1">{{ $item->number }}</div>
-                                            <small class="text-muted"><i class="ri-user-2-line me-1"></i> Received by:
+                                            <small class="text-muted"><i class="bx bx-user me-1"></i> Received by:
                                                 {{ $item->user->name }}</small>
                                         </td>
                                         <td>
@@ -146,12 +146,12 @@
                                                 <a href="{{ route('inbound.putAway.detail', ['number' => $item->number]) }}"
                                                     class="btn btn-soft-secondary btn-sm" data-bs-toggle="tooltip"
                                                     title="View Detail">
-                                                    <i class="ri-eye-line align-bottom me-1"></i> Detail
+                                                    <i class="bx bx-show align-middle me-1"></i> Detail
                                                 </a>
                                                 @if ($item->status == 'open')
                                                     <a href="{{ route('inbound.putAway.process', ['number' => $item->number]) }}"
                                                         class="btn btn-success btn-sm btn-label waves-effect waves-light">
-                                                        <i class="ri-drag-drop-line label-icon align-middle fs-16 me-2"></i>
+                                                        <i class="bx bx-move label-icon align-middle fs-16 me-2"></i>
                                                         Put Away
                                                     </a>
                                                 @endif
@@ -161,7 +161,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="8" class="text-center py-5 text-muted">
-                                            <i class="ri-inbox-line fs-32 opacity-25 d-block mb-2"></i>
+                                            <i class="bx bx-loader-circle fs-32 opacity-25 d-block mb-2"></i>
                                             No pending put away tasks found.
                                         </td>
                                     </tr>

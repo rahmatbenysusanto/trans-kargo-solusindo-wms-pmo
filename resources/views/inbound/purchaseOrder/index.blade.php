@@ -56,11 +56,11 @@
                                 </select>
                             </div>
                             <div class="col-md-2 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary flex-grow-1">
-                                    <i class="ri-search-line align-bottom me-1"></i> Search
+                                <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
+                                    <i class="bx bx-search align-middle me-1"></i> Search
                                 </button>
                                 <a href="{{ url()->current() }}" class="btn btn-soft-danger px-3">
-                                    <i class="ri-refresh-line"></i>
+                                    <i class="bx bx-refresh"></i>
                                 </a>
                             </div>
                         </div>
@@ -75,8 +75,8 @@
                     class="card-header bg-light-subtle py-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Incoming Shipment Records</h5>
                     <a href="{{ route('inbound.receiving.create') }}"
-                        class="btn btn-primary btn-label waves-effect waves-light btn-sm">
-                        <i class="ri-add-circle-line label-icon align-middle fs-16 me-2"></i> Create New Receiving
+                        class="btn btn-primary btn-label waves-effect waves-light btn-sm fw-bold">
+                        <i class="bx bx-plus-circle label-icon align-middle fs-16 me-2"></i> Create New Receiving
                     </a>
                 </div>
                 <div class="card-body p-0">
@@ -105,7 +105,7 @@
                                         </td>
                                         <td>
                                             <div class="text-dark fw-medium">{{ $item->client->name }}</div>
-                                            <small class="text-muted"><i class="ri-user-2-line me-1"></i>
+                                            <small class="text-muted"><i class="bx bx-user me-1"></i>
                                                 {{ $item->user->name }}</small>
                                         </td>
                                         <td class="text-center">
@@ -150,12 +150,12 @@
                                                 <a href="{{ route('inbound.receiving.downloadExcel', ['id' => $item->id]) }}"
                                                     class="btn btn-soft-success btn-icon btn-sm" data-bs-toggle="tooltip"
                                                     title="Download Excel">
-                                                    <i class="ri-file-excel-2-line"></i>
+                                                    <i class="bx bxs-file-export"></i>
                                                 </a>
                                                 <a href="{{ route('inbound.receiving.downloadPDF', ['id' => $item->id]) }}"
                                                     target="_blank" class="btn btn-soft-danger btn-icon btn-sm"
                                                     data-bs-toggle="tooltip" title="Download PDF">
-                                                    <i class="ri-file-pdf-line"></i>
+                                                    <i class="bx bxs-file-pdf"></i>
                                                 </a>
                                             </div>
                                         </td>
@@ -164,12 +164,12 @@
                                                 <button
                                                     class="btn btn-soft-secondary btn-sm btn-icon waves-effect waves-light"
                                                     type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="ri-more-fill"></i>
+                                                    <i class="bx bx-dots-vertical-rounded"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li><a class="dropdown-item"
                                                             href="{{ route('inbound.receiving.detail', ['number' => $item->number]) }}"><i
-                                                                class="ri-eye-line align-bottom me-2 text-muted"></i> View
+                                                                class="bx bx-show align-middle me-2 text-muted"></i> View
                                                             Detail</a></li>
                                                     @if ($item->status == 'new')
                                                         <li>
@@ -178,12 +178,13 @@
                                                         <li><a class="dropdown-item text-primary"
                                                                 href="javascript:void(0);"
                                                                 onclick="processPO('{{ $item->number }}')"><i
-                                                                    class="ri-check-line align-bottom me-2"></i> Process
+                                                                    class="bx bx-check-circle align-middle me-2"></i>
+                                                                Process
                                                                 PO</a></li>
                                                         <li><a class="dropdown-item text-danger"
                                                                 href="javascript:void(0);"
                                                                 onclick="cancelPO('{{ $item->number }}')"><i
-                                                                    class="ri-close-circle-line align-bottom me-2"></i>
+                                                                    class="bx bx-x-circle align-middle me-2"></i>
                                                                 Cancel PO</a></li>
                                                     @endif
                                                 </ul>
@@ -193,7 +194,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="9" class="text-center py-5 text-muted">
-                                            <i class="ri-inbox-archive-line fs-32 opacity-25 d-block mb-2"></i>
+                                            <i class="bx bx-archive fs-32 opacity-25 d-block mb-2"></i>
                                             No receiving records found for the selected criteria.
                                         </td>
                                     </tr>

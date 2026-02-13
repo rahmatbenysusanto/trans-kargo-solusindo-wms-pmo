@@ -26,6 +26,42 @@
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
 
+    <style>
+        /* Premium Pagination Styles */
+        .pagination {
+            gap: 5px;
+        }
+
+        .pagination .page-item .page-link {
+            border-radius: 8px !important;
+            border: 1px solid #e9ebec;
+            color: #405189;
+            font-weight: 500;
+            padding: 8px 14px;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #405189;
+            border-color: #405189;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(64, 81, 137, 0.2);
+        }
+
+        .pagination .page-item .page-link:hover {
+            background-color: #f3f6f9;
+            border-color: #dce1e6;
+            color: #405189;
+            transform: translateY(-1px);
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #fafbfb;
+            color: #adb5bd;
+            border-color: #eff2f7;
+        }
+    </style>
 </head>
 
 <body>

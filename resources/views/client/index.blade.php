@@ -81,6 +81,13 @@
                         </table>
                     </div>
                 </div>
+                @if ($client->hasPages())
+                    <div class="card-footer bg-white border-top py-3">
+                        <div class="d-flex justify-content-end">
+                            {{ $client->links() }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

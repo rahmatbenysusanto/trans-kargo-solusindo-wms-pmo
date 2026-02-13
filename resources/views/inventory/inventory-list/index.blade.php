@@ -61,11 +61,11 @@
                                 </select>
                             </div>
                             <div class="col-md-2 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary flex-grow-1">
-                                    <i class="ri-search-line align-bottom me-1"></i> Search
+                                <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
+                                    <i class="bx bx-search align-middle me-1"></i> Search
                                 </button>
                                 <a href="{{ url()->current() }}" class="btn btn-soft-danger px-3">
-                                    <i class="ri-refresh-line"></i>
+                                    <i class="bx bx-refresh"></i>
                                 </a>
                             </div>
                         </div>
@@ -81,12 +81,12 @@
                     <h5 class="card-title mb-0">Live Inventory Records</h5>
                     <div class="d-flex gap-2">
                         <a href="{{ route('inventory.downloadExcel', request()->all()) }}"
-                            class="btn btn-soft-success btn-sm btn-label waves-effect waves-light">
-                            <i class="ri-file-excel-2-line label-icon align-middle fs-16 me-2"></i> Export Excel
+                            class="btn btn-soft-success btn-sm btn-label waves-effect waves-light fw-bold">
+                            <i class="bx bxs-file-export label-icon align-middle fs-16 me-2"></i> Export Excel
                         </a>
                         <a href="{{ route('inventory.downloadPDF', request()->all()) }}" target="_blank"
-                            class="btn btn-soft-danger btn-sm btn-label waves-effect waves-light">
-                            <i class="ri-file-pdf-line label-icon align-middle fs-16 me-2"></i> Export PDF
+                            class="btn btn-soft-danger btn-sm btn-label waves-effect waves-light fw-bold">
+                            <i class="bx bxs-file-pdf label-icon align-middle fs-16 me-2"></i> Export PDF
                         </a>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
                                                 <div class="flex-shrink-0 me-2">
                                                     <div class="avatar-xs">
                                                         <div class="avatar-title bg-info-subtle text-info rounded">
-                                                            <i class="ri-database-2-line"></i>
+                                                            <i class="bx bx-package"></i>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -126,7 +126,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <i class="ri-map-pin-line text-muted me-2"></i>
+                                                <i class="bx bx-map-pin text-muted me-2"></i>
                                                 <div>
                                                     <div class="small fw-medium">{{ $product->bin->storageArea->name }}
                                                     </div>
@@ -177,14 +177,14 @@
                                             <a href="{{ route('inbound.inventory.history', ['id' => $product->id]) }}"
                                                 class="btn btn-soft-secondary btn-icon btn-sm waves-effect waves-light"
                                                 data-bs-toggle="tooltip" title="View History">
-                                                <i class="ri-history-line"></i>
+                                                <i class="bx bx-history"></i>
                                             </a>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="8" class="text-center py-5 text-muted">
-                                            <i class="ri-database-low-line fs-32 opacity-25 d-block mb-2"></i>
+                                            <i class="bx bx-box fs-32 opacity-25 d-block mb-2"></i>
                                             No assets found matching the search criteria.
                                         </td>
                                     </tr>
