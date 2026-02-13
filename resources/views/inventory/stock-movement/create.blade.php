@@ -1,40 +1,52 @@
 @extends('layout.index')
-@section('title', 'Create Stock Movement')
+@section('title', 'Change Storage Product')
 
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Create Stock Movement</h4>
+                <h4 class="mb-sm-0">Internal Transfer (Stock Movement)</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a>Inventory</a></li>
-                        <li class="breadcrumb-item">Stock Movement</li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item"><a>Movement</a></li>
+                        <li class="breadcrumb-item active">New Transfer</li>
                     </ol>
                 </div>
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">List Products</h4>
+        <!-- Selection Card -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light-subtle py-3 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-search-eye-line text-info fs-20 me-2"></i>
+                        <h5 class="card-title mb-0">Select Items to Move</h5>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped align-middle" id="tableProductsOutbound">
-                            <thead>
+                    <div class="mb-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-light text-muted"><i
+                                    class="ri-search-2-line"></i></span>
+                            <input type="text" class="form-control border-light bg-light" id="searchAsset"
+                                placeholder="Search by PN, Name, or SN ..." onkeyup="filterAssets(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover align-middle table-nowrap mb-0">
+                            <thead class="bg-light text-muted sticky-top">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Product</th>
-                                    <th>Storage</th>
-                                    <th>Client</th>
-                                    <th>Action</th>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Asset Details</th>
+                                    <th>Current Storage</th>
+                                    <th class="text-end">Select</th>
                                 </tr>
                             </thead>
-                            <tbody id="listProducts">
-
+                            <tbody id="listAssets">
+                                <!-- Rendered via JS -->
                             </tbody>
                         </table>
                     </div>
@@ -42,67 +54,65 @@
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">Product Change Storage</h4>
-                        <a class="btn btn-primary btn-sm" onclick="changeProductStorage()">Change Product Storage</a>
+        <!-- Target Storage Card -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 h-100 border-start border-info border-3">
+                <div class="card-header bg-light-subtle py-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <i class="ri-map-pin-range-line text-info fs-20 me-2"></i>
+                        <h5 class="card-title mb-0">Destination Storage</h5>
                     </div>
                 </div>
-
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-3">
-                            <label class="form-label">Area</label>
-                            <select class="form-control" id="area" onchange="changeStorageArea(this.value)">
-                                <option value="">-- Choose Area --</option>
-                                @foreach($storageArea as $area)
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small text-uppercase">Area</label>
+                            <select class="form-select border-light bg-light" id="area"
+                                onchange="changeStorageArea(this.value)">
+                                <option value="">Select Area</option>
+                                @foreach ($storageArea as $area)
                                     <option value="{{ $area->id }}">{{ $area->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-3">
-                            <label class="form-label">Rak</label>
-                            <select class="form-control" id="rak" onchange="changeStorageRak(this.value)">
-
+                        <div class="col-6">
+                            <label class="form-label text-muted small text-uppercase">Rak</label>
+                            <select class="form-select border-light bg-light" id="rak"
+                                onchange="changeStorageRak(this.value)">
+                                <option value="">Select Rak</option>
                             </select>
                         </div>
-                        <div class="col-3">
-                            <label class="form-label">Lantai</label>
-                            <select class="form-control" id="lantai" onchange="changeStorageLantai(this.value)">
-
+                        <div class="col-6">
+                            <label class="form-label text-muted small text-uppercase">Lantai</label>
+                            <select class="form-select border-light bg-light" id="lantai"
+                                onchange="changeStorageLantai(this.value)">
+                                <option value="">Select Lantai</option>
                             </select>
                         </div>
-                        <div class="col-3">
-                            <label class="form-label">Bin</label>
-                            <select class="form-control" id="bin">
-
+                        <div class="col-6">
+                            <label class="form-label text-muted small text-uppercase">Bin / Box</label>
+                            <select class="form-select border-light bg-light" id="bin">
+                                <option value="">Select Bin</option>
                             </select>
                         </div>
                     </div>
-                </div>
 
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Product Put Away</h4>
-                </div>
+                    <hr class="my-4 border-light">
 
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped align-middle" id="tableListProducts">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Product</th>
-                                    <th>Serial Number</th>
-                                    <th>Client</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsOutbound">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="card-title fs-13 mb-0 text-uppercase text-muted">Selected Assets (<span
+                                id="countSelected">0</span>)</h6>
+                        <button class="btn btn-info btn-sm btn-label waves-effect waves-light" onclick="processTransfer()">
+                            <i class="ri-arrow-left-right-line label-icon align-middle fs-16 me-2"></i> Process Transfer
+                        </button>
+                    </div>
 
-                            </tbody>
-                        </table>
+                    <div id="selectedAssetList" class="bg-light p-2 rounded"
+                        style="min-height: 100px; max-height: 300px; overflow-y: auto;">
+                        <div class="text-center py-4 text-muted" id="placeholderSelected">
+                            <i class="ri-box-3-line fs-24 d-block mb-1 opacity-25"></i>
+                            <small>No items selected for transfer</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,230 +122,196 @@
 
 @section('js')
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        localStorage.clear();
-        loadProduct();
+        let allInventory = @json($inventory);
+        let selectedItems = [];
+        let searchQuery = '';
 
-        $(document).ready(function () {
-            $('#tableProductsOutbound').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-            });
+        // Initialize display
+        renderAssets();
 
-            $('#tableListProducts').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-            });
-        });
-
-        function loadProduct() {
-            const dataProducts = @json($inventory);
-            const products = [];
-
-            dataProducts.forEach((product) => {
-                products.push({
-                    id: product.id,
-                    partName: product.part_name,
-                    partNumber: product.part_number,
-                    serialNumber: product.serial_number,
-                    client: product.inbound_detail.inbound.client.name,
-                    select: 0
-                });
-            });
-
-            localStorage.setItem('products', JSON.stringify(products));
-            viewProducts();
+        function filterAssets(val) {
+            searchQuery = val.toLowerCase();
+            renderAssets();
         }
 
-        function viewProducts() {
-            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+        function renderAssets() {
             let html = '';
-
-            products.forEach((product, index) => {
-                if (product.select === 0) {
-                    html += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>
-                                <div class="fw-bold">${product.partName}</div>
-                                <div>${product.partNumber}</div>
-                            </td>
-                            <td>${product.serialNumber}</td>
-                            <td>${product.client}</td>
-                            <td><a class="btn btn-secondary btn-sm" onclick="selectProduct('${index}')">Select</a></td>
-                        </tr>
-                    `;
-                }
+            let filtered = allInventory.filter(item => {
+                const matchesSearch = item.part_name.toLowerCase().includes(searchQuery) ||
+                    item.part_number.toLowerCase().includes(searchQuery) ||
+                    item.serial_number.toLowerCase().includes(searchQuery);
+                const isNotSelected = !selectedItems.find(s => s.id === item.id);
+                return matchesSearch && isNotSelected;
             });
 
-            document.getElementById('listProducts').innerHTML = html;
-        }
-
-        function selectProduct(index) {
-            const products = JSON.parse(localStorage.getItem('products')) ?? [];
-            const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
-
-            products[index].select = 1;
-            productsOutbound.push(products[index]);
-
-            localStorage.setItem('products', JSON.stringify(products));
-            localStorage.setItem('productsOutbound', JSON.stringify(productsOutbound));
-
-            viewProducts();
-            viewProductsOutbound();
-        }
-
-        function viewProductsOutbound() {
-            const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
-            let html = '';
-
-            productsOutbound.forEach((product, index) => {
+            filtered.forEach((item, index) => {
+                const loc = item.bin ? `${item.bin.storage_area.name} > ${item.bin.name}` : '-';
                 html += `
                     <tr>
-                        <td>${index + 1}</td>
+                        <td class="text-muted small">${index + 1}</td>
                         <td>
-                            <div class="fw-bold">${product.partName}</div>
-                            <div>${product.partNumber}</div>
+                            <div class="fw-medium text-dark">${item.part_name}</div>
+                            <div class="small text-muted">SN: <span class="text-primary font-monospace">${item.serial_number}</span></div>
                         </td>
-                        <td>${product.serialNumber}</td>
-                        <td>${product.client}</td>
-                        <td><a class="btn btn-danger btn-sm" onclick="deleteProduct('${index}')">Delete</a></td>
+                        <td>
+                            <div class="small fw-medium">${loc}</div>
+                            <div class="text-muted small" style="font-size: 11px;">${item.inbound_detail.inbound.client.name}</div>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-soft-info btn-icon btn-sm" onclick="selectItem(${item.id})">
+                                <i class="ri-add-line"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
 
-            document.getElementById('productsOutbound').innerHTML = html;
+            if (filtered.length === 0) {
+                html = `<tr><td colspan="4" class="text-center py-4 text-muted">No available assets found.</td></tr>`;
+            }
+
+            document.getElementById('listAssets').innerHTML = html;
         }
 
-        function deleteProduct(index) {
-            const products = JSON.parse(localStorage.getItem('products')) ?? [];
-            const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
-            const findProductOutbound = productsOutbound[index];
-            const findProduct = products.find((i) => i.id === findProductOutbound.id);
-
-            productsOutbound.splice(index, 1);
-            findProduct.select = 0;
-
-            localStorage.setItem('products', JSON.stringify(products));
-            localStorage.setItem('productsOutbound', JSON.stringify(productsOutbound));
-
-            viewProducts();
-            viewProductsOutbound();
+        function selectItem(id) {
+            const item = allInventory.find(i => i.id === id);
+            selectedItems.push(item);
+            renderAssets();
+            renderSelected();
         }
 
-        function changeProductStorage() {
+        function removeItem(id) {
+            selectedItems = selectedItems.filter(i => i.id !== id);
+            renderAssets();
+            renderSelected();
+        }
+
+        function renderSelected() {
+            const container = document.getElementById('selectedAssetList');
+            const count = document.getElementById('countSelected');
+            const placeholder = document.getElementById('placeholderSelected');
+
+            count.innerText = selectedItems.length;
+
+            if (selectedItems.length === 0) {
+                placeholder.classList.remove('d-none');
+                container.innerHTML = '';
+                container.appendChild(placeholder);
+                return;
+            }
+
+            placeholder.classList.add('d-none');
+            let html = '';
+            selectedItems.forEach(item => {
+                html += `
+                    <div class="d-flex align-items-center justify-content-between p-2 bg-white rounded border mb-2 shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-xs me-2">
+                                <div class="avatar-title bg-info-subtle text-info rounded">
+                                    <i class="ri-box-3-line"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fs-12 fw-medium text-dark">${item.part_name}</div>
+                                <div class="text-muted" style="font-size: 10px;">SN: ${item.serial_number}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-link text-danger p-0" onclick="removeItem(${item.id})">
+                            <i class="ri-close-circle-fill fs-18"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function processTransfer() {
+            const binId = document.getElementById('bin').value;
+
+            if (!binId) {
+                Swal.fire('Error', 'Please select destination Storage (Bin).', 'error');
+                return;
+            }
+
+            if (selectedItems.length === 0) {
+                Swal.fire('Error', 'Please select at least one item to move.', 'error');
+                return;
+            }
+
             Swal.fire({
-                title: "Are you sure?",
-                text: "Change Product Storage",
-                icon: "warning",
+                title: "Confirm Transfer?",
+                text: `Moving ${selectedItems.length} items to the selected storage bin.`,
+                icon: "question",
                 showCancelButton: true,
+                confirmButtonText: "Yes, Transfer Now",
                 customClass: {
-                    confirmButton: "btn btn-primary w-xs me-2 mt-2",
+                    confirmButton: "btn btn-info w-xs me-2 mt-2",
                     cancelButton: "btn btn-danger w-xs mt-2"
                 },
-                confirmButtonText: "Yes, Process it!",
-                buttonsStyling: false,
-                showCloseButton: true
-            }).then(async (t)=> {
+                buttonsStyling: false
+            }).then(async (t) => {
                 if (t.value) {
-
                     $.ajax({
                         url: '{{ route('inventory.stockMovement.store') }}',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
-                            bin: document.getElementById('bin').value,
-                            products: JSON.parse(localStorage.getItem('productsOutbound')) ?? []
+                            bin: binId,
+                            products: selectedItems
                         },
                         success: (res) => {
                             if (res.status) {
-                                Swal.fire({
-                                    title: 'Success',
-                                    text: 'Change Product Storage Success',
-                                    icon: 'success'
-                                }).then((i) => {
-                                    window.location.reload();
-                                });
+                                Swal.fire('Success', 'Inventory moved successfully.', 'success')
+                                    .then(() => {
+                                        window.location.href =
+                                            '{{ route('inventory.stockMovement.index') }}';
+                                    });
                             } else {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: 'Change Product Storage Failed',
-                                    icon: 'error'
-                                });
+                                Swal.fire('Error', res.message || 'Transfer failed.', 'error');
                             }
                         }
                     });
-
                 }
             });
         }
 
-        function changeStorageArea(valueArea) {
-            $.ajax({
-                url: '{{ route('storage.rak.find') }}',
-                method: 'GET',
-                data: {
-                    areaId: valueArea
-                },
-                success: (res) => {
-                    const dataRak = res.data;
-                    let html = `<option value="">-- Choose Rak --</option>`;
-
-                    dataRak.forEach((rak) => {
-                        html += `<option value="${rak.id}">${rak.name}</option>`;
-                    });
-
-                    document.getElementById('rak').innerHTML = html;
-                }
+        // Storage selection logic (AJAX)
+        function changeStorageArea(areaId) {
+            if (!areaId) return;
+            $.get('{{ route('storage.rak.find') }}', {
+                areaId
+            }, function(res) {
+                let html = '<option value="">Select Rak</option>';
+                res.data.forEach(r => html += `<option value="${r.id}">${r.name}</option>`);
+                document.getElementById('rak').innerHTML = html;
+                document.getElementById('lantai').innerHTML = '<option value="">Select Lantai</option>';
+                document.getElementById('bin').innerHTML = '<option value="">Select Bin</option>';
             });
         }
 
-        function changeStorageRak(value) {
-            $.ajax({
-                url: '{{ route('storage.lantai.find') }}',
-                method: 'GET',
-                data: {
-                    areaId: document.getElementById('area').value,
-                    rakId: value
-                },
-                success: (res) => {
-                    const dataLantai = res.data;
-                    let html = `<option value="">-- Choose Lantai --</option>`;
-
-                    dataLantai.forEach((lantai) => {
-                        html += `<option value="${lantai.id}">${lantai.name}</option>`;
-                    });
-
-                    document.getElementById('lantai').innerHTML = html;
-                }
+        function changeStorageRak(rakId) {
+            const areaId = document.getElementById('area').value;
+            if (!rakId) return;
+            $.get('{{ route('storage.lantai.find') }}', {
+                areaId,
+                rakId
+            }, function(res) {
+                let html = '<option value="">Select Lantai</option>';
+                res.data.forEach(l => html += `<option value="${l.id}">${l.name}</option>`);
+                document.getElementById('lantai').innerHTML = html;
+                document.getElementById('bin').innerHTML = '<option value="">Select Bin</option>';
             });
         }
 
-        function changeStorageLantai(value) {
-            $.ajax({
-                url: '{{ route('storage.bin.find') }}',
-                method: 'GET',
-                data: {
-                    lantaiId: value
-                },
-                success: (res) => {
-                    const dataBin = res.data;
-                    let html = `<option value="">-- Choose Bin --</option>`;
-
-                    dataBin.forEach((bin) => {
-                        html += `<option value="${bin.id}">${bin.name}</option>`;
-                    });
-
-                    document.getElementById('bin').innerHTML = html;
-                }
+        function changeStorageLantai(lantaiId) {
+            if (!lantaiId) return;
+            $.get('{{ route('storage.bin.find') }}', {
+                lantaiId
+            }, function(res) {
+                let html = '<option value="">Select Bin</option>';
+                res.data.forEach(b => html += `<option value="${b.id}">${b.name}</option>`);
+                document.getElementById('bin').innerHTML = html;
             });
         }
     </script>

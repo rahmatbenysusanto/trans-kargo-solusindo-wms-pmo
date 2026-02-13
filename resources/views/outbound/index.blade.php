@@ -1,146 +1,178 @@
 @extends('layout.index')
-@section('title', 'Outbound')
+@section('title', 'Outbound List')
 
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Outbound</h4>
+                <h4 class="mb-sm-0">Outbound List</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item active"><a>Outbound</a></li>
+                        <li class="breadcrumb-item"><a>Outbound</a></li>
+                        <li class="breadcrumb-item active">List</li>
                     </ol>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex justify-content-end gap-2 mb-3">
-            <a href="{{ route('outbound.create') }}" class="btn btn-secondary">Create Outbound</a>
-        </div>
-
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
                     <form action="{{ url()->current() }}" method="GET">
-                        <div class="row">
-                            <div class="col-2">
-                                <label class="form-label">Client</label>
-                                <select class="form-control" name="client">
-                                    <option value="">-- Choose Client --</option>
-                                    @foreach($client as $item)
-                                        <option value="{{ $item->id }}" {{ request()->get('client') == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Client</label>
+                                <select class="form-select border-light bg-light" name="client">
+                                    <option value="">All Clients</option>
+                                    @foreach ($client as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request()->get('client') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">Delivery Date</label>
-                                <input type="date" class="form-control" value="{{ request()->get('delivery_date') }}" name="delivery_date">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Delivery Date</label>
+                                <input type="date" class="form-control border-light bg-light"
+                                    value="{{ request()->get('delivery_date') }}" name="delivery_date">
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">Courier</label>
-                                <input type="text" class="form-control" value="{{ request()->get('courier') }}" name="courier" placeholder="Courier ...">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Courier</label>
+                                <input type="text" class="form-control border-light bg-light"
+                                    value="{{ request()->get('courier') }}" name="courier" placeholder="Expedition ...">
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">AWB</label>
-                                <input type="text" class="form-control" value="{{ request()->get('awb') }}" name="awb" placeholder="AWB ...">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">AWB / Tracking</label>
+                                <input type="text" class="form-control border-light bg-light"
+                                    value="{{ request()->get('awb') }}" name="awb" placeholder="Tracking No ...">
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">Received By</label>
-                                <input type="text" class="form-control" value="{{ request()->get('received_by') }}" name="awb" placeholder="Received By ...">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Received By</label>
+                                <input type="text" class="form-control border-light bg-light"
+                                    value="{{ request()->get('received_by') }}" name="received_by" placeholder="Name ...">
                             </div>
-                            <div class="col-2">
-                                <label class="form-label text-white">-</label>
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary">Search</button>
-                                    <a href="{{ url()->current() }}" class="btn btn-danger">Clear</a>
-                                </div>
+                            <div class="col-md-2 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="ri-search-line align-bottom me-1"></i> Filter
+                                </button>
+                                <a href="{{ url()->current() }}" class="btn btn-soft-danger">
+                                    <i class="ri-refresh-line"></i>
+                                </a>
                             </div>
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light-subtle py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Outbound Transactions</h5>
+                        <a href="{{ route('outbound.create') }}" class="btn btn-primary btn-label waves-effect waves-light">
+                            <i class="ri-add-line label-icon align-middle fs-16 me-2"></i> Create Outbound
+                        </a>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table striped align-middle">
-                            <thead>
+                        <table class="table table-hover align-middle table-nowrap mb-0">
+                            <thead class="bg-light text-muted">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Number</th>
-                                    <th>Client Name</th>
-                                    <th>Site Location</th>
-                                    <th class="text-center">QTY</th>
-                                    <th>Delivery Date</th>
-                                    <th>Courier</th>
-                                    <th>AWB</th>
-                                    <th>Received By</th>
-                                    <th>Processed By</th>
-                                    <th>Doc</th>
-                                    <th>Action</th>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Transaction No</th>
+                                    <th>Client</th>
+                                    <th>Destination</th>
+                                    <th class="text-center">Items</th>
+                                    <th>Delivery Info</th>
+                                    <th>Handled By</th>
+                                    <th>Docs</th>
+                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            @foreach($outbound as $index => $item)
-                                <tr>
-                                    <td>{{ $outbound->firstItem() + $index }}</td>
-                                    <td>{{ $item->number }}</td>
-                                    <td>{{ $item->client->name }}</td>
-                                    <td>{{ $item->site_location }}</td>
-                                    <td class="text-center fw-bold">{{ number_format($item->qty) }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($item->delivery_date)->translatedFormat('d F Y') }}</td>
-                                    <td>{{ $item->courier }}</td>
-                                    <td>{{ $item->tracking_number }}</td>
-                                    <td>{{ $item->received_by }}</td>
-                                    <td>{{ $item->user->name }}</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <a href="{{ route('outbound.downloadExcel', ['id' => $item->id]) }}" class="btn btn-success btn-sm">
-                                                <i class="mdi mdi-file-excel" style="font-size: 14px;"></i>
+                                @forelse($outbound as $index => $item)
+                                    <tr>
+                                        <td class="text-muted">{{ $outbound->firstItem() + $index }}</td>
+                                        <td>
+                                            <span class="text-primary fw-medium">{{ $item->number }}</span>
+                                            <small
+                                                class="text-muted d-block">{{ $item->created_at->format('d M Y, H:i') }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ $item->client->name }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="text-wrap" style="min-width: 150px;">
+                                                <i class="ri-map-pin-line text-muted me-1"></i> {{ $item->site_location }}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="avatar-sm mx-auto">
+                                                <div class="avatar-title bg-info-subtle text-info rounded-circle fw-bold">
+                                                    {{ $item->qty }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-truck-line text-primary fs-18"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-medium">
+                                                        {{ \Carbon\Carbon::parse($item->delivery_date)->format('d M Y') }}
+                                                    </div>
+                                                    <small class="text-muted">{{ $item->courier }} -
+                                                        {{ $item->tracking_number }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="ri-user-received-line text-muted me-1"></i>
+                                                <div>
+                                                    <div class="small fw-medium">{{ $item->received_by }}</div>
+                                                    <div class="small text-muted">Proc: {{ $item->user->name }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <a href="{{ route('outbound.downloadExcel', ['id' => $item->id]) }}"
+                                                    class="btn btn-soft-success btn-icon btn-sm" data-bs-toggle="tooltip"
+                                                    title="Download Excel">
+                                                    <i class="ri-file-excel-2-line"></i>
+                                                </a>
+                                                <a href="{{ route('outbound.downloadPDF', ['id' => $item->id]) }}"
+                                                    class="btn btn-soft-danger btn-icon btn-sm" target="_blank"
+                                                    data-bs-toggle="tooltip" title="Download PDF Document">
+                                                    <i class="ri-file-pdf-line"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('outbound.detail', ['id' => $item->id]) }}"
+                                                class="btn btn-soft-secondary btn-sm">
+                                                <i class="ri-eye-line align-bottom me-1"></i> Detail
                                             </a>
-                                            <a href="{{ route('outbound.downloadPDF', ['id' => $item->id]) }}" class="btn btn-pdf btn-sm text-white" target="_blank">
-                                                <i class="mdi mdi-file-pdf-box" style="font-size: 14px;"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('outbound.detail', ['id' => $item->id]) }}" class="btn btn-secondary btn-sm">Detail</a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5 text-muted">
+                                            <i class="ri-inbox-line fs-32 opacity-25 d-block mb-2"></i>
+                                            No outbound transactions found.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex justify-content-end mt-2">
-                        @if ($outbound->hasPages())
-                            <ul class="pagination">
-                                @if ($outbound->onFirstPage())
-                                    <li class="disabled"><span>&laquo; Previous</span></li>
-                                @else
-                                    <li><a href="{{ $outbound->previousPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="prev">&laquo; Previous</a></li>
-                                @endif
 
-                                @foreach ($outbound->links()->elements as $element)
-                                    @if (is_string($element))
-                                        <li class="disabled"><span>{{ $element }}</span></li>
-                                    @endif
-
-                                    @if (is_array($element))
-                                        @foreach ($element as $page => $url)
-                                            @if ($page == $outbound->currentPage())
-                                                <li class="active"><span>{{ $page }}</span></li>
-                                            @else
-                                                <li><a href="{{ $url }}&per_page={{ request('per_page', 10) }}">{{ $page }}</a></li>
-                                            @endif
-                                        @endforeach
-                                    @endif
-                                @endforeach
-
-                                @if ($outbound->hasMorePages())
-                                    <li><a href="{{ $outbound->nextPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="next">Next &raquo;</a></li>
-                                @else
-                                    <li class="disabled"><span>Next &raquo;</span></li>
-                                @endif
-                            </ul>
-                        @endif
-
+                    <div class="mt-4">
+                        {{ $outbound->links() }}
                     </div>
                 </div>
             </div>

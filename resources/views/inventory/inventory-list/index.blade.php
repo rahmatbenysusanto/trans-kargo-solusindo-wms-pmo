@@ -5,156 +5,203 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Inventory List</h4>
+                <h4 class="mb-sm-0">Inventory Stock</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a>Inventory</a></li>
-                        <li class="breadcrumb-item active">Inventory List</li>
+                        <li class="breadcrumb-item active">Stock List</li>
                     </ol>
                 </div>
             </div>
         </div>
 
-        <div class="col-12">
-            <div class="mb-3 d-flex justify-content-end gap-2">
-                <a class="btn btn-success btn-sm" href="{{ route('inventory.downloadExcel', ['status' => request()->get('status'), 'status' => request()->get('status')]) }}">
-                    Download Excel <i class="mdi mdi-file-excel" style="font-size: 14px;"></i>
-                </a>
-                <a class="btn btn-pdf btn-sm text-white" target="_blank" href="{{ route('inventory.downloadPDF', ['status' => request()->get('status'), 'status' => request()->get('status')]) }}">
-                    Download PDF <i class="mdi mdi-file-pdf-box" style="font-size: 14px;"></i>
-                </a>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
                     <form action="{{ url()->current() }}" method="GET">
-                        <div class="row">
-                            <div class="col-2">
-                                <label class="form-label">Part Name</label>
-                                <input type="text" class="form-control" name="partName" value="{{ request()->get('partName') }}" placeholder="Part Name ...">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Part Name</label>
+                                <input type="text" class="form-control border-light bg-light" name="partName"
+                                    value="{{ request()->get('partName') }}" placeholder="Search Name ...">
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">Part Number</label>
-                                <input type="text" class="form-control" name="partNumber" value="{{ request()->get('partNumber') }}" placeholder="Part Number ...">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Part Number</label>
+                                <input type="text" class="form-control border-light bg-light" name="partNumber"
+                                    value="{{ request()->get('partNumber') }}" placeholder="Search PN ...">
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">Serial Number</label>
-                                <input type="text" class="form-control" name="serialNumber" value="{{ request()->get('serialNumber') }}" placeholder="Serial Number ...">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Serial Number</label>
+                                <input type="text" class="form-control border-light bg-light" name="serialNumber"
+                                    value="{{ request()->get('serialNumber') }}" placeholder="Search SN ...">
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">Client</label>
-                                <select class="form-control" name="client">
-                                    <option value="">-- Choose Client --</option>
-                                    @foreach($client as $item)
-                                        <option value="{{ $item->id }}" {{ request()->get('client') == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Client</label>
+                                <select class="form-select border-light bg-light" name="client">
+                                    <option value="">All Clients</option>
+                                    @foreach ($client as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request()->get('client') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-2">
-                                <label class="form-label">Status</label>
-                                <select class="form-control" name="status">
-                                    <option value="">-- Choose Status --</option>
-                                    <option value="available" {{ request()->get('status') == 'available' ? 'selected' : '' }}>Available</option>
-                                    <option value="reserved" {{ request()->get('status') == 'reserved' ? 'selected' : '' }}>Reserved</option>
-                                    <option value="in use" {{ request()->get('status') == 'in use' ? 'selected' : '' }}>In Use</option>
-                                    <option value="defective" {{ request()->get('status') == 'defective' ? 'selected' : '' }}>Defective</option>
+                            <div class="col-md-2">
+                                <label class="form-label text-muted small text-uppercase">Stock Status</label>
+                                <select class="form-select border-light bg-light" name="status">
+                                    <option value="">All Status</option>
+                                    <option value="available"
+                                        {{ request()->get('status') == 'available' ? 'selected' : '' }}>Available</option>
+                                    <option value="reserved" {{ request()->get('status') == 'reserved' ? 'selected' : '' }}>
+                                        Reserved</option>
+                                    <option value="in use" {{ request()->get('status') == 'in use' ? 'selected' : '' }}>In
+                                        Use</option>
+                                    <option value="defective"
+                                        {{ request()->get('status') == 'defective' ? 'selected' : '' }}>Defective</option>
                                 </select>
                             </div>
-                            <div class="col-2">
-                                <label class="form-label text-white">-</label>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-primary">Search</button>
-                                    <a href="{{ url()->current() }}" class="btn btn-danger">Clear</a>
-                                </div>
+                            <div class="col-md-2 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="ri-search-line align-bottom me-1"></i> Search
+                                </button>
+                                <a href="{{ url()->current() }}" class="btn btn-soft-danger px-3">
+                                    <i class="ri-refresh-line"></i>
+                                </a>
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="card-body">
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm border-0 border-top border-primary border-3">
+                <div
+                    class="card-header bg-light-subtle py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Live Inventory Records</h5>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('inventory.downloadExcel', request()->all()) }}"
+                            class="btn btn-soft-success btn-sm btn-label waves-effect waves-light">
+                            <i class="ri-file-excel-2-line label-icon align-middle fs-16 me-2"></i> Export Excel
+                        </a>
+                        <a href="{{ route('inventory.downloadPDF', request()->all()) }}" target="_blank"
+                            class="btn btn-soft-danger btn-sm btn-label waves-effect waves-light">
+                            <i class="ri-file-pdf-line label-icon align-middle fs-16 me-2"></i> Export PDF
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
-                            <thead>
+                        <table class="table table-hover align-middle table-nowrap mb-0">
+                            <thead class="bg-light text-muted">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Storage</th>
-                                    <th>Part Name</th>
-                                    <th>Part Number</th>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Asset Details</th>
+                                    <th>Storage Location</th>
                                     <th>Serial Number</th>
-                                    <th>Owner Status</th>
-                                    <th>PIC</th>
+                                    <th>Ownership</th>
                                     <th class="text-center">Status</th>
-                                    <th>Client</th>
-                                    <th>Action</th>
+                                    <th>Client / Owner</th>
+                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            @foreach($inventory as $index => $product)
-                                <tr>
-                                    <td>{{ $inventory->firstItem() + $index }}</td>
-                                    <td>{{ $product->bin->storageArea->name }} - {{ $product->bin->storageRak->name }} - {{ $product->bin->storageLantai->name }} - {{ $product->bin->name }}</td>
-                                    <td>{{ $product->part_name }}</td>
-                                    <td>{{ $product->part_number }}</td>
-                                    <td>{{ $product->serial_number }}</td>
-                                    <td>{{ $product->inboundDetail->inbound->owner_status }}</td>
-                                    <td>{{ $product->pic }}</td>
-                                    <td class="text-center">
-                                        @switch($product->status)
-                                            @case('available')
-                                                <span class="badge bg-success">Available</span>
-                                                @break
-                                            @case('reserved')
-                                                <span class="badge bg-warning">Reserved</span>
-                                                @break
-                                            @case('in use')
-                                                <span class="badge bg-secondary">In Use</span>
-                                                @break
-                                            @case('defective')
-                                                <span class="badge bg-danger">Defective</span>
-                                                @break
-                                        @endswitch
-                                    </td>
-                                    <td>{{ $product->inboundDetail->inbound->client->name }}</td>
-                                    <td>
-                                        <a href="{{ route('inbound.inventory.history', ['id' => $product->id]) }}" class="btn btn-secondary btn-sm">History</a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                                @forelse($inventory as $index => $product)
+                                    <tr>
+                                        <td class="text-muted">{{ $inventory->firstItem() + $index }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-2">
+                                                    <div class="avatar-xs">
+                                                        <div class="avatar-title bg-info-subtle text-info rounded">
+                                                            <i class="ri-database-2-line"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h6 class="fs-14 mb-0 text-dark">{{ $product->part_name }}</h6>
+                                                    <small class="text-muted">PN: {{ $product->part_number }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="ri-map-pin-line text-muted me-2"></i>
+                                                <div>
+                                                    <div class="small fw-medium">{{ $product->bin->storageArea->name }}
+                                                    </div>
+                                                    <div class="text-muted" style="font-size: 11px;">
+                                                        {{ $product->bin->storageRak->name }} •
+                                                        {{ $product->bin->storageLantai->name }} •
+                                                        {{ $product->bin->name }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <code
+                                                class="text-primary font-monospace fw-medium">{{ $product->serial_number }}</code>
+                                        </td>
+                                        <td>
+                                            <div class="small fw-medium">
+                                                {{ $product->inboundDetail->inbound->owner_status }}</div>
+                                            <div class="text-muted" style="font-size: 11px;">PIC: {{ $product->pic }}</div>
+                                        </td>
+                                        <td class="text-center">
+                                            @php
+                                                $statusClass = 'bg-secondary';
+                                                $statusText = ucfirst($product->status);
+                                                switch ($product->status) {
+                                                    case 'available':
+                                                        $statusClass = 'bg-success';
+                                                        break;
+                                                    case 'reserved':
+                                                        $statusClass = 'bg-warning text-dark';
+                                                        break;
+                                                    case 'in use':
+                                                        $statusClass = 'bg-info';
+                                                        break;
+                                                    case 'defective':
+                                                        $statusClass = 'bg-danger';
+                                                        break;
+                                                }
+                                            @endphp
+                                            <span
+                                                class="badge {{ $statusClass }} px-3 py-2 fs-11 text-uppercase">{{ $statusText }}</span>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge bg-light text-dark border">{{ $product->inboundDetail->inbound->client->name }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('inbound.inventory.history', ['id' => $product->id]) }}"
+                                                class="btn btn-soft-secondary btn-icon btn-sm waves-effect waves-light"
+                                                data-bs-toggle="tooltip" title="View History">
+                                                <i class="ri-history-line"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5 text-muted">
+                                            <i class="ri-database-low-line fs-32 opacity-25 d-block mb-2"></i>
+                                            No assets found matching the search criteria.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex justify-content-end mt-2">
-                        @if ($inventory->hasPages())
-                            <ul class="pagination">
-                                @if ($inventory->onFirstPage())
-                                    <li class="disabled"><span>&laquo; Previous</span></li>
-                                @else
-                                    <li><a href="{{ $inventory->previousPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="prev">&laquo; Previous</a></li>
-                                @endif
-
-                                @foreach ($inventory->links()->elements as $element)
-                                    @if (is_string($element))
-                                        <li class="disabled"><span>{{ $element }}</span></li>
-                                    @endif
-
-                                    @if (is_array($element))
-                                        @foreach ($element as $page => $url)
-                                            @if ($page == $inventory->currentPage())
-                                                <li class="active"><span>{{ $page }}</span></li>
-                                            @else
-                                                <li><a href="{{ $url }}&per_page={{ request('per_page', 10) }}">{{ $page }}</a></li>
-                                            @endif
-                                        @endforeach
-                                    @endif
-                                @endforeach
-
-                                @if ($inventory->hasMorePages())
-                                    <li><a href="{{ $inventory->nextPageUrl() }}&per_page={{ request('per_page', 10) }}" rel="next">Next &raquo;</a></li>
-                                @else
-                                    <li class="disabled"><span>Next &raquo;</span></li>
-                                @endif
-                            </ul>
-                        @endif
-
+                </div>
+                <div class="card-footer py-2">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="text-muted small">
+                            Showing {{ $inventory->firstItem() ?? 0 }} to {{ $inventory->lastItem() ?? 0 }} of
+                            {{ $inventory->total() }} entries
+                        </div>
+                        <div>
+                            {{ $inventory->links() }}
+                        </div>
                     </div>
                 </div>
             </div>

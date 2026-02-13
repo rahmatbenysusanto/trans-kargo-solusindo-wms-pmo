@@ -42,6 +42,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::prefix('/put-away')->group(function () {
             Route::get('/', 'putAway')->name('inbound.putAway.index');
             Route::get('/process', 'putAwayProcess')->name('inbound.putAway.process');
+            Route::get('/detail', 'putAwayDetail')->name('inbound.putAway.detail');
             Route::post('/store', 'putAwayStore')->name('inbound.putAway.store');
         });
     });
@@ -49,6 +50,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::prefix('/inventory')->controller(InventoryController::class)->group(function () {
         Route::get('/', 'index')->name('inbound.inventory.index');
         Route::get('/history', 'history')->name('inbound.inventory.history');
+        Route::get('/cycle-count', 'cycleCount')->name('inventory.cycleCount');
 
         Route::prefix('/stock-movement')->group(function () {
             Route::get('/', 'stockMovement')->name('inventory.stockMovement.index');
@@ -73,6 +75,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::prefix('/outbound')->controller(OutboundController::class)->group(function () {
         Route::get('/', 'index')->name('outbound.index');
         Route::get('/create', 'create')->name('outbound.create');
+        Route::get('/inventory-search', 'searchInventory')->name('outbound.inventory.search');
         Route::post('/store', 'store')->name('outbound.store');
         Route::get('/detail', 'detail')->name('outbound.detail');
 
@@ -83,6 +86,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::prefix('/return')->controller(ReturnController::class)->group(function () {
         Route::get('/', 'index')->name('return.index');
         Route::get('/create', 'create')->name('return.create');
+        Route::get('/inventory-search', 'searchInventory')->name('return.inventory.search');
         Route::post('/store', 'store')->name('return.store');
         Route::get('/detail', 'detail')->name('return.detail');
 

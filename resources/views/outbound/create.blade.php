@@ -16,102 +16,171 @@
         </div>
 
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light-subtle py-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">Outbound Data</h4>
-                        <a class="btn btn-secondary btn-sm" onclick="createOutbound()">Create Outbound</a>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-xs me-3">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                    <i class="ri-truck-line fs-18"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title mb-0">Outbound Information</h5>
+                        </div>
+                        <button class="btn btn-primary btn-label waves-effect waves-light" onclick="createOutbound()">
+                            <i class="ri-send-plane-2-line label-icon align-middle fs-16 me-2"></i> Submit Outbound
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-3 mb-3">
-                            <label class="form-label">Client</label>
-                            <select class="form-control" id="client">
-                                <option value="">-- Choose Client --</option>
-                                @foreach($client as $item)
-                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                @endforeach
-                            </select>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Client</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light"><i
+                                        class="ri-user-star-line"></i></span>
+                                <select class="form-select border-light bg-light" id="client">
+                                    <option value="">-- Choose Client --</option>
+                                    @foreach ($client as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-3 mb-3">
-                            <label class="form-label">Site Location</label>
-                            <input type="text" class="form-control" id="siteLocation" placeholder="Site Location ...">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Site Location</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light"><i class="ri-map-pin-line"></i></span>
+                                <input type="text" class="form-control border-light bg-light" id="siteLocation"
+                                    placeholder="Enter Site ...">
+                            </div>
                         </div>
-                        <div class="col-3 mb-3">
-                            <label class="form-label">Received By</label>
-                            <input type="text" class="form-control" id="receivedBy" placeholder="Received By ...">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Received By</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light"><i
+                                        class="ri-user-follow-line"></i></span>
+                                <input type="text" class="form-control border-light bg-light" id="receivedBy"
+                                    placeholder="Recipient Name ...">
+                            </div>
                         </div>
-                        <div class="col-3 mb-3">
-                            <label class="form-label">Delivery Date</label>
-                            <input type="date" class="form-control" id="deliveryDate" value="{{ date('Y-m-d') }}">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Delivery Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light"><i
+                                        class="ri-calendar-event-line"></i></span>
+                                <input type="date" class="form-control border-light bg-light" id="deliveryDate"
+                                    value="{{ date('Y-m-d') }}">
+                            </div>
                         </div>
-                        <div class="col-3 mb-3">
-                            <label class="form-label">Courier</label>
-                            <input type="text" class="form-control" id="courier" placeholder="Courier ...">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Courier Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light"><i class="ri-e-bike-2-line"></i></span>
+                                <input type="text" class="form-control border-light bg-light" id="courier"
+                                    placeholder="Expedition / Courier ...">
+                            </div>
                         </div>
-                        <div class="col-3 mb-3">
-                            <label class="form-label">Tracking Number / AWB</label>
-                            <input type="text" class="form-control" id="trackingNumber" placeholder="Tracking Number ...">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">AWB / Tracking Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light"><i class="ri-qr-code-line"></i></span>
+                                <input type="text" class="form-control border-light bg-light" id="trackingNumber"
+                                    placeholder="Tracking Number ...">
+                            </div>
                         </div>
-                        <div class="col-3 mb-3">
-                            <label class="form-label">Remarks</label>
-                            <input type="text" class="form-control" id="remarks">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Remarks</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-light"><i class="ri-chat-4-line"></i></span>
+                                <input type="text" class="form-control border-light bg-light" id="remarks"
+                                    placeholder="Notes ...">
+                            </div>
                         </div>
-                        <div class="col-3 mb-3">
-                            <label class="form-label">QTY Product</label>
-                            <input type="number" class="form-control" id="qtyProduct" placeholder="0" readonly>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Total Selected Items</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-primary text-white border-primary"><i
+                                        class="ri-hand-coin-line"></i></span>
+                                <input type="number" class="form-control border-primary bg-primary-subtle fw-bold"
+                                    id="qtyProduct" value="0" readonly>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Products List</h4>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light-subtle py-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-2">
+                            <i class="ri-list-unordered fs-20 text-info"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-0">Inventory Available</h5>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="tableListProducts" class="table table-striped align-middle">
-                            <thead>
+                <div class="card-body p-0">
+                    <div class="p-3 bg-light-subtle border-bottom">
+                        <div class="search-box">
+                            <input type="text" class="form-control" id="searchInventory"
+                                placeholder="Search Part Name, PN, or SN...">
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover table-nowrap align-middle mb-0">
+                            <thead class="bg-light text-muted">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Product</th>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Product Information</th>
                                     <th>Serial Number</th>
                                     <th>Client</th>
-                                    <th>Action</th>
+                                    <th class="text-end">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="listProducts">
-
-                            </tbody>
+                            <tbody id="listProducts"></tbody>
                         </table>
                     </div>
                 </div>
+                <div class="card-footer py-2 bg-light-subtle" id="inventoryPagination"></div>
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Products Outbound</h4>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light-subtle py-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-2">
+                            <i class="ri-checkbox-circle-line fs-20 text-success"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-0 text-success">Selected for Outbound</h5>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="tableProductsOutbound" class="table table-striped align-middle">
-                            <thead>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table id="tableProductsOutbound" class="table table-hover table-nowrap align-middle mb-0">
+                            <thead class="bg-light text-muted text-success">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Product</th>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Product Information</th>
                                     <th>Serial Number</th>
                                     <th>Client</th>
-                                    <th>Action</th>
+                                    <th class="text-end text-danger">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="productsOutbound">
-
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="ri-shopping-cart-2-line fs-32 opacity-25"></i>
+                                        <p class="mt-2 mb-0">No products selected.<br>Search and select from the left list.
+                                        </p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -128,80 +197,106 @@
 
     <script>
         localStorage.clear();
-        loadProduct();
+        let currentPage = 1;
+        let searchQuery = '';
 
-        $(document).ready(function () {
-            $('#tableProductsOutbound').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-            });
+        $(document).ready(function() {
+            fetchInventory();
 
-            $('#tableListProducts').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
+            $('#searchInventory').on('keyup', function() {
+                searchQuery = $(this).val();
+                currentPage = 1;
+                fetchInventory();
             });
         });
 
-        function loadProduct() {
-            const dataProducts = @json($inventory);
-            const products = [];
-
-            dataProducts.forEach((product) => {
-                products.push({
-                    id: product.id,
-                    partName: product.part_name,
-                    partNumber: product.part_number,
-                    serialNumber: product.serial_number,
-                    client: product.inbound_detail.inbound.client.name,
-                    select: 0
-                });
-            });
-
-            localStorage.setItem('products', JSON.stringify(products));
-            viewProducts();
-        }
-
-        function viewProducts() {
-            const products = JSON.parse(localStorage.getItem('products')) ?? [];
-            let html = '';
-
-            products.forEach((product, index) => {
-                if (product.select === 0) {
-                    html += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>
-                                <div class="fw-bold">${product.partName}</div>
-                                <div>${product.partNumber}</div>
-                            </td>
-                            <td>${product.serialNumber}</td>
-                            <td>${product.client}</td>
-                            <td><a class="btn btn-secondary btn-sm" onclick="selectProduct('${index}')">Select</a></td>
-                        </tr>
-                    `;
+        function fetchInventory(page = 1) {
+            currentPage = page;
+            $.ajax({
+                url: '{{ route('outbound.inventory.search') }}',
+                method: 'GET',
+                data: {
+                    search: searchQuery,
+                    page: page
+                },
+                success: function(res) {
+                    renderInventory(res);
                 }
             });
-
-            document.getElementById('listProducts').innerHTML = html;
         }
 
-        function selectProduct(index) {
-            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+        function renderInventory(res) {
             const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
+            const selectedIds = productsOutbound.map(p => p.id);
 
-            products[index].select = 1;
-            productsOutbound.push(products[index]);
+            let html = '';
+            res.data.forEach((product, index) => {
+                const isSelected = selectedIds.includes(product.id);
+                const clientName = product.client ? product.client.name : '-';
 
-            localStorage.setItem('products', JSON.stringify(products));
+                html += `
+                    <tr>
+                        <td><span class="text-muted fw-medium">${(res.current_page - 1) * res.per_page + index + 1}</span></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="fs-14 mb-1 text-dark">${product.part_name}</h6>
+                                    <p class="text-muted mb-0 small">PN: ${product.part_number}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code class="text-primary font-monospace">${product.serial_number}</code></td>
+                        <td><span class="badge badge-soft-primary px-2">${clientName}</span></td>
+                        <td class="text-end">
+                            ${isSelected ? 
+                                `<span class="badge badge-soft-success">Selected</span>` :
+                                `<button class="btn btn-soft-info btn-icon btn-sm" onclick="selectProductAjax(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                                                    <i class="ri-arrow-right-line"></i>
+                                                </button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            });
+
+            if (res.data.length === 0) {
+                html = `<tr><td colspan="5" class="text-center py-4 text-muted">No products found.</td></tr>`;
+            }
+
+            document.getElementById('listProducts').innerHTML = html;
+
+            // Render Pagination
+            let paginationHtml = `
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm justify-content-end mb-0">
+                        <li class="page-item ${res.prev_page_url ? '' : 'disabled'}">
+                            <a class="page-link" href="javascript:void(0)" onclick="fetchInventory(${res.current_page - 1})">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="javascript:void(0)">${res.current_page} of ${res.last_page}</a></li>
+                        <li class="page-item ${res.next_page_url ? '' : 'disabled'}">
+                            <a class="page-link" href="javascript:void(0)" onclick="fetchInventory(${res.current_page + 1})">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            `;
+            document.getElementById('inventoryPagination').innerHTML = paginationHtml;
+        }
+
+        function selectProductAjax(product) {
+            const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
+            const clientName = product.client ? product.client.name : '-';
+
+            productsOutbound.push({
+                id: product.id,
+                partName: product.part_name,
+                partNumber: product.part_number,
+                serialNumber: product.serial_number,
+                client: clientName
+            });
+
             localStorage.setItem('productsOutbound', JSON.stringify(productsOutbound));
 
-            viewProducts();
+            fetchInventory(currentPage);
             viewProductsOutbound();
         }
 
@@ -209,38 +304,51 @@
             const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
             let html = '';
 
-            productsOutbound.forEach((product, index) => {
-                html += `
+            if (productsOutbound.length === 0) {
+                html = `
                     <tr>
-                        <td>${index + 1}</td>
-                        <td>
-                            <div class="fw-bold">${product.partName}</div>
-                            <div>${product.partNumber}</div>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="ri-shopping-cart-2-line fs-32 opacity-25"></i>
+                            <p class="mt-2 mb-0">No products selected.<br>Search and select from the left list.</p>
                         </td>
-                        <td>${product.serialNumber}</td>
-                        <td>${product.client}</td>
-                        <td><a class="btn btn-danger btn-sm" onclick="deleteProduct('${index}')">Delete</a></td>
                     </tr>
                 `;
-            });
+            } else {
+                productsOutbound.forEach((product, index) => {
+                    html += `
+                        <tr>
+                            <td><span class="text-muted fw-medium">${index + 1}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h6 class="fs-14 mb-1 text-dark">${product.partName}</h6>
+                                        <p class="text-muted mb-0 small">PN: ${product.partNumber}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><code class="text-success font-monospace">${product.serialNumber}</code></td>
+                            <td><span class="badge badge-soft-primary px-2">${product.client}</span></td>
+                            <td class="text-end">
+                                <button class="btn btn-soft-danger btn-icon btn-sm" onclick="deleteProduct('${index}')">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
 
             document.getElementById('qtyProduct').value = productsOutbound.length;
             document.getElementById('productsOutbound').innerHTML = html;
         }
 
         function deleteProduct(index) {
-            const products = JSON.parse(localStorage.getItem('products')) ?? [];
             const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
-            const findProductOutbound = productsOutbound[index];
-            const findProduct = products.find((i) => i.id === findProductOutbound.id);
-
             productsOutbound.splice(index, 1);
-            findProduct.select = 0;
 
-            localStorage.setItem('products', JSON.stringify(products));
             localStorage.setItem('productsOutbound', JSON.stringify(productsOutbound));
 
-            viewProducts();
+            fetchInventory(currentPage);
             viewProductsOutbound();
         }
 
@@ -257,7 +365,7 @@
                 confirmButtonText: "Yes, Create it!",
                 buttonsStyling: false,
                 showCloseButton: true
-            }).then(async (t)=> {
+            }).then(async (t) => {
                 if (t.value) {
 
                     $.ajax({

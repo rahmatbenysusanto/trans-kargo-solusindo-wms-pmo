@@ -17,135 +17,146 @@
         </div>
 
         <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <table>
-                                <tr>
-                                    <td class="fw-bold">Number</td>
-                                    <td class="fw-bold ps-3">:</td>
-                                    <td class="ps-1">{{ $inbound->number }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Client</td>
-                                    <td class="fw-bold ps-3">:</td>
-                                    <td class="ps-1">{{ $inbound->client->name }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Site Location</td>
-                                    <td class="fw-bold ps-3">:</td>
-                                    <td class="ps-1">{{ $inbound->site_location }}</td>
-                                </tr>
-                            </table>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-lg-3 col-md-6 border-end">
+                            <div class="p-3">
+                                <p class="text-muted text-uppercase fw-semibold mb-2 fs-12">Inbound Number</p>
+                                <h5 class="mb-0 text-primary">{{ $inbound->number }}</h5>
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <table>
-                                <tr>
-                                    <td class="fw-bold">Inbound Type</td>
-                                    <td class="fw-bold ps-3">:</td>
-                                    <td class="ps-1">{{ $inbound->inbound_type }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Owner Status</td>
-                                    <td class="fw-bold ps-3">:</td>
-                                    <td class="ps-1">{{ $inbound->owner_status }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Date</td>
-                                    <td class="fw-bold ps-3">:</td>
-                                    <td class="ps-1">{{ \Carbon\Carbon::parse($inbound->created_at)->translatedFormat('d F Y') }}</td>
-                                </tr>
-                            </table>
+                        <div class="col-lg-3 col-md-6 border-end">
+                            <div class="p-3">
+                                <p class="text-muted text-uppercase fw-semibold mb-2 fs-12">Client Name</p>
+                                <h5 class="mb-0">{{ $inbound->client->name }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 border-end">
+                            <div class="p-3">
+                                <p class="text-muted text-uppercase fw-semibold mb-2 fs-12">Received Date</p>
+                                <h5 class="mb-0">
+                                    {{ \Carbon\Carbon::parse($inbound->created_at)->translatedFormat('d F Y') }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="p-3 text-center">
+                                <p class="text-muted text-uppercase fw-semibold mb-2 fs-12">Progress PA</p>
+                                <div class="px-3">
+                                    <div class="progress progress-sm animated-progress custom-progress">
+                                        <div class="progress-bar bg-success" role="progressbar" id="pa_progress_bar"
+                                            style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted mt-1 d-block" id="pa_progress_text">0% Complete</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">List Products</h4>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light-subtle py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-2">
+                            <i class="ri-list-check-2 fs-20 text-info"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-0">Products Ready to Put Away</h5>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="tableListProducts" class="table table-striped align-middle">
-                            <thead>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 700px; overflow-y: auto;">
+                        <table id="tableListProducts" class="table table-hover table-nowrap align-middle mb-0">
+                            <thead class="bg-light text-muted">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Part Name</th>
-                                    <th>Part Number</th>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Product Information</th>
                                     <th>Serial Number</th>
-                                    <th>Action</th>
+                                    <th>Condition</th>
+                                    <th class="text-end">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="listProducts">
-
-                            </tbody>
+                            <tbody id="listProducts"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">Storage</h4>
-                        <a class="btn btn-primary btn-sm" onclick="putAwayProcess()">Put Away Process</a>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light-subtle py-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-2">
+                                <i class="ri-map-pin-2-line fs-20 text-success"></i>
+                            </div>
+                            <h5 class="card-title mb-0 text-success">Destination Storage</h5>
+                        </div>
+                        <button class="btn btn-success btn-label waves-effect waves-light btn-sm"
+                            onclick="putAwayProcess()">
+                            <i class="ri-check-double-line label-icon align-middle fs-16 me-2"></i> Confirm Put Away
+                        </button>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-3">
-                            <label class="form-label">Area</label>
-                            <select class="form-control" id="area" onchange="changeStorageArea(this.value)">
-                                <option value="">-- Choose Area --</option>
-                                @foreach($storageArea as $area)
+                <div class="card-body border-bottom bg-light-subtle">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Area</label>
+                            <select class="form-select form-select-sm" id="area"
+                                onchange="changeStorageArea(this.value)">
+                                <option value="">Select Area</option>
+                                @foreach ($storageArea as $area)
                                     <option value="{{ $area->id }}">{{ $area->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-3">
-                            <label class="form-label">Rak</label>
-                            <select class="form-control" id="rak" onchange="changeStorageRak(this.value)">
-
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Rak</label>
+                            <select class="form-select form-select-sm" id="rak"
+                                onchange="changeStorageRak(this.value)">
+                                <option value="">Select Rak</option>
                             </select>
                         </div>
-                        <div class="col-3">
-                            <label class="form-label">Lantai</label>
-                            <select class="form-control" id="lantai" onchange="changeStorageLantai(this.value)">
-
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Lantai</label>
+                            <select class="form-select form-select-sm" id="lantai"
+                                onchange="changeStorageLantai(this.value)">
+                                <option value="">Select Lantai</option>
                             </select>
                         </div>
-                        <div class="col-3">
-                            <label class="form-label">Bin</label>
-                            <select class="form-control" id="bin">
-
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted text-uppercase fw-semibold mb-1">Bin</label>
+                            <select class="form-select form-select-sm border-success" id="bin">
+                                <option value="">Select Bin</option>
                             </select>
                         </div>
                     </div>
                 </div>
-
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Product Put Away</h4>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="tableListProductPA" class="table table-striped align-middle">
-                            <thead>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 700px; overflow-y: auto;">
+                        <table class="table table-nowrap align-middle mb-0">
+                            <thead class="table-light text-muted">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Part Name</th>
-                                    <th>Part Number</th>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Product Information</th>
                                     <th>Serial Number</th>
-                                    <th>Action</th>
+                                    <th>Condition</th>
+                                    <th class="text-end text-danger">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="listProductPA">
-
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="ri-drag-drop-line fs-36 opacity-25"></i>
+                                        <p class="mt-2 mb-0">No products selected yet.<br>Select products from the left
+                                            side to continue.</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -164,21 +175,19 @@
         localStorage.clear();
         loadProducts();
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#tableListProductPA').DataTable({
-                pageLength: 10,
-                lengthChange: true,
+                paging: false,
                 searching: true,
                 ordering: true,
-                info: true,
+                info: false,
             });
 
             $('#tableListProducts').DataTable({
-                pageLength: 10,
-                lengthChange: true,
+                paging: false,
                 searching: true,
                 ordering: true,
-                info: true,
+                info: false,
             });
         });
 
@@ -192,6 +201,7 @@
                     partName: product.part_name,
                     partNumber: product.part_number,
                     serialNumber: product.serial_number,
+                    condition: product.condition,
                     select: 0
                 });
             });
@@ -200,23 +210,60 @@
             viewListProducts();
         }
 
+        function getConditionBadge(condition) {
+            if (condition === 'Good') return `<span class="badge bg-success-subtle text-success">${condition}</span>`;
+            if (condition === 'Used') return `<span class="badge bg-warning-subtle text-warning">${condition}</span>`;
+            if (condition === 'Defective') return `<span class="badge bg-danger-subtle text-danger">${condition}</span>`;
+            return `<span class="badge bg-secondary-subtle text-secondary">${condition || '-'}</span>`;
+        }
+
         function viewListProducts() {
             const products = JSON.parse(localStorage.getItem('products')) ?? [];
-            let html = '';
+            const productPA = JSON.parse(localStorage.getItem('productPA')) ?? [];
+            const totalProducts = products.length;
+            const selectedCount = productPA.length;
 
+            // Update progress bar
+            const progress = totalProducts > 0 ? (selectedCount / totalProducts) * 100 : 0;
+            const progressBar = document.getElementById('pa_progress_bar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+                document.getElementById('pa_progress_text').innerText = Math.round(progress) + '% Complete';
+            }
+
+            let html = '';
+            let count = 0;
             products.forEach((product, index) => {
                 if (product.select === 0) {
+                    count++;
                     html += `
                         <tr>
-                            <td>${index + 1}</td>
-                            <td>${product.partName}</td>
-                            <td>${product.partNumber}</td>
-                            <td>${product.serialNumber}</td>
-                            <td><a class="btn btn-secondary btn-sm" onclick="selectProductPA('${index}')">Select</a></td>
+                            <td><span class="text-muted fw-medium">${count}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h6 class="fs-14 mb-1 text-dark">${product.partName}</h6>
+                                        <p class="text-muted mb-0 small">PN: ${product.partNumber}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><code class="text-primary font-monospace">${product.serialNumber}</code></td>
+                            <td>${getConditionBadge(product.condition)}</td>
+                            <td class="text-end">
+                                <button class="btn btn-soft-info btn-icon btn-sm" onclick="selectProductPA('${index}')">
+                                    <i class="ri-arrow-right-line"></i>
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }
             });
+
+            if (count === 0) {
+                html =
+                    `<tr><td colspan="5" class="text-center py-4 text-muted"><i class="ri-checkbox-circle-line text-success fs-24 d-block mb-1"></i> All products are selected</td></tr>`;
+            }
 
             document.getElementById('listProducts').innerHTML = html;
         }
@@ -226,7 +273,6 @@
             const productPA = JSON.parse(localStorage.getItem('productPA')) ?? [];
 
             productPA.push(products[index]);
-
             products[index].select = 1;
 
             localStorage.setItem('products', JSON.stringify(products));
@@ -239,19 +285,50 @@
             const productPA = JSON.parse(localStorage.getItem('productPA')) ?? [];
             let html = '';
 
-            productPA.forEach((product, index) => {
-                html += `
-                     <tr>
-                        <td>${index + 1}</td>
-                        <td>${product.partName}</td>
-                        <td>${product.partNumber}</td>
-                        <td>${product.serialNumber}</td>
-                        <td><a class="btn btn-danger btn-sm" onclick="deleteProductPA('${index}')">Delete</a></td>
-                    </tr>
-                `;
-            });
+            if (productPA.length === 0) {
+                html = `<tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="ri-drag-drop-line fs-36 opacity-25"></i>
+                        <p class="mt-2 mb-0">No products selected yet.<br>Select products from the left side to continue.</p>
+                    </td>
+                </tr>`;
+            } else {
+                productPA.forEach((product, index) => {
+                    html += `
+                         <tr>
+                            <td><span class="text-muted fw-medium">${index + 1}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h6 class="fs-14 mb-1 text-dark">${product.partName}</h6>
+                                        <p class="text-muted mb-0 small">PN: ${product.partNumber}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><code class="text-success font-monospace">${product.serialNumber}</code></td>
+                            <td>${getConditionBadge(product.condition)}</td>
+                            <td class="text-end">
+                                <button class="btn btn-soft-danger btn-icon btn-sm" onclick="deleteProductPA('${index}')">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
 
             document.getElementById('listProductPA').innerHTML = html;
+
+            // Sync progress bar
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+            const totalProducts = products.length;
+            const progress = totalProducts > 0 ? (productPA.length / totalProducts) * 100 : 0;
+            const progressBar = document.getElementById('pa_progress_bar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+                document.getElementById('pa_progress_text').innerText = Math.round(progress) + '% Complete';
+            }
         }
 
         function deleteProductPA(index) {
@@ -344,7 +421,7 @@
                 confirmButtonText: "Yes, Process it!",
                 buttonsStyling: false,
                 showCloseButton: true
-            }).then(async (t)=> {
+            }).then(async (t) => {
                 if (t.value) {
                     $.ajax({
                         url: '{{ route('inbound.putAway.store') }}',

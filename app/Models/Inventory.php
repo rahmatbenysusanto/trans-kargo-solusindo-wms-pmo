@@ -35,4 +35,9 @@ class Inventory extends Model
     {
         return $this->belongsTo(InboundDetail::class, 'inbound_detail_id');
     }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
 }

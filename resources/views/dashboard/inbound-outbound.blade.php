@@ -1,23 +1,40 @@
 @extends('layout.index')
-@section('title', 'Dashboard Inbound vs Return Trend')
+@section('title', 'Trends Dashboard')
 
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Inbound vs Return Trend</h4>
+                <h4 class="mb-sm-0 text-uppercase fw-bold text-primary">Transaction Trends</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a>Dashboard</a></li>
+                        <li class="breadcrumb-item active">Inbound vs Return</li>
+                    </ol>
+                </div>
             </div>
         </div>
 
         <div class="col-12">
-            <div class="card">
-                <div class="card-header border-0 align-items-center d-flex">
-                    <h4 class="card-title mb-0 flex-grow-1">Inbound vs Outbound/Return</h4>
+            <div class="card shadow-sm border-0 border-top border-primary border-3">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-0 fw-bold">Commercial Activity Analysis</h5>
+                        <p class="text-muted mb-0 small text-uppercase fw-medium">Monthly Inbound vs Outbound Performance
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0 d-flex gap-2">
+                        <span class="badge bg-soft-primary text-primary px-3 py-2"><i
+                                class="mdi mdi-circle-medium me-1"></i> Inbound</span>
+                        <span class="badge bg-soft-success text-success px-3 py-2"><i
+                                class="mdi mdi-circle-medium me-1"></i> Outbound</span>
+                    </div>
                 </div>
 
-                <div class="card-body p-0 pb-2">
+                <div class="card-body p-4">
                     <div class="w-100">
-                        <div id="customer_impression_charts" data-colors='["--vz-primary", "--vz-success"]' class="apex-charts" dir="ltr"></div>
+                        <div id="customer_impression_charts" data-colors='["--vz-primary", "--vz-success"]'
+                            class="apex-charts" dir="ltr"></div>
                     </div>
                 </div>
             </div>
@@ -36,50 +53,71 @@
                         return -1 === t.indexOf(",") ?
                             getComputedStyle(document.documentElement).getPropertyValue(t) || t :
                             2 == (e = e.split(",")).length ?
-                                "rgba(" + getComputedStyle(document.documentElement).getPropertyValue(e[0]) + "," + e[1] + ")" :
-                                t
+                            "rgba(" + getComputedStyle(document.documentElement).getPropertyValue(e[0]) + "," + e[
+                                1] + ")" :
+                            t
                     });
                 }
-                console.warn("data-colors atributes not found on", e);
             }
         }
 
         var linechartcustomerColors = getChartColorsArray("customer_impression_charts");
 
         if (linechartcustomerColors) {
-            options = {
-                series: [
-                    {
-                        name: "Inbound",
+            var options = {
+                series: [{
+                        name: "Items Received (Inbound)",
                         type: "bar",
                         data: {!! json_encode($dataInbound) !!}
                     },
                     {
-                        name: "Outbound",
+                        name: "Items Shipped (Outbound)",
                         type: "area",
                         data: {!! json_encode($dataOutbound) !!}
                     }
                 ],
                 chart: {
-                    height: 500,
+                    height: 450,
                     type: "line",
                     toolbar: {
-                        show: false
-                    }
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: false,
+                            zoom: false,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: false
+                        }
+                    },
+                    dropShadow: {
+                        enabled: true,
+                        color: '#000',
+                        top: 18,
+                        left: 7,
+                        blur: 10,
+                        opacity: 0.1
+                    },
                 },
                 stroke: {
-                    curve: "straight",
-                    dashArray: [0, 0, 8],
-                    width: [2, 0, 2.2]
+                    curve: "smooth",
+                    width: [0, 3]
                 },
                 fill: {
-                    opacity: [0.9, 0.1]
+                    type: ['solid', 'gradient'],
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.45,
+                        opacityTo: 0.05,
+                        stops: [20, 100, 100, 100]
+                    }
                 },
                 markers: {
-                    size: [0, 0, 0],
+                    size: [0, 5],
                     strokeWidth: 2,
                     hover: {
-                        size: 4
+                        size: 7
                     }
                 },
                 xaxis: {
@@ -91,61 +129,40 @@
                         show: false
                     }
                 },
+                yaxis: {
+                    title: {
+                        text: 'Total Quantum',
+                        style: {
+                            color: '#adb5bd',
+                            fontWeight: 500
+                        }
+                    }
+                },
                 grid: {
                     show: true,
-                    xaxis: {
-                        lines: {
-                            show: true
-                        }
-                    },
-                    yaxis: {
-                        lines: {
-                            show: false
-                        }
-                    },
+                    borderColor: '#f1f1f1',
+                    strokeDashArray: 3,
                     padding: {
                         top: 0,
-                        right: -2,
-                        bottom: 15,
+                        right: 30,
+                        bottom: 0,
                         left: 10
                     }
                 },
                 legend: {
-                    show: true,
-                    horizontalAlign: "center",
-                    offsetX: 0,
-                    offsetY: -5,
-                    markers: {
-                        width: 9,
-                        height: 9,
-                        radius: 6
-                    },
-                    itemMargin: {
-                        horizontal: 10,
-                        vertical: 0
-                    }
+                    show: false
                 },
                 plotOptions: {
                     bar: {
-                        columnWidth: "30%",
-                        barHeight: "70%"
+                        columnWidth: "25%",
+                        borderRadius: 4
                     }
                 },
                 colors: linechartcustomerColors,
                 tooltip: {
                     shared: true,
-                    y: [
-                        {
-                            formatter: function(e) {
-                                return void 0 !== e ? e.toFixed(0) : e
-                            }
-                        },
-                        {
-                            formatter: function(e) {
-                                return void 0 !== e ? e.toFixed(0) : e
-                            }
-                        },
-                    ]
+                    intersect: false,
+                    theme: 'dark'
                 }
             };
 

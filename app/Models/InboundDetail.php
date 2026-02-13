@@ -26,4 +26,9 @@ class InboundDetail extends Model
     {
         return $this->belongsTo(Inbound::class, 'inbound_id');
     }
+
+    public function inventory(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Inventory::class, 'inbound_detail_id');
+    }
 }

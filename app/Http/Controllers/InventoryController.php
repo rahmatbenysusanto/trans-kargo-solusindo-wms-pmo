@@ -58,18 +58,38 @@ class InventoryController extends Controller
         return view('inventory.inventory-list.history', compact('title', 'inventory', 'history'));
     }
 
-    public function stockMovement(): View
+    public function stockMovement(Request $request): View
     {
+        $history = InventoryHistory::with('inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai', 'inventory.inboundDetail.inbound.client')
+            ->where('type', 'stock movement')
+            ->when($request->query('serialNumber'), function ($query) use ($request) {
+                return $query->whereHas('inventory', function ($q) use ($request) {
+                    $q->where('serial_number', 'LIKE', '%' . $request->query('serialNumber') . '%');
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
         $title = 'Stock Movement';
-        return view('inventory.stock-movement.index', compact('title'));
+        return view('inventory.stock-movement.index', compact('title', 'history'));
+    }
+
+    public function cycleCount(Request $request): View
+    {
+        $history = InventoryHistory::with('inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai', 'inventory.inboundDetail.inbound.client')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        $title = 'Cycle Count';
+        return view('inventory.cycle-count.index', compact('title', 'history'));
     }
 
     public function create(): View
     {
         $storageArea = StorageArea::all();
-        $inventory = Inventory::with('inboundDetail.inbound.client:id,name')
-            ->whereNot('qty', 0)
-            ->select('id', 'part_name', 'part_number', 'serial_number', 'inbound_detail_id')
+        $inventory = Inventory::with(['inboundDetail.inbound.client:id,name', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai'])
+            ->where('qty', '>', 0)
+            ->select('id', 'part_name', 'part_number', 'serial_number', 'inbound_detail_id', 'bin_id')
             ->get();
 
         $title = 'Stock Movement';
@@ -84,7 +104,33 @@ class InventoryController extends Controller
         try {
             DB::beginTransaction();
 
-            
+            $binId = $request->post('bin');
+            $products = $request->post('products');
+
+            if (empty($binId) || empty($products)) {
+                return response()->json(['status' => false, 'message' => 'Bin or products not selected']);
+            }
+
+            foreach ($products as $item) {
+                $inventory = Inventory::with('bin.storageArea', 'bin.storageRak', 'bin.storageLantai')->find($item['id']);
+                if ($inventory) {
+                    $oldLoc = $inventory->bin->storageArea->name . ' - ' . $inventory->bin->storageRak->name . ' - ' . $inventory->bin->storageLantai->name . ' - ' . $inventory->bin->name;
+
+                    $inventory->update(['bin_id' => $binId]);
+
+                    // Refresh to get new location info for history
+                    $inventory->refresh();
+                    $inventory->load('bin.storageArea', 'bin.storageRak', 'bin.storageLantai');
+
+                    $newLoc = $inventory->bin->storageArea->name . ' - ' . $inventory->bin->storageRak->name . ' - ' . $inventory->bin->storageLantai->name . ' - ' . $inventory->bin->name;
+
+                    InventoryHistory::create([
+                        'inventory_id'  => $inventory->id,
+                        'type'          => 'stock movement',
+                        'description'   => "Moved from [$oldLoc] to [$newLoc]",
+                    ]);
+                }
+            }
 
             DB::commit();
             return response()->json([
@@ -94,6 +140,7 @@ class InventoryController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => false,
+                'message' => $th->getMessage()
             ]);
         }
     }
@@ -115,15 +162,15 @@ class InventoryController extends Controller
         $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')->whereNot('qty', 0)->get();
         $column = 2;
         foreach ($inventory as $product) {
-            $activeWorksheet->setCellValue('A'. $column, $product->bin->storageArea->name.' - '.$product->bin->storageRak->name.' - '.$product->bin->storageLantai->name.' - '.$product->bin->name);
-            $activeWorksheet->setCellValue('B'. $column, $product->inboundDetail->inbound->client->name);
-            $activeWorksheet->setCellValue('C'. $column, $product->part_name);
-            $activeWorksheet->setCellValue('D'. $column, $product->part_number);
-            $activeWorksheet->setCellValue('E'. $column, $product->serial_number);
-            $activeWorksheet->setCellValue('F'. $column, $product->inboundDetail->inbound->owner_status);
-            $activeWorksheet->setCellValue('G'. $column, $product->pic);
-            $activeWorksheet->setCellValue('H'. $column, $product->status);
-            $activeWorksheet->setCellValue('I'. $column, $product->remark);
+            $activeWorksheet->setCellValue('A' . $column, $product->bin->storageArea->name . ' - ' . $product->bin->storageRak->name . ' - ' . $product->bin->storageLantai->name . ' - ' . $product->bin->name);
+            $activeWorksheet->setCellValue('B' . $column, $product->inboundDetail->inbound->client->name);
+            $activeWorksheet->setCellValue('C' . $column, $product->part_name);
+            $activeWorksheet->setCellValue('D' . $column, $product->part_number);
+            $activeWorksheet->setCellValue('E' . $column, $product->serial_number);
+            $activeWorksheet->setCellValue('F' . $column, $product->inboundDetail->inbound->owner_status);
+            $activeWorksheet->setCellValue('G' . $column, $product->pic);
+            $activeWorksheet->setCellValue('H' . $column, $product->status);
+            $activeWorksheet->setCellValue('I' . $column, $product->remark);
 
             $column++;
         }

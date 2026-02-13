@@ -32,7 +32,7 @@ class ReturnController extends Controller
                 return $query->where('courier', $request->query('courier'));
             })
             ->when($request->query('awb'), function ($query) use ($request) {
-                return $query->where('tracking_number', 'LIKE', '%'.$request->query('awb').'%');
+                return $query->where('tracking_number', 'LIKE', '%' . $request->query('awb') . '%');
             })
             ->when($request->query('received_by'), function ($query) use ($request) {
                 return $query->where('received_by', $request->query('received_by'));
@@ -56,20 +56,40 @@ class ReturnController extends Controller
     public function create(): View
     {
         $client = Client::all();
-        $inventory = Inventory::with('inboundDetail.inbound.client:id,name')
-            ->whereNot('qty', 0)
-            ->select('id', 'part_name', 'part_number', 'serial_number', 'inbound_detail_id')
-            ->get();
-
         $title = 'Return';
-        return view('return.create', compact('title', 'client', 'inventory'));
+        return view('return.create', compact('title', 'client'));
+    }
+
+    public function searchInventory(Request $request)
+    {
+        $search = $request->query('search');
+        $inventory = Inventory::with('client:id,name')
+            ->where('qty', '>', 0)
+            ->when($search, function ($query) use ($search) {
+                return $query->where('part_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('part_number', 'LIKE', '%' . $search . '%')
+                    ->orWhere('serial_number', 'LIKE', '%' . $search . '%');
+            })
+            ->select('id', 'part_name', 'part_number', 'serial_number', 'inbound_detail_id', 'client_id')
+            ->paginate(15);
+
+        return response()->json($inventory);
+    }
+
+    public function detail(Request $request): View
+    {
+        $outbound = Outbound::with('client', 'user')->where('id', $request->query('id'))->first();
+        $outboundDetail = OutboundDetail::with('inventory')->where('outbound_id', $request->query('id'))->get();
+
+        $title = 'Return Detail';
+        return view('return.detail', compact('title', 'outbound', 'outboundDetail'));
     }
 
     private function returnNumber()
     {
         $prefix = 'RTC-' . date('Ym') . '-';
 
-        $last = Outbound::where('number', 'like', $prefix.'%')
+        $last = Outbound::where('number', 'like', $prefix . '%')
             ->orderBy('number', 'desc')
             ->first();
 
@@ -167,15 +187,15 @@ class ReturnController extends Controller
 
         $column = 13;
         foreach ($outboundDetail as $product) {
-            $activeWorksheet->setCellValue('A'.$column, $product->inventory->part_name);
-            $activeWorksheet->setCellValue('B'.$column, $product->inventory->part_number);
-            $activeWorksheet->setCellValue('C'.$column, ' '.$product->inventory->serial_number);
-            $activeWorksheet->setCellValue('C'.$column, $product->condition);
+            $activeWorksheet->setCellValue('A' . $column, $product->inventory->part_name);
+            $activeWorksheet->setCellValue('B' . $column, $product->inventory->part_number);
+            $activeWorksheet->setCellValue('C' . $column, ' ' . $product->inventory->serial_number);
+            $activeWorksheet->setCellValue('C' . $column, $product->condition);
 
             $column++;
         }
 
-        $fileName = 'Return '.$outbound->number.'.xlsx';
+        $fileName = 'Return ' . $outbound->number . '.xlsx';
 
         return response()->streamDownload(function () use ($spreadsheet) {
             $writer = new Xlsx($spreadsheet);
@@ -191,7 +211,7 @@ class ReturnController extends Controller
         $outboundDetail = OutboundDetail::with('inventory')->where('outbound_id', $request->query('id'))->get();
 
         $pdf = Pdf::loadView('pdf.return', compact('outbound', 'outboundDetail'))->setPaper('A4', 'landscape');
-        $fileName = 'Return'.$outbound->number.'.pdf';
+        $fileName = 'Return' . $outbound->number . '.pdf';
         return $pdf->stream($fileName);
     }
 }

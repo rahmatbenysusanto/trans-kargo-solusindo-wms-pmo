@@ -75,7 +75,7 @@ class InboundController extends Controller
     {
         $prefix = 'INB-' . date('Ym') . '-';
 
-        $last = Inbound::where('number', 'like', $prefix.'%')
+        $last = Inbound::where('number', 'like', $prefix . '%')
             ->orderBy('number', 'desc')
             ->first();
 
@@ -187,14 +187,15 @@ class InboundController extends Controller
         return view('inbound.put-away.index', compact('title', 'inbound'));
     }
 
-    public function detailPutAway(Request $request): View
+    public function putAwayDetail(Request $request): View
     {
-        $inbound = Inbound::find($request->query('id'));
-        $inboundDetail = InboundDetail::where('inbound_id', $request->query('id'))->get();
-        $storage = StorageArea::all();
+        $inbound = Inbound::with('client', 'user')->where('number', $request->query('number'))->first();
+        $inboundDetail = InboundDetail::with('inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai')
+            ->where('inbound_id', $inbound->id)
+            ->get();
 
         $title = 'Put Away';
-        return view('inbound.put-away.process', compact('title', 'inbound', 'inboundDetail', 'storage'));
+        return view('inbound.put-away.detail', compact('title', 'inbound', 'inboundDetail'));
     }
 
     public function putAwayProcess(Request $request): View
@@ -297,13 +298,13 @@ class InboundController extends Controller
 
         $column = 9;
         foreach ($inboundDetail as $product) {
-            $activeWorksheet->setCellValue('A'.$column, $product->part_name);
-            $activeWorksheet->setCellValue('B'.$column, $product->part_number);
-            $activeWorksheet->setCellValue('C'.$column, $product->serial_number);
-            $activeWorksheet->setCellValue('D'.$column, $product->condition);
-            $activeWorksheet->setCellValue('E'.$column, $product->manufacture_date);
-            $activeWorksheet->setCellValue('F'.$column, $product->warranty_end_date);
-            $activeWorksheet->setCellValue('G'.$column, $product->eos_date);
+            $activeWorksheet->setCellValue('A' . $column, $product->part_name);
+            $activeWorksheet->setCellValue('B' . $column, $product->part_number);
+            $activeWorksheet->setCellValue('C' . $column, $product->serial_number);
+            $activeWorksheet->setCellValue('D' . $column, $product->condition);
+            $activeWorksheet->setCellValue('E' . $column, $product->manufacture_date);
+            $activeWorksheet->setCellValue('F' . $column, $product->warranty_end_date);
+            $activeWorksheet->setCellValue('G' . $column, $product->eos_date);
 
             $column++;
         }
