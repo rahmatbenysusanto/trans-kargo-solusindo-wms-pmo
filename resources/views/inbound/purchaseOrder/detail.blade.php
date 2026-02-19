@@ -50,6 +50,8 @@
                                     <h6 class="mb-0 text-uppercase small fw-bold text-muted">Client Information</h6>
                                 </div>
                                 <h5 class="fs-15 mb-1">{{ $inbound->client->name }}</h5>
+                                <p class="text-muted mb-0 small">PIC: <span
+                                        class="text-primary fw-medium">{{ $inbound->pic->name ?? '-' }}</span></p>
                                 <p class="text-muted mb-0 small">Status: <span
                                         class="badge bg-info-subtle text-info">{{ $inbound->owner_status }}</span></p>
                             </div>

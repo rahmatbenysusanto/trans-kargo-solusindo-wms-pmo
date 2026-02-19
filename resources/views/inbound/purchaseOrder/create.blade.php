@@ -112,6 +112,17 @@
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
+                                <label class="form-label">PIC</label>
+                                <select class="form-select" name="pic" id="pic">
+                                    <option value="">-- Choose PIC --</option>
+                                    @foreach ($pic as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
                                 <label class="form-label">Remarks</label>
                                 <textarea class="form-control" name="remarks" id="remarks"></textarea>
                             </div>
@@ -803,6 +814,7 @@
                         },
                         data: JSON.stringify({
                             client: document.getElementById('client').value,
+                            pic: document.getElementById('pic').value,
                             inboundType: document.getElementById('inbound_type').value,
                             ownershipStatus: document.getElementById('ownership_status').value,
                             siteLocation: document.getElementById('site_location').value,

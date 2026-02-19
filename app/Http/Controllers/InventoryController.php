@@ -18,7 +18,7 @@ class InventoryController extends Controller
 {
     public function index(Request $request): View
     {
-        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')
+        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client', 'pic')
             ->when($request->query('partName'), function ($query) use ($request) {
                 return $query->where('part_name', 'like', '%' . $request->query('partName') . '%');
             })
@@ -51,7 +51,7 @@ class InventoryController extends Controller
 
     public function history(Request $request): View
     {
-        $inventory = Inventory::with('inboundDetail.inbound', 'bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai')->where('id', $request->query('id'))->first();
+        $inventory = Inventory::with('inboundDetail.inbound', 'bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'pic')->where('id', $request->query('id'))->first();
         $history = InventoryHistory::where('inventory_id', $request->query('id'))->get();
 
         $title = 'Inventory List';
@@ -168,7 +168,7 @@ class InventoryController extends Controller
             $activeWorksheet->setCellValue('D' . $column, $product->part_number);
             $activeWorksheet->setCellValue('E' . $column, $product->serial_number);
             $activeWorksheet->setCellValue('F' . $column, $product->inboundDetail->inbound->owner_status);
-            $activeWorksheet->setCellValue('G' . $column, $product->pic);
+            $activeWorksheet->setCellValue('G' . $column, $product->pic->name ?? '-');
             $activeWorksheet->setCellValue('H' . $column, $product->status);
             $activeWorksheet->setCellValue('I' . $column, $product->remark);
 

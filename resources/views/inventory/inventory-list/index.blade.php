@@ -145,7 +145,8 @@
                                         <td>
                                             <div class="small fw-medium">
                                                 {{ $product->inboundDetail->inbound->owner_status }}</div>
-                                            <div class="text-muted" style="font-size: 11px;">PIC: {{ $product->pic }}</div>
+                                            <div class="text-muted" style="font-size: 11px;">PIC:
+                                                {{ $product->pic->name ?? '-' }}</div>
                                         </td>
                                         <td class="text-center">
                                             @php

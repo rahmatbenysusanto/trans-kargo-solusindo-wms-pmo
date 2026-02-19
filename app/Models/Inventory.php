@@ -22,9 +22,15 @@ class Inventory extends Model
         'manufacture_date',
         'warranty_end_date',
         'eos_date',
+        'pic_id',
         'pic',
         'remark'
     ];
+
+    public function pic(): BelongsTo
+    {
+        return $this->belongsTo(Pic::class, 'pic_id');
+    }
 
     public function bin(): BelongsTo
     {

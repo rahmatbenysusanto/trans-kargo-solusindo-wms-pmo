@@ -750,8 +750,17 @@
                         <li class="nav-item">
                             <a class="nav-link menu-link {{ $title == 'Client' ? 'active' : '' }}"
                                 href="{{ route('client.index') }}">
-                                <i class="mdi mdi-account-cowboy-hat"></i>
+                                <i class="mdi mdi-account-group-outline"></i>
                                 <span data-key="t-user"> Client </span>
+                            </a>
+                        </li>
+
+                        <!-- PIC -->
+                        <li class="nav-item">
+                            <a class="nav-link menu-link {{ $title == 'PIC' ? 'active' : '' }}"
+                                href="{{ route('pic.index') }}">
+                                <i class="mdi mdi-account-tie-outline"></i>
+                                <span data-key="t-user"> PIC </span>
                             </a>
                         </li>
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InboundController;
+use App\Http\Controllers\PicController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OutboundController;
 use App\Http\Controllers\ReturnController;
@@ -135,5 +136,12 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::prefix('/client')->controller(ClientController::class)->group(function () {
         Route::get('/', 'index')->name('client.index');
         Route::post('/store', 'store')->name('client.store');
+    });
+
+    Route::prefix('/pic')->controller(PicController::class)->group(function () {
+        Route::get('/', 'index')->name('pic.index');
+        Route::post('/store', 'store')->name('pic.store');
+        Route::post('/update/{id}', 'update')->name('pic.update');
+        Route::post('/destroy/{id}', 'destroy')->name('pic.destroy');
     });
 });

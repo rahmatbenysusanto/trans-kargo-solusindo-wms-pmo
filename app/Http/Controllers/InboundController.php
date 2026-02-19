@@ -7,6 +7,7 @@ use App\Models\Inbound;
 use App\Models\InboundDetail;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
+use App\Models\Pic;
 use App\Models\Product;
 use App\Models\StorageArea;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -22,7 +23,7 @@ class InboundController extends Controller
 {
     public function index(Request $request): View
     {
-        $inbound = Inbound::with('client', 'user')
+        $inbound = Inbound::with('client', 'user', 'pic')
             ->when($request->query('number'), function ($query, $value) {
                 $query->where('number', $value);
             })
@@ -56,7 +57,7 @@ class InboundController extends Controller
 
     public function detail(Request $request): View
     {
-        $inbound = Inbound::where('number', $request->query('number'))->first();
+        $inbound = Inbound::with('pic')->where('number', $request->query('number'))->first();
         $inboundDetail = InboundDetail::where('inbound_id', $inbound->id)->get();
 
         $title = 'Purchase Order';
@@ -66,9 +67,10 @@ class InboundController extends Controller
     public function create(): View
     {
         $client = Client::all();
+        $pic = Pic::all();
 
         $title = 'Purchase Order';
-        return view('inbound.purchaseOrder.create', compact('title', 'client'));
+        return view('inbound.purchaseOrder.create', compact('title', 'client', 'pic'));
     }
 
     private function inboundNumber()
@@ -95,6 +97,7 @@ class InboundController extends Controller
             $inbound = Inbound::create([
                 'number'        => $this->inboundNumber(),
                 'client_id'     => $request->post('client'),
+                'pic_id'        => $request->post('pic'),
                 'site_location' => $request->post('siteLocation'),
                 'inbound_type'  => $request->post('inboundType'),
                 'owner_status'  => $request->post('ownershipStatus'),
@@ -236,6 +239,7 @@ class InboundController extends Controller
                     'manufacture_date'  => $inboundDetail->manufacture_date,
                     'warranty_end_date' => $inboundDetail->warranty_end_date,
                     'eos_date'          => $inboundDetail->eos_date,
+                    'pic_id'            => $inbound->pic_id,
                     'pic'               => '',
                     'condition'         => 'good'
                 ]);
@@ -279,24 +283,26 @@ class InboundController extends Controller
         $activeWorksheet->setCellValue('A3', 'Site Location');
         $activeWorksheet->setCellValue('A4', 'Inbound Type');
         $activeWorksheet->setCellValue('A5', 'Owner Status');
-        $activeWorksheet->setCellValue('A6', 'Date');
+        $activeWorksheet->setCellValue('A6', 'PIC');
+        $activeWorksheet->setCellValue('A7', 'Date');
 
         $activeWorksheet->setCellValue('B1', $inbound->number);
         $activeWorksheet->setCellValue('B2', $inbound->client->name);
         $activeWorksheet->setCellValue('B3', $inbound->site_location);
         $activeWorksheet->setCellValue('B4', $inbound->inbound_type);
         $activeWorksheet->setCellValue('B5', $inbound->owner_status);
-        $activeWorksheet->setCellValue('B6', $inbound->created_at);
+        $activeWorksheet->setCellValue('B6', $inbound->pic->name ?? '-');
+        $activeWorksheet->setCellValue('B7', $inbound->created_at);
 
-        $activeWorksheet->setCellValue('A8', 'Part Name');
-        $activeWorksheet->setCellValue('B8', 'Part Number');
-        $activeWorksheet->setCellValue('C8', 'Serial Number');
-        $activeWorksheet->setCellValue('D8', 'Condition');
-        $activeWorksheet->setCellValue('E8', 'Manufacture Date');
-        $activeWorksheet->setCellValue('F8', 'Warranty End Date');
-        $activeWorksheet->setCellValue('G8', 'EOS Date');
+        $activeWorksheet->setCellValue('A9', 'Part Name');
+        $activeWorksheet->setCellValue('B9', 'Part Number');
+        $activeWorksheet->setCellValue('C9', 'Serial Number');
+        $activeWorksheet->setCellValue('D9', 'Condition');
+        $activeWorksheet->setCellValue('E9', 'Manufacture Date');
+        $activeWorksheet->setCellValue('F9', 'Warranty End Date');
+        $activeWorksheet->setCellValue('G9', 'EOS Date');
 
-        $column = 9;
+        $column = 10;
         foreach ($inboundDetail as $product) {
             $activeWorksheet->setCellValue('A' . $column, $product->part_name);
             $activeWorksheet->setCellValue('B' . $column, $product->part_number);

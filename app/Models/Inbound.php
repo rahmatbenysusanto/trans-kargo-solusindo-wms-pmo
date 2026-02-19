@@ -12,6 +12,7 @@ class Inbound extends Model
     protected $fillable = [
         'number',
         'client_id',
+        'pic_id',
         'site_location',
         'inbound_type',
         'owner_status',
@@ -21,6 +22,11 @@ class Inbound extends Model
         'received_at',
         'created_by'
     ];
+
+    public function pic(): BelongsTo
+    {
+        return $this->belongsTo(Pic::class);
+    }
 
     public function client(): BelongsTo
     {
