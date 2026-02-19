@@ -21,6 +21,57 @@
                     <h4 class="card-title mb-0 flex-grow-1">Inventory History Logs</h4>
                 </div>
                 <div class="card-body">
+                    <form action="{{ route('inventory.cycleCount') }}" method="GET" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Serial Number</label>
+                                <input type="text" name="serialNumber" class="form-control"
+                                    placeholder="Search Serial..." value="{{ request('serialNumber') }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Part Name</label>
+                                <input type="text" name="partName" class="form-control" placeholder="Search Product..."
+                                    value="{{ request('partName') }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Client</label>
+                                <select name="client" class="form-select">
+                                    <option value="">All Client</option>
+                                    @foreach ($client as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request('client') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Type</label>
+                                <select name="type" class="form-select">
+                                    <option value="">All Type</option>
+                                    <option value="Inbound" {{ request('type') == 'Inbound' ? 'selected' : '' }}>Inbound
+                                    </option>
+                                    <option value="Outbound" {{ request('type') == 'Outbound' ? 'selected' : '' }}>
+                                        Outbound</option>
+                                    <option value="Movement" {{ request('type') == 'Movement' ? 'selected' : '' }}>
+                                        Movement</option>
+                                    <option value="PutAway" {{ request('type') == 'PutAway' ? 'selected' : '' }}>PutAway
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="btn-group w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="ri-filter-fill align-bottom me-1"></i> Filter
+                                    </button>
+                                    <a href="{{ route('inventory.cycleCount') }}" class="btn btn-light">
+                                        <i class="ri-refresh-line align-bottom me-1"></i> Reset
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle mb-0">
                             <thead class="table-light text-muted">

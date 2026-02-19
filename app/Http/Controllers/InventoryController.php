@@ -77,11 +77,31 @@ class InventoryController extends Controller
     public function cycleCount(Request $request): View
     {
         $history = InventoryHistory::with('inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai', 'inventory.inboundDetail.inbound.client')
+            ->when($request->query('serialNumber'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('serial_number', 'like', "%$value%");
+                });
+            })
+            ->when($request->query('partName'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('part_name', 'like', "%$value%");
+                });
+            })
+            ->when($request->query('client'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('client_id', $value);
+                });
+            })
+            ->when($request->query('type'), function ($query, $value) {
+                $query->where('type', 'like', "%$value%");
+            })
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->paginate(15)
+            ->appends($request->query());
 
+        $client = Client::all();
         $title = 'Cycle Count';
-        return view('inventory.cycle-count.index', compact('title', 'history'));
+        return view('inventory.cycle-count.index', compact('title', 'history', 'client'));
     }
 
     public function create(): View
