@@ -32,6 +32,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
             Route::get('/', 'index')->name('inbound.receiving.index');
             Route::get('/create', 'create')->name('inbound.receiving.create');
             Route::post('/store', 'store')->name('inbound.receiving.store');
+            Route::get('/bulk-import', 'bulkImport')->name('inbound.receiving.bulkImport');
+            Route::post('/bulk-import', 'bulkImportStore')->name('inbound.receiving.bulkImport.store');
             Route::get('/detail', 'detail')->name('inbound.receiving.detail');
 
             Route::post('/change-status', 'changeStatus')->name('inbound.receiving.changeStatus');

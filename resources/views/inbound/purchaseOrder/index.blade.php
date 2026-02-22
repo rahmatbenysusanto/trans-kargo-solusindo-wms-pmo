@@ -74,10 +74,16 @@
                 <div
                     class="card-header bg-light-subtle py-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Incoming Shipment Records</h5>
-                    <a href="{{ route('inbound.receiving.create') }}"
-                        class="btn btn-primary btn-label waves-effect waves-light btn-sm fw-bold">
-                        <i class="bx bx-plus-circle label-icon align-middle fs-16 me-2"></i> Create New Receiving
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('inbound.receiving.bulkImport') }}"
+                            class="btn btn-soft-success btn-label waves-effect waves-light btn-sm fw-bold">
+                            <i class="bx bx-file label-icon align-middle fs-16 me-2"></i> Bulk Import Excel
+                        </a>
+                        <a href="{{ route('inbound.receiving.create') }}"
+                            class="btn btn-primary btn-label waves-effect waves-light btn-sm fw-bold">
+                            <i class="bx bx-plus-circle label-icon align-middle fs-16 me-2"></i> Create New Receiving
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

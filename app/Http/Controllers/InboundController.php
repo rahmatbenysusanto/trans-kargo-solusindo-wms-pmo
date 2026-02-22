@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Carbon\Carbon;
 use Throwable;
 
 class InboundController extends Controller
@@ -71,6 +73,124 @@ class InboundController extends Controller
 
         $title = 'Purchase Order';
         return view('inbound.purchaseOrder.create', compact('title', 'client', 'pic'));
+    }
+
+    public function bulkImport(): View
+    {
+        $title = 'Bulk Import Receiving';
+        return view('inbound.purchaseOrder.bulk-import', compact('title'));
+    }
+
+    public function bulkImportStore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $file = $request->file('file');
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $worksheet = $spreadsheet->getActiveSheet();
+            $rows = $worksheet->toArray();
+
+            // Skip header (row 1)
+            $data = array_slice($rows, 1);
+
+            $groups = [];
+
+            foreach ($data as $row) {
+                if (empty($row[1]) || empty($row[6])) continue; // Need Date and Client ("By")
+
+                // Handle Date (Column B - Index 1)
+                $dateValue = $row[1];
+                if (is_numeric($dateValue)) {
+                    $receivedAt = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateValue)->format('Y-m-d');
+                } else {
+                    try {
+                        $receivedAt = Carbon::parse($dateValue)->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        $receivedAt = now()->format('Y-m-d');
+                    }
+                }
+
+                $partName = $row[2] ?? '-';    // Column C - Index 2
+                $sn = $row[3] ?? '-';          // Column D - Index 3
+                $site = $row[4] ?? '';         // Column E - Index 4
+                $picName = $row[5] ?? 'System'; // Column F - Index 5
+                $clientName = 'Telkomsel';     // Forced as per user request
+                $awb = $row[7] ?? '';          // Column H - Index 7
+                $remarks = $row[8] ?? '';       // Column I - Index 8
+
+                // Group only by Date, Site Location, and PIC as requested
+                $groupKey = "{$receivedAt}|{$picName}|{$site}";
+
+                if (!isset($groups[$groupKey])) {
+                    $groups[$groupKey] = [
+                        'received_at' => $receivedAt,
+                        'client_name' => $clientName,
+                        'pic_name' => $picName,
+                        'site_location' => $site,
+                        'awb' => $awb,
+                        'products' => []
+                    ];
+                }
+
+                $groups[$groupKey]['products'][] = [
+                    'part_name' => $partName,
+                    'sn' => $sn,
+                    'remarks' => $remarks
+                ];
+            }
+
+            foreach ($groups as $group) {
+                // Find or Create Client
+                $client = Client::firstOrCreate(['name' => $group['client_name']]);
+
+                // Find or Create PIC
+                $pic = Pic::firstOrCreate(['name' => $group['pic_name']]);
+
+                // Create Inbound
+                $inbound = Inbound::create([
+                    'number'        => $this->inboundNumber(),
+                    'client_id'     => $client->id,
+                    'pic_id'        => $pic->id,
+                    'site_location' => $group['site_location'],
+                    'inbound_type'  => 'Relocation',
+                    'owner_status'  => 'Milik Client',
+                    'quantity'      => count($group['products']),
+                    'status'        => 'new',
+                    'remarks'       => $group['awb'] ? 'AWB: ' . $group['awb'] : 'Bulk Import from Master',
+                    'received_at'   => $group['received_at'],
+                    'created_by'    => 1 // Default Admin
+                ]);
+
+                foreach ($group['products'] as $item) {
+                    $product = Product::firstOrCreate(['part_name' => $item['part_name']]);
+
+                    InboundDetail::create([
+                        'inbound_id'    => $inbound->id,
+                        'product_id'    => $product->id,
+                        'qty'           => 1,
+                        'qty_pa'        => 0,
+                        'part_name'     => $item['part_name'],
+                        'part_number'   => $item['part_name'], // Assign PN as Part Name if not separate in Excel
+                        'serial_number' => $item['sn'],
+                        'condition'     => 'Good',
+                        'remarks'       => $item['remarks']
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('inbound.receiving.index')->with('success', 'Bulk import processed successfully. ' . count($groups) . ' Inbound transactions created.');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error('Bulk Import Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error during bulk import: ' . $e->getMessage());
+        }
     }
 
     private function inboundNumber()
