@@ -75,6 +75,9 @@
                                 </div>
                                 <h5 class="fs-15 mb-1">{{ \Carbon\Carbon::parse($inbound->created_at)->format('d M Y') }}
                                 </h5>
+                                <p class="text-muted mb-0 small">Receiving Date: <span
+                                        class="text-info fw-medium">{{ $inbound->received_at ? \Carbon\Carbon::parse($inbound->received_at)->format('d M Y') : '-' }}</span>
+                                </p>
                                 <p class="text-muted mb-0 small">Time: <span
                                         class="text-dark fw-medium">{{ \Carbon\Carbon::parse($inbound->created_at)->format('H:i') }}</span>
                                 </p>
@@ -103,6 +106,7 @@
                                     <th>Serial No</th>
                                     <th>Condition</th>
                                     <th>Lifecycle Dates</th>
+                                    <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -131,6 +135,7 @@
                                                 <span>EOS: {{ $detail->eos_date ?: '-' }}</span>
                                             </div>
                                         </td>
+                                        <td>{{ $detail->remarks ?: '-' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -19,7 +19,8 @@ class InboundDetail extends Model
         'condition',
         'manufacture_date',
         'warranty_end_date',
-        'eos_date'
+        'eos_date',
+        'remarks'
     ];
 
     public function inbound(): BelongsTo

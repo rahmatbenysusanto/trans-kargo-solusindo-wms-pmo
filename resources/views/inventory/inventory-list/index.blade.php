@@ -102,6 +102,7 @@
                                     <th>Ownership</th>
                                     <th class="text-center">Status</th>
                                     <th>Client / Owner</th>
+                                    <th>Remark</th>
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -173,6 +174,9 @@
                                         <td>
                                             <span
                                                 class="badge bg-light text-dark border">{{ $product->inboundDetail->inbound->client->name }}</span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ $product->remark ?: '-' }}</small>
                                         </td>
                                         <td class="text-center">
                                             <a href="{{ route('inbound.inventory.history', ['id' => $product->id]) }}"

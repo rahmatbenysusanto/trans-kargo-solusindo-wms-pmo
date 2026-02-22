@@ -104,6 +104,7 @@ class InboundController extends Controller
                 'quantity'      => count($request->post('products')),
                 'status'        => 'new',
                 'remarks'       => $request->post('remarks'),
+                'received_at'   => $request->post('receivingDate'),
                 'created_by'    => 1
             ]);
 
@@ -128,6 +129,7 @@ class InboundController extends Controller
                     'manufacture_date'  => $product['manufactureDate'] ?? null,
                     'warranty_end_date' => $product['warrantyEndDate'] ?? null,
                     'eos_date'          => $product['eosDate'] ?? null,
+                    'remarks'           => $product['remarks'] ?? null,
                 ]);
             }
 
@@ -241,7 +243,8 @@ class InboundController extends Controller
                     'eos_date'          => $inboundDetail->eos_date,
                     'pic_id'            => $inbound->pic_id,
                     'pic'               => '',
-                    'condition'         => 'good'
+                    'condition'         => 'good',
+                    'remark'            => $inboundDetail->remarks,
                 ]);
 
                 InventoryHistory::create([

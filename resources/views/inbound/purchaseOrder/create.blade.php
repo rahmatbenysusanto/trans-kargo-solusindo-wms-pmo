@@ -123,8 +123,14 @@
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
+                                <label class="form-label">Receiving Date</label>
+                                <input type="date" class="form-control" name="receiving_date" id="receiving_date">
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="mb-3">
                                 <label class="form-label">Remarks</label>
-                                <textarea class="form-control" name="remarks" id="remarks"></textarea>
+                                <textarea class="form-control" name="remarks" id="remarks" rows="1"></textarea>
                             </div>
                         </div>
                     </div>
@@ -267,6 +273,7 @@
                                     <th>Manufacture Date</th>
                                     <th>Warranty End Date</th>
                                     <th>EOS Date</th>
+                                    <th>Remarks</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -315,6 +322,10 @@
                             <div class="mb-3">
                                 <label class="form-label">EOS Date</label>
                                 <input type="date" class="form-control" id="add_eos_date">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Remarks</label>
+                                <textarea class="form-control" id="add_remarks" placeholder="Product Remarks ..."></textarea>
                             </div>
                         </div>
                         <div class="col-6">
@@ -396,6 +407,10 @@
                             <div class="mb-3">
                                 <label class="form-label">EOS Date</label>
                                 <input type="date" class="form-control" id="edit_eos_date">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Remarks</label>
+                                <textarea class="form-control" id="edit_remarks"></textarea>
                             </div>
                         </div>
                         <div class="col-6">
@@ -500,7 +515,8 @@
                 condition: document.getElementById('add_condition').value,
                 manufactureDate: document.getElementById('add_manufacture_date').value,
                 warrantyEndDate: document.getElementById('add_warranty_end_date').value,
-                eosDate: document.getElementById('add_eos_date').value
+                eosDate: document.getElementById('add_eos_date').value,
+                remarks: document.getElementById('add_remarks').value
             });
 
             localStorage.setItem('products', JSON.stringify(products));
@@ -513,6 +529,7 @@
             document.getElementById('add_manufacture_date').value = '';
             document.getElementById('add_warranty_end_date').value = '';
             document.getElementById('add_eos_date').value = '';
+            document.getElementById('add_remarks').value = '';
             $('#addProductModal').modal('hide');
         }
 
@@ -582,9 +599,10 @@
                                     </ul>
                                 </div>
                             </td>
-                            <td>${ product.manufactureDate || '-' }</td>
+                             <td>${ product.manufactureDate || '-' }</td>
                             <td>${ product.warrantyEndDate || '-' }</td>
                             <td>${ product.eosDate || '-' }</td>
+                            <td>${ product.remarks || '-' }</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-soft-info btn-sm" onclick="editProductModal(${originalIndex})">
@@ -729,7 +747,8 @@
                         condition: 'Good',
                         manufactureDate: item['Manufacture Date'] || '',
                         warrantyEndDate: item['Warranty End Date'] || '',
-                        eosDate: item['EOS Date'] || ''
+                        eosDate: item['EOS Date'] || '',
+                        remarks: item['Remarks'] || ''
                     });
                 });
                 localStorage.setItem('products', JSON.stringify(products));
@@ -754,6 +773,7 @@
                 document.getElementById('edit_manufacture_date').value = product.manufactureDate || '';
                 document.getElementById('edit_warranty_end_date').value = product.warrantyEndDate || '';
                 document.getElementById('edit_eos_date').value = product.eosDate || '';
+                document.getElementById('edit_remarks').value = product.remarks || '';
 
                 $('#editProductModal').modal('show');
             }
@@ -771,7 +791,8 @@
                     condition: document.getElementById('edit_condition').value,
                     manufactureDate: document.getElementById('edit_manufacture_date').value,
                     warrantyEndDate: document.getElementById('edit_warranty_end_date').value,
-                    eosDate: document.getElementById('edit_eos_date').value
+                    eosDate: document.getElementById('edit_eos_date').value,
+                    remarks: document.getElementById('edit_remarks').value
                 };
 
                 localStorage.setItem('products', JSON.stringify(products));
@@ -819,6 +840,7 @@
                             ownershipStatus: document.getElementById('ownership_status').value,
                             siteLocation: document.getElementById('site_location').value,
                             remarks: document.getElementById('remarks').value,
+                            receivingDate: document.getElementById('receiving_date').value,
                             products: JSON.parse(localStorage.getItem('products')) ?? []
                         }),
                         success: (res) => {
