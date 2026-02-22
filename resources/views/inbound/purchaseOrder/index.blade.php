@@ -107,7 +107,8 @@
                                         <td class="text-muted">{{ $inbound->firstItem() + $index }}</td>
                                         <td>
                                             <div class="fw-semibold text-primary mb-1">{{ $item->number }}</div>
-                                            <div class="badge badge-soft-info fs-11">{{ $item->owner_status }}</div>
+                                            <div class="badge bg-info-subtle text-info border border-info-subtle fs-11">
+                                                {{ $item->owner_status }}</div>
                                         </td>
                                         <td>
                                             <div class="text-dark fw-medium">{{ $item->client->name }}</div>
@@ -152,7 +153,7 @@
                                                 class="badge {{ $statusClass }} text-uppercase px-3 py-2">{{ $item->status }}</span>
                                         </td>
                                         <td>
-                                            <div class="d-flex gap-1 justify-content-center">
+                                            <div class="d-flex gap-1 justify-content-start">
                                                 <a href="{{ route('inbound.receiving.downloadExcel', ['id' => $item->id]) }}"
                                                     class="btn btn-soft-success btn-icon btn-sm" data-bs-toggle="tooltip"
                                                     title="Download Excel">
