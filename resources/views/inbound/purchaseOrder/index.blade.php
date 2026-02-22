@@ -92,6 +92,7 @@
                                 <tr>
                                     <th style="width: 50px;">#</th>
                                     <th>Transaction No</th>
+                                    <th>PIC</th>
                                     <th>Client / Status</th>
                                     <th class="text-center">QTY</th>
                                     <th>Inbound Type</th>
@@ -109,6 +110,9 @@
                                             <div class="fw-semibold text-primary mb-1">{{ $item->number }}</div>
                                             <div class="badge bg-info-subtle text-info border border-info-subtle fs-11">
                                                 {{ $item->owner_status }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-medium text-dark">{{ $item->pic->name ?? '-' }}</div>
                                         </td>
                                         <td>
                                             <div class="text-dark fw-medium">{{ $item->client->name }}</div>
