@@ -37,13 +37,8 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-muted small text-uppercase">Ownership</label>
-                                <select class="form-select border-light bg-light" name="ownership">
-                                    <option value="">All Status</option>
-                                    <option {{ request()->get('ownership') == 'Milik Client' ? 'selected' : '' }}>Milik
-                                        Client</option>
-                                    <option {{ request()->get('ownership') == 'Titipan' ? 'selected' : '' }}>Titipan
-                                    </option>
-                                </select>
+                                <input type="text" class="form-control border-light bg-light" name="ownership"
+                                    value="{{ request()->get('ownership') }}" placeholder="Ownership ...">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-muted small text-uppercase">Type</label>

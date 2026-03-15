@@ -97,11 +97,8 @@
                         <div class="col-4">
                             <div class="mb-3">
                                 <label class="form-label">Ownership Status</label>
-                                <select class="form-select" name="ownership_status" id="ownership_status">
-                                    <option value="">-- Choose Ownership Status --</option>
-                                    <option>Milik Client</option>
-                                    <option>Titipan</option>
-                                </select>
+                                <input type="text" class="form-control" name="ownership_status" id="ownership_status"
+                                    placeholder="Ownership Status ...">
                             </div>
                         </div>
                         <div class="col-4">

@@ -25,6 +25,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/inbound-vs-return', 'inboundVsReturn')->name('inboundVsReturn');
         Route::get('/top-devices', 'topDevices')->name('topDevices');
         Route::get('/lifecycle-status-distributor', 'lifecycleStatusDistributor')->name('lifecycleStatusDistributor');
+        Route::get('/stock-monitoring', 'stockMonitoring')->name('stockMonitoring');
+        Route::get('/stock-monitoring/detail', 'stockMonitoringDetail')->name('stockMonitoring.detail');
     });
 
     Route::prefix('/inbound')->controller(InboundController::class)->group(function () {

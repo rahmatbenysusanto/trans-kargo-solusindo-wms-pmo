@@ -152,4 +152,41 @@ class DashboardController extends Controller
         $title = "Lifecycle Status Distributor";
         return view('dashboard.lifecycle-status-distributor', compact('title', 'data', 'chart'));
     }
+    public function stockMonitoring(Request $request): View
+    {
+        $stocks = DB::table('inventory')
+            ->select('part_name', 'part_number', DB::raw('SUM(qty) as total_qty'))
+            ->where('qty', '>', 0)
+            ->groupBy('part_name', 'part_number')
+            ->get();
+
+        $totalItems = DB::table('inventory')->where('qty', '>', 0)->sum('qty');
+        $uniqueParts = $stocks->count();
+        $totalSerialNumbers = DB::table('inventory')->where('qty', '>', 0)->whereNotNull('serial_number')->where('serial_number', '!=', '')->count();
+
+        $title = "Stock Monitoring";
+        return view('dashboard.stock_monitoring', compact('title', 'stocks', 'totalItems', 'uniqueParts', 'totalSerialNumbers'));
+    }
+
+    public function stockMonitoringDetail(Request $request)
+    {
+        $partName = $request->query('part_name');
+        $partNumber = $request->query('part_number');
+
+        $serials = DB::table('inventory')
+            ->leftJoin('storage_bin', 'inventory.bin_id', '=', 'storage_bin.id')
+            ->where('part_name', $partName)
+            ->where('part_number', $partNumber)
+            ->where('qty', '>', 0)
+            ->select(
+                'serial_number',
+                'storage_bin.name as bin_name',
+                'inventory.status',
+                'inventory.condition',
+                'inventory.pic'
+            )
+            ->get();
+
+        return response()->json($serials);
+    }
 }

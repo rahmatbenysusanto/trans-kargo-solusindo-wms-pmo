@@ -568,14 +568,14 @@
 
                         <li class="menu-title"><span data-key="t-menu">Dashboard</span></li>
                         <li
-                            class="nav-item {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor']) ? 'active' : '' }}">
+                            class="nav-item {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor', 'Stock Monitoring']) ? 'active' : '' }}">
                             <a class="nav-link menu-link" href="#sidebarDashboard" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarDashboard">
                                 <i class="mdi mdi-view-dashboard-outline"></i>
                                 <span data-key="t-widgets">Dashboard</span>
                             </a>
 
-                            <div class="collapse menu-dropdown {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor']) ? 'show' : '' }}"
+                            <div class="collapse menu-dropdown {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor', 'Stock Monitoring']) ? 'show' : '' }}"
                                 id="sidebarDashboard">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
@@ -602,6 +602,11 @@
                                         <a href="{{ route('topDevices') }}"
                                             class="nav-link {{ $title == 'Dashboard Top Devices by Client' ? 'active' : '' }}"
                                             data-key="t-analytics"> Top Devices by Client </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('stockMonitoring') }}"
+                                            class="nav-link {{ $title == 'Stock Monitoring' ? 'active' : '' }}"
+                                            data-key="t-analytics"> Stock Monitoring </a>
                                     </li>
                                 </ul>
                             </div>
