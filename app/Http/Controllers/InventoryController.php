@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
 use App\Models\StorageArea;
+use App\Models\StorageBin;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -210,5 +211,28 @@ class InventoryController extends Controller
         $pdf = Pdf::loadView('pdf.inventory', compact('inventory'))->setPaper('A4', 'landscape');
         $fileName = 'Inventory.pdf';
         return $pdf->stream($fileName);
+    }
+
+    public function storageInventory(Request $request): View
+    {
+        $storages = StorageBin::with(['storageArea', 'storageRak', 'storageLantai'])
+            ->withCount(['inventory as total_items'])
+            ->withSum('inventory as total_qty', 'qty')
+            ->having('total_items', '>', 0)
+            ->get();
+
+        $title = 'Storage Inventory';
+        return view('inventory.storage-inventory.index', compact('title', 'storages'));
+    }
+
+    public function storageInventoryDetail(Request $request): View
+    {
+        $binId = $request->query('bin_id');
+        $inventory = Inventory::with(['bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'client', 'pic'])
+            ->where('bin_id', $binId)
+            ->get();
+
+        $title = 'Storage Inventory Detail';
+        return view('inventory.storage-inventory.detail', compact('title', 'inventory'));
     }
 }

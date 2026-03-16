@@ -57,6 +57,11 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/history', 'history')->name('inbound.inventory.history');
         Route::get('/cycle-count', 'cycleCount')->name('inventory.cycleCount');
 
+        Route::prefix('/storage-inventory')->group(function () {
+            Route::get('/', 'storageInventory')->name('inventory.storageInventory.index');
+            Route::get('/detail', 'storageInventoryDetail')->name('inventory.storageInventory.detail');
+        });
+
         Route::prefix('/stock-movement')->group(function () {
             Route::get('/', 'stockMovement')->name('inventory.stockMovement.index');
             Route::get('/create', 'create')->name('inventory.stockMovement.create');

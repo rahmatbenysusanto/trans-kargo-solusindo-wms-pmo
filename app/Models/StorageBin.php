@@ -23,4 +23,9 @@ class StorageBin extends Model
     {
         return $this->belongsTo(StorageLantai::class, 'storage_lantai_id');
     }
+
+    public function inventory(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Inventory::class, 'bin_id');
+    }
 }
