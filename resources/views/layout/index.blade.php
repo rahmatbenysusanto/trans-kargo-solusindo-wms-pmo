@@ -645,13 +645,13 @@
 
                         <!-- Inventory -->
                         <li class="nav-item">
-                            <a class="nav-link menu-link {{ in_array($title, ['Inventory List', 'Storage Inventory', 'Storage Inventory Detail', 'Stock Movement', 'Cycle Count']) ? 'active' : '' }}"
+                            <a class="nav-link menu-link {{ in_array($title, ['Inventory List', 'Inventory History', 'Storage Inventory', 'Storage Inventory Detail', 'Stock Movement', 'Cycle Count']) ? 'active' : '' }}"
                                 href="#inventory" data-bs-toggle="collapse" role="button" aria-expanded="false"
                                 aria-controls="inventory">
                                 <i class="mdi mdi-warehouse"></i>
                                 <span data-key="t-widgets">Inventory</span>
                             </a>
-                            <div class="collapse menu-dropdown {{ in_array($title, ['Inventory List', 'Storage Inventory', 'Storage Inventory Detail', 'Stock Movement', 'Cycle Count']) ? 'show' : '' }}"
+                            <div class="collapse menu-dropdown {{ in_array($title, ['Inventory List', 'Inventory History', 'Storage Inventory', 'Storage Inventory Detail', 'Stock Movement', 'Cycle Count']) ? 'show' : '' }}"
                                 id="inventory">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
@@ -659,6 +659,13 @@
                                             class="nav-link {{ $title == 'Inventory List' ? 'active' : '' }}"
                                             data-key="t-analytics">
                                             <i class="mdi mdi-format-list-bulleted me-2"></i> Inventory List
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('inventory.inventoryHistory') }}"
+                                            class="nav-link {{ $title == 'Inventory History' ? 'active' : '' }}"
+                                            data-key="t-analytics">
+                                            <i class="mdi mdi-history me-2"></i> Inventory History
                                         </a>
                                     </li>
                                     <li class="nav-item">

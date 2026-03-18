@@ -14,4 +14,9 @@ class OutboundDetail extends Model
     {
         return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
     }
+
+    public function outbound(): BelongsTo
+    {
+        return $this->belongsTo(Outbound::class, 'outbound_id', 'id');
+    }
 }

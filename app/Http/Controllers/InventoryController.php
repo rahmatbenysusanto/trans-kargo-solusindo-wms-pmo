@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\InventoryHistory;
+use App\Models\OutboundDetail;
 use App\Models\StorageArea;
 use App\Models\StorageBin;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -57,6 +58,22 @@ class InventoryController extends Controller
 
         $title = 'Inventory List';
         return view('inventory.inventory-list.history', compact('title', 'inventory', 'history'));
+    }
+
+    public function inventoryHistory(Request $request): View
+    {
+        $history = OutboundDetail::with(['inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai', 'outbound.client'])
+            ->when($request->query('serialNumber'), function ($query) use ($request) {
+                return $query->whereHas('inventory', function ($q) use ($request) {
+                    $q->where('serial_number', 'LIKE', '%' . $request->query('serialNumber') . '%');
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->appends($request->query());
+
+        $title = 'Inventory History';
+        return view('inventory.inventory-history.index', compact('title', 'history'));
     }
 
     public function stockMovement(Request $request): View

@@ -55,6 +55,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::prefix('/inventory')->controller(InventoryController::class)->group(function () {
         Route::get('/', 'index')->name('inbound.inventory.index');
         Route::get('/history', 'history')->name('inbound.inventory.history');
+        Route::get('/inventory-history', 'inventoryHistory')->name('inventory.inventoryHistory');
         Route::get('/cycle-count', 'cycleCount')->name('inventory.cycleCount');
 
         Route::prefix('/storage-inventory')->group(function () {
