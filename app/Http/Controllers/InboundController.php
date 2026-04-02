@@ -77,19 +77,18 @@ class InboundController extends Controller
 
     public function bulkImport(): View
     {
+        session()->forget('bulk_import_data');
         $title = 'Bulk Import Receiving';
         return view('inbound.purchaseOrder.bulk-import', compact('title'));
     }
 
-    public function bulkImportStore(Request $request)
+    public function bulkImportPreview(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls'
         ]);
 
         try {
-            DB::beginTransaction();
-
             $file = $request->file('file');
             $spreadsheet = IOFactory::load($file->getRealPath());
             $worksheet = $spreadsheet->getActiveSheet();
@@ -144,6 +143,32 @@ class InboundController extends Controller
                 ];
             }
 
+            if (empty($groups)) {
+                return redirect()->back()->with('error', 'No valid data found in the uploaded file.');
+            }
+
+            // Store in session for confirmation
+            session(['bulk_import_data' => $groups]);
+
+            $title = 'Bulk Import Preview';
+            return view('inbound.purchaseOrder.bulk-import', compact('title', 'groups'));
+        } catch (Throwable $e) {
+            Log::error('Bulk Import Preview Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error during bulk import preview: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkImportConfirm(Request $request)
+    {
+        $groups = session('bulk_import_data');
+
+        if (!$groups) {
+            return redirect()->route('inbound.receiving.bulkImport')->with('error', 'No data found to process. Please upload the file again.');
+        }
+
+        try {
+            DB::beginTransaction();
+
             foreach ($groups as $group) {
                 // Find or Create Client
                 $client = Client::firstOrCreate(['name' => $group['client_name']]);
@@ -185,11 +210,14 @@ class InboundController extends Controller
 
             DB::commit();
 
+            // Clear session data
+            session()->forget('bulk_import_data');
+
             return redirect()->route('inbound.receiving.index')->with('success', 'Bulk import processed successfully. ' . count($groups) . ' Inbound transactions created.');
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error('Bulk Import Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error during bulk import: ' . $e->getMessage());
+            Log::error('Bulk Import Confirm Error: ' . $e->getMessage());
+            return redirect()->route('inbound.receiving.bulkImport')->with('error', 'Error during bulk import processing: ' . $e->getMessage());
         }
     }
 
