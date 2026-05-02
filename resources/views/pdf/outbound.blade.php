@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Outbound Report</title>
+    <title>Delivery Note</title>
 
     <style>
         body {
@@ -155,9 +155,11 @@
         <table class="header-table">
             <tr>
                 <td>
-                    <h1 class="report-title">Outbound Report</h1>
+                    <h1 class="report-title">Delivery Note</h1>
                 </td>
                 <td class="company-info">
+                    <img src="{{ public_path('assets/images/ntt.png') }}" alt="Logo"
+                        style="height: 40px; margin-bottom: 5px;"><br>
                     TRANS KARGO SOLUSINDO<br>
                     <span style="font-size: 9px; font-weight: normal;">Warehouse Management System</span>
                 </td>
