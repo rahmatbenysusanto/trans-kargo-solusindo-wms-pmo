@@ -45,6 +45,7 @@
                                     <li>Column F: <strong>PIC</strong> (PIC Name)</li>
                                     <li>Column G: <strong>By</strong> (Client Name)</li>
                                     <li>Column I: <strong>Remarks</strong> (Detail Remarks)</li>
+                                    <li>Column J: <strong>Part Description</strong> (Optional Description)</li>
                                 </ul>
                             </div>
 
@@ -125,6 +126,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Part Name</th>
+                                                                <th>Part Description</th>
                                                                 <th>Serial Number</th>
                                                                 <th>Remarks</th>
                                                             </tr>
@@ -133,6 +135,7 @@
                                                             @foreach ($group['products'] as $product)
                                                                 <tr>
                                                                     <td>{{ $product['part_name'] }}</td>
+                                                                    <td>{{ $product['part_description'] ?? '-' }}</td>
                                                                     <td>{{ $product['sn'] }}</td>
                                                                     <td>{{ $product['remarks'] }}</td>
                                                                 </tr>

@@ -17,6 +17,7 @@ class Inventory extends Model
         'status',
         'part_name',
         'part_number',
+        'part_description',
         'serial_number',
         'condition',
         'manufacture_date',

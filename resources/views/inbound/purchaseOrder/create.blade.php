@@ -265,6 +265,7 @@
                                     <th>#</th>
                                     <th>Part Name</th>
                                     <th>Part Number</th>
+                                    <th>Part Description</th>
                                     <th>Serial Number</th>
                                     <th>Condition</th>
                                     <th>Manufacture Date</th>
@@ -306,6 +307,11 @@
                                 <label class="form-label">Part Name</label>
                                 <input type="text" class="form-control" id="add_part_name"
                                     placeholder="Part Name ...">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Part Description</label>
+                                <input type="text" class="form-control" id="add_part_description"
+                                    placeholder="Part Description ...">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Serial Number</label>
@@ -392,6 +398,10 @@
                             <div class="mb-3">
                                 <label class="form-label">Part Name</label>
                                 <input type="text" class="form-control" id="edit_part_name">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Part Description</label>
+                                <input type="text" class="form-control" id="edit_part_description">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Serial Number</label>
@@ -508,6 +518,7 @@
             products.push({
                 partName: document.getElementById('add_part_name').value,
                 partNumber: document.getElementById('add_part_number').value,
+                partDescription: document.getElementById('add_part_description').value,
                 serialNumber: document.getElementById('add_serial_number').value,
                 condition: document.getElementById('add_condition').value,
                 manufactureDate: document.getElementById('add_manufacture_date').value,
@@ -521,6 +532,7 @@
 
             document.getElementById('add_part_name').value = '';
             document.getElementById('add_part_number').value = '';
+            document.getElementById('add_part_description').value = '';
             document.getElementById('add_serial_number').value = '';
             document.getElementById('add_condition').value = '';
             document.getElementById('add_manufacture_date').value = '';
@@ -537,6 +549,7 @@
             const filteredProducts = allProducts.filter(product =>
                 (product.partName || '').toLowerCase().includes(searchTerm) ||
                 (product.partNumber || '').toLowerCase().includes(searchTerm) ||
+                (product.partDescription || '').toLowerCase().includes(searchTerm) ||
                 (product.serialNumber || '').toLowerCase().includes(searchTerm)
             );
 
@@ -570,6 +583,7 @@
                             <td>${ displayIndex + 1 }</td>
                             <td><span class="fw-medium">${ product.partName }</span></td>
                             <td>${ product.partNumber }</td>
+                            <td>${ product.partDescription || '-' }</td>
                             <td><code class="text-primary">${ product.serialNumber }</code></td>
                             <td>
                                 <div class="dropdown condition-dropdown">
@@ -740,6 +754,7 @@
                     products.push({
                         partName: item['PN#'],
                         partNumber: item['PN#'],
+                        partDescription: item['Part Description'] || '',
                         serialNumber: item['SN#'],
                         condition: 'Good',
                         manufactureDate: item['Manufacture Date'] || '',
@@ -765,6 +780,7 @@
                 document.getElementById('edit_index').value = index;
                 document.getElementById('edit_part_name').value = product.partName;
                 document.getElementById('edit_part_number').value = product.partNumber;
+                document.getElementById('edit_part_description').value = product.partDescription || '';
                 document.getElementById('edit_serial_number').value = product.serialNumber;
                 document.getElementById('edit_condition').value = product.condition;
                 document.getElementById('edit_manufacture_date').value = product.manufactureDate || '';
@@ -784,6 +800,7 @@
                 products[index] = {
                     partName: document.getElementById('edit_part_name').value,
                     partNumber: document.getElementById('edit_part_number').value,
+                    partDescription: document.getElementById('edit_part_description').value,
                     serialNumber: document.getElementById('edit_serial_number').value,
                     condition: document.getElementById('edit_condition').value,
                     manufactureDate: document.getElementById('edit_manufacture_date').value,

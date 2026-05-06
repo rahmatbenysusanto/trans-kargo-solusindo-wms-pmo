@@ -242,6 +242,7 @@
                                 <div class="flex-grow-1">
                                     <h6 class="fs-14 mb-1 text-dark">${product.part_name}</h6>
                                     <p class="text-muted mb-0 small">PN: ${product.part_number}</p>
+                                    <p class="text-muted mb-0 small text-truncate" style="max-width: 200px;">Desc: ${product.part_description || '-'}</p>
                                 </div>
                             </div>
                         </td>
@@ -290,6 +291,7 @@
                 id: product.id,
                 partName: product.part_name,
                 partNumber: product.part_number,
+                partDescription: product.part_description,
                 serialNumber: product.serial_number,
                 client: clientName
             });
@@ -323,6 +325,7 @@
                                     <div class="flex-grow-1">
                                         <h6 class="fs-14 mb-1 text-dark">${product.partName}</h6>
                                         <p class="text-muted mb-0 small">PN: ${product.partNumber}</p>
+                                        <p class="text-muted mb-0 small text-truncate" style="max-width: 200px;">Desc: ${product.partDescription || '-'}</p>
                                     </div>
                                 </div>
                             </td>

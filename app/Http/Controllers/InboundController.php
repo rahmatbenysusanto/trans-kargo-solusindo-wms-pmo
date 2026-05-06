@@ -139,6 +139,7 @@ class InboundController extends Controller
                 $groups[$groupKey]['products'][] = [
                     'part_name' => $partName,
                     'sn' => $sn,
+                    'part_description' => $row[9] ?? '', // Column J - Index 9
                     'remarks' => $remarks
                 ];
             }
@@ -200,7 +201,8 @@ class InboundController extends Controller
                         'qty'           => 1,
                         'qty_pa'        => 0,
                         'part_name'     => $item['part_name'],
-                        'part_number'   => $item['part_name'], // Assign PN as Part Name if not separate in Excel
+                        'part_number'   => $item['part_name'],
+                        'part_description' => $item['part_description'] ?? null,
                         'serial_number' => $item['sn'],
                         'condition'     => 'Good',
                         'remarks'       => $item['remarks']
@@ -261,7 +263,10 @@ class InboundController extends Controller
                 if ($checkProduct != null) {
                     $productId = $checkProduct->id;
                 } else {
-                    $createProduct = Product::create(['part_name' => $product['partName']]);
+                    $createProduct = Product::create([
+                        'part_name' => $product['partName'],
+                        'part_description' => $product['partDescription'] ?? null
+                    ]);
                     $productId = $createProduct->id;
                 }
 
@@ -272,6 +277,7 @@ class InboundController extends Controller
                     'qty_pa'        => 0,
                     'part_name'     => $product['partName'],
                     'part_number'   => $product['partNumber'],
+                    'part_description' => $product['partDescription'] ?? null,
                     'serial_number' => $product['serialNumber'],
                     'condition'     => $product['condition'] ?? null,
                     'manufacture_date'  => $product['manufactureDate'] ?? null,
@@ -385,6 +391,7 @@ class InboundController extends Controller
                     'status'            => 'available',
                     'part_name'         => $inboundDetail->part_name,
                     'part_number'       => $inboundDetail->part_number,
+                    'part_description'  => $inboundDetail->part_description,
                     'serial_number'     => $inboundDetail->serial_number,
                     'manufacture_date'  => $inboundDetail->manufacture_date,
                     'warranty_end_date' => $inboundDetail->warranty_end_date,
@@ -447,21 +454,23 @@ class InboundController extends Controller
 
         $activeWorksheet->setCellValue('A9', 'Part Name');
         $activeWorksheet->setCellValue('B9', 'Part Number');
-        $activeWorksheet->setCellValue('C9', 'Serial Number');
-        $activeWorksheet->setCellValue('D9', 'Condition');
-        $activeWorksheet->setCellValue('E9', 'Manufacture Date');
-        $activeWorksheet->setCellValue('F9', 'Warranty End Date');
-        $activeWorksheet->setCellValue('G9', 'EOS Date');
+        $activeWorksheet->setCellValue('C9', 'Part Description');
+        $activeWorksheet->setCellValue('D9', 'Serial Number');
+        $activeWorksheet->setCellValue('E9', 'Condition');
+        $activeWorksheet->setCellValue('F9', 'Manufacture Date');
+        $activeWorksheet->setCellValue('G9', 'Warranty End Date');
+        $activeWorksheet->setCellValue('H9', 'EOS Date');
 
         $column = 10;
         foreach ($inboundDetail as $product) {
             $activeWorksheet->setCellValue('A' . $column, $product->part_name);
             $activeWorksheet->setCellValue('B' . $column, $product->part_number);
-            $activeWorksheet->setCellValue('C' . $column, $product->serial_number);
-            $activeWorksheet->setCellValue('D' . $column, $product->condition);
-            $activeWorksheet->setCellValue('E' . $column, $product->manufacture_date);
-            $activeWorksheet->setCellValue('F' . $column, $product->warranty_end_date);
-            $activeWorksheet->setCellValue('G' . $column, $product->eos_date);
+            $activeWorksheet->setCellValue('C' . $column, $product->part_description);
+            $activeWorksheet->setCellValue('D' . $column, $product->serial_number);
+            $activeWorksheet->setCellValue('E' . $column, $product->condition);
+            $activeWorksheet->setCellValue('F' . $column, $product->manufacture_date);
+            $activeWorksheet->setCellValue('G' . $column, $product->warranty_end_date);
+            $activeWorksheet->setCellValue('H' . $column, $product->eos_date);
 
             $column++;
         }

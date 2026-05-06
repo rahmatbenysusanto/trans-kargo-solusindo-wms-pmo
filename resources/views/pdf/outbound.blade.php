@@ -158,8 +158,6 @@
                     <h1 class="report-title">Delivery Note</h1>
                 </td>
                 <td class="company-info">
-                    <img src="{{ public_path('assets/images/ntt.png') }}" alt="Logo"
-                        style="height: 40px; margin-bottom: 5px;"><br>
                     TRANS KARGO SOLUSINDO<br>
                     <span style="font-size: 9px; font-weight: normal;">Warehouse Management System</span>
                 </td>
@@ -234,7 +232,8 @@
                 <tr>
                     <th>No</th>
                     <th>Part Name</th>
-                    <th>Part Number</th>
+                    <th>Part Description</th>
+                    <th>Qty</th>
                     <th>Serial Number</th>
                 </tr>
             </thead>
@@ -243,7 +242,8 @@
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td>{{ $product->inventory->part_name }}</td>
-                        <td>{{ $product->inventory->part_number }}</td>
+                        <td>{{ $product->inventory->part_description }}</td>
+                        <td class="text-center">{{ $product->inventory->qty ?? 1 }}</td>
                         <td>{{ $product->inventory->serial_number }}</td>
                     </tr>
                 @endforeach
@@ -276,8 +276,8 @@
 
     <script type="text/php">
         if (isset($pdf)) {
-            $x = 750;
-            $y = 565;
+            $x = 520;
+            $y = 820;
             $text = "Page {PAGE_NUM} of {PAGE_COUNT}";
             $font = $fontMetrics->get_font("helvetica", "normal");
             $size = 9;

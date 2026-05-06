@@ -121,7 +121,8 @@
                                                 </div>
                                                 <div>
                                                     <h6 class="fs-14 mb-0 text-dark">{{ $product->part_name }}</h6>
-                                                    <small class="text-muted">PN: {{ $product->part_number }}</small>
+                                                    <div class="text-muted small">PN: {{ $product->part_number }}</div>
+                                                    <div class="text-muted small">Desc: {{ $product->part_description }}</div>
                                                 </div>
                                             </div>
                                         </td>

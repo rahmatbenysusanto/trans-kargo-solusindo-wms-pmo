@@ -205,7 +205,7 @@ class OutboundController extends Controller
         $outbound = Outbound::with('client', 'user')->where('id', $request->query('id'))->first();
         $outboundDetail = OutboundDetail::with('inventory')->where('outbound_id', $request->query('id'))->get();
 
-        $pdf = Pdf::loadView('pdf.outbound', compact('outbound', 'outboundDetail'))->setPaper('A4', 'landscape');
+        $pdf = Pdf::loadView('pdf.outbound', compact('outbound', 'outboundDetail'))->setPaper('A4', 'portrait');
         $fileName = 'Outbound' . $outbound->number . '.pdf';
         return $pdf->stream($fileName);
     }

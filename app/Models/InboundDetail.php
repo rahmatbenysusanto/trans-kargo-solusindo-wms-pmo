@@ -15,6 +15,7 @@ class InboundDetail extends Model
         'qty_pa',
         'part_name',
         'part_number',
+        'part_description',
         'serial_number',
         'condition',
         'manufacture_date',

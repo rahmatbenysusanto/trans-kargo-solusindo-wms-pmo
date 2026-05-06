@@ -226,6 +226,7 @@
                     <th style="width: 30px;">No</th>
                     <th>Part Name</th>
                     <th>Part Number</th>
+                    <th>Part Description</th>
                     <th>Serial Number</th>
                     <th>Condition</th>
                     <th>Manufacture</th>
@@ -239,6 +240,7 @@
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td style="font-weight: bold; color: #2c3e50;">{{ $product->part_name }}</td>
                         <td>{{ $product->part_number }}</td>
+                        <td>{{ $product->part_description }}</td>
                         <td><code style="color: #e67e22;">{{ $product->serial_number }}</code></td>
                         <td class="text-center">{{ strtoupper($product->condition) }}</td>
                         <td class="text-center">{{ $product->manufacture_date }}</td>

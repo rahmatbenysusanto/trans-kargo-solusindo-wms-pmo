@@ -144,6 +144,7 @@
                                                 </div>
                                                 <div>
                                                     <h6 class="fs-14 mb-0">{{ $detail->inventory->part_name }}</h6>
+                                                    <p class="text-muted small mb-0">{{ $detail->inventory->part_description }}</p>
                                                 </div>
                                             </div>
                                         </td>
