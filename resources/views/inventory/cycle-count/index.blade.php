@@ -19,16 +19,26 @@
             <div class="card">
                 <div class="card-header border-0 align-items-center d-flex">
                     <h4 class="card-title mb-0 flex-grow-1">Inventory History Logs</h4>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('inventory.cycleCount.downloadExcel', request()->all()) }}"
+                            class="btn btn-soft-success btn-sm btn-label waves-effect waves-light fw-bold">
+                            <i class="bx bxs-file-export label-icon align-middle fs-16 me-2"></i> Export Excel
+                        </a>
+                        <a href="{{ route('inventory.cycleCount.downloadPDF', request()->all()) }}" target="_blank"
+                            class="btn btn-soft-danger btn-sm btn-label waves-effect waves-light fw-bold">
+                            <i class="bx bxs-file-pdf label-icon align-middle fs-16 me-2"></i> Export PDF
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('inventory.cycleCount') }}" method="GET" class="mb-4">
                         <div class="row g-3">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Serial Number</label>
                                 <input type="text" name="serialNumber" class="form-control"
                                     placeholder="Search Serial..." value="{{ request('serialNumber') }}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Part Name</label>
                                 <input type="text" name="partName" class="form-control" placeholder="Search Product..."
                                     value="{{ request('partName') }}">
@@ -58,6 +68,16 @@
                                     <option value="PutAway" {{ request('type') == 'PutAway' ? 'selected' : '' }}>PutAway
                                     </option>
                                 </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" name="startDate" class="form-control"
+                                    value="{{ request('startDate') }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">End Date</label>
+                                <input type="date" name="endDate" class="form-control"
+                                    value="{{ request('endDate') }}">
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <div class="btn-group w-100">

@@ -2,6 +2,62 @@
 @section('title', 'Inventory List')
 
 @section('content')
+    <style>
+        /* Styling for the QR label tag */
+        .qr-label-card {
+            width: 110px;
+            background: #ffffff;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            position: relative;
+        }
+
+        .qr-label-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: #405189;
+        }
+
+        .qr-label-card::after {
+            content: '\ea2e'; /* Boxicon zoom-in or boxicon details icon */
+            font-family: 'boxicons';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 11px;
+            color: #adb5bd;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .qr-label-card:hover::after {
+            opacity: 1;
+        }
+
+        .qr-code-placeholder {
+            background: #fafafa;
+            border-radius: 4px;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-code-placeholder canvas,
+        .qr-code-placeholder img {
+            width: 64px !important;
+            height: 64px !important;
+        }
+
+    </style>
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -180,11 +236,21 @@
                                             <small class="text-muted">{{ $product->remark ?: '-' }}</small>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('inbound.inventory.history', ['id' => $product->id]) }}"
-                                                class="btn btn-soft-secondary btn-icon btn-sm waves-effect waves-light"
-                                                data-bs-toggle="tooltip" title="View History">
-                                                <i class="bx bx-history"></i>
-                                            </a>
+                                            <div class="d-flex gap-1 justify-content-center">
+                                                <button type="button" 
+                                                        class="btn btn-soft-primary btn-icon btn-sm btn-view-qr" 
+                                                        data-pn="{{ $product->part_number }}" 
+                                                        data-sn="{{ $product->serial_number }}"
+                                                        data-bs-toggle="tooltip" 
+                                                        title="View QR Label">
+                                                    <i class="bx bx-qr-scan fs-16"></i>
+                                                </button>
+                                                <a href="{{ route('inbound.inventory.history', ['id' => $product->id]) }}"
+                                                    class="btn btn-soft-secondary btn-icon btn-sm waves-effect waves-light"
+                                                    data-bs-toggle="tooltip" title="View History">
+                                                    <i class="bx bx-history"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
@@ -213,4 +279,252 @@
             </div>
         </div>
     </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="qrModalLabel">Asset QR Label</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center pt-2 pb-4">
+                    <p class="text-muted small mb-3">Scan this QR code using a scanner to identify the product.</p>
+                    
+                    <!-- Label Container that matches print format -->
+                    <div class="bg-light p-4 rounded-3 border border-dashed border-2 mb-4 d-inline-block">
+                        <div id="modal-label-print-area" class="bg-white p-3 border rounded shadow-sm d-flex flex-column align-items-center" style="width: 220px;">
+                            <div id="modal-qr-placeholder" class="mb-3"></div>
+                            <div class="text-muted fw-bold text-center w-100 text-truncate" id="modal-pn-text" style="font-size: 11px; border-top: 1px dashed #eee; padding-top: 8px; margin-top: 5px;">
+                                PN: -
+                            </div>
+                            <div class="text-dark font-monospace text-center w-100 text-truncate" id="modal-sn-text" style="font-size: 11px;">
+                                SN: -
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary fw-bold" id="btn-print-qr-label">
+                            <i class="bx bx-printer align-middle me-1"></i> Print Label
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+@section('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // QR Codes will render dynamically inside the modal when requested via the view button.
+
+            var modalQr = null;
+
+            // Handle Click on QR Label Card
+            $('.btn-view-qr').on('click', function() {
+                var pn = $(this).data('pn');
+                var sn = $(this).data('sn');
+
+                $('#modal-pn-text').text('PN: ' + pn);
+                $('#modal-sn-text').text('SN: ' + sn);
+                $('#modal-qr-placeholder').empty();
+
+                // Generate larger QR code inside modal
+                modalQr = new QRCode(document.getElementById('modal-qr-placeholder'), {
+                    text: sn.toString(),
+                    width: 140,
+                    height: 140,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+
+                // Show Bootstrap modal
+                var qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+                qrModal.show();
+            });
+
+            // Robust helper to extract/generate QR code base64 source reliably
+            function getQRCodeSrc(pn, sn, callback) {
+                // 1. Try to extract directly from the already rendered modal placeholder (already in active DOM)
+                var modalQrPlaceholder = document.getElementById('modal-qr-placeholder');
+                if (modalQrPlaceholder) {
+                    var generatedImg = modalQrPlaceholder.querySelector('img');
+                    var generatedCanvas = modalQrPlaceholder.querySelector('canvas');
+                    var src = '';
+                    
+                    if (generatedImg && generatedImg.src && generatedImg.src.indexOf('data:image') === 0 && generatedImg.src !== 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') {
+                        src = generatedImg.src;
+                    } else if (generatedCanvas) {
+                        src = generatedCanvas.toDataURL();
+                    }
+                    
+                    if (src) {
+                        callback(src);
+                        return;
+                    }
+                }
+                
+                // 2. Fallback: generate it on an attached hidden container so the browser renders it fully
+                var tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.top = '-9999px';
+                document.body.appendChild(tempDiv);
+                
+                new QRCode(tempDiv, {
+                    text: sn.toString(),
+                    width: 120,
+                    height: 120,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                
+                // Allow a small tick for QRCode library base64 conversion
+                setTimeout(function() {
+                    var img = tempDiv.querySelector('img');
+                    var canvas = tempDiv.querySelector('canvas');
+                    var src = '';
+                    
+                    if (img && img.src && img.src.indexOf('data:image') === 0 && img.src !== 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7') {
+                        src = img.src;
+                    } else if (canvas) {
+                        src = canvas.toDataURL();
+                    }
+                    
+                    document.body.removeChild(tempDiv);
+                    callback(src);
+                }, 150);
+            }
+
+            // Isolated Sandbox Printing for Barcode Labels (guarantees paper sizing & prevents CSS conflicts)
+            function printLabel(pn, sn) {
+                getQRCodeSrc(pn, sn, function(qrSrc) {
+                    // Create sandboxed print iframe with dimensions matching standard sticker sizes to prevent collapsed (blank) layout
+                    var iframe = document.createElement('iframe');
+                    iframe.style.position = 'fixed';
+                    iframe.style.width = '50mm';
+                    iframe.style.height = '30mm';
+                    iframe.style.left = '-9999px';
+                    iframe.style.top = '-9999px';
+                    iframe.style.border = 'none';
+                    document.body.appendChild(iframe);
+
+                    var doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(`
+                        <html>
+                        <head>
+                            <title>Print Label</title>
+                            <style>
+                                @page {
+                                    size: 50mm 30mm;
+                                    margin: 0;
+                                }
+                                * {
+                                    box-sizing: border-box;
+                                }
+                                body {
+                                    margin: 0;
+                                    padding: 0;
+                                    background: #ffffff;
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 50mm;
+                                    height: 30mm;
+                                }
+                                .label-container {
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    justify-content: center;
+                                    text-align: center;
+                                    width: 100%;
+                                    height: 100%;
+                                    padding: 1.5mm;
+                                }
+                                .qr-code {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin-bottom: 1.2mm;
+                                }
+                                .qr-code img {
+                                    width: 18mm !important;
+                                    height: 18mm !important;
+                                    display: block !important;
+                                }
+                                .label-text {
+                                    font-family: 'Courier New', Courier, monospace;
+                                    font-size: 6.5pt;
+                                    font-weight: bold;
+                                    line-height: 1.2;
+                                    color: #000000;
+                                    width: 100%;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    margin: 0;
+                                    text-transform: uppercase;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="label-container">
+                                <div class="qr-code">
+                                    <img src="${qrSrc}" id="qr-img" />
+                                </div>
+                                <div class="label-text">PN: ${pn}</div>
+                                <div class="label-text">SN: ${sn}</div>
+                            </div>
+                            <script>
+                                function triggerPrint() {
+                                    window.focus();
+                                    setTimeout(function() {
+                                        window.print();
+                                    }, 100);
+                                }
+                                
+                                var img = document.getElementById('qr-img');
+                                if (img && img.complete) {
+                                    triggerPrint();
+                                } else if (img) {
+                                    img.onload = triggerPrint;
+                                    img.onerror = triggerPrint;
+                                } else {
+                                    triggerPrint();
+                                }
+                                
+                                // Auto clean-up iframe after user prints/closes print dialog
+                                window.onafterprint = function() {
+                                    try {
+                                        window.parent.document.body.removeChild(window.frameElement);
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                };
+                            <\/script>
+                        </body>
+                        </html>
+                    `);
+                    doc.close();
+                });
+            }
+
+            // Handle Print Label Button click
+            $('#btn-print-qr-label').on('click', function() {
+                var pn = $('#modal-pn-text').text().replace('PN: ', '').trim();
+                var sn = $('#modal-sn-text').text().replace('SN: ', '').trim();
+                printLabel(pn, sn);
+            });
+        });
+    </script>
 @endsection

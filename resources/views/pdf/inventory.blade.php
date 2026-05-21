@@ -150,6 +150,7 @@
             <thead>
                 <tr>
                     <th style="width: 25px;">No</th>
+                    <th style="width: 70px;">QR Code</th>
                     <th>Storage Location</th>
                     <th>Client / Owner</th>
                     <th>Asset Details</th>
@@ -164,6 +165,9 @@
                 @foreach ($inventory as $index => $product)
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
+                        <td class="text-center" style="padding: 4px;">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data={{ urlencode($product->serial_number) }}" width="45" height="45" style="border: 1px solid #ccc; padding: 2px; background: white;" />
+                        </td>
                         <td>
                             <div style="font-weight: bold; color: #2c3e50;">{{ $product->bin->name }}</div>
                             <div class="storage-text">

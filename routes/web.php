@@ -58,6 +58,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/history', 'history')->name('inbound.inventory.history');
         Route::get('/inventory-history', 'inventoryHistory')->name('inventory.inventoryHistory');
         Route::get('/cycle-count', 'cycleCount')->name('inventory.cycleCount');
+        Route::get('/cycle-count/download-excel', 'cycleCountDownloadExcel')->name('inventory.cycleCount.downloadExcel');
+        Route::get('/cycle-count/download-pdf', 'cycleCountDownloadPDF')->name('inventory.cycleCount.downloadPDF');
 
         Route::prefix('/storage-inventory')->group(function () {
             Route::get('/', 'storageInventory')->name('inventory.storageInventory.index');

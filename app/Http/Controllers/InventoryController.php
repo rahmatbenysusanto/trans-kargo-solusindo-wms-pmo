@@ -113,6 +113,12 @@ class InventoryController extends Controller
             ->when($request->query('type'), function ($query, $value) {
                 $query->where('type', 'like', "%$value%");
             })
+            ->when($request->query('startDate'), function ($query, $value) {
+                $query->where('created_at', '>=', $value . ' 00:00:00');
+            })
+            ->when($request->query('endDate'), function ($query, $value) {
+                $query->where('created_at', '<=', $value . ' 23:59:59');
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->appends($request->query());
@@ -120,6 +126,129 @@ class InventoryController extends Controller
         $client = Client::all();
         $title = 'Cycle Count';
         return view('inventory.cycle-count.index', compact('title', 'history', 'client'));
+    }
+
+    public function cycleCountDownloadExcel(Request $request)
+    {
+        $spreadsheet = new Spreadsheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet();
+        $activeWorksheet->setCellValue('A1', 'Date & Time');
+        $activeWorksheet->setCellValue('B1', 'Product Name');
+        $activeWorksheet->setCellValue('C1', 'Part Number');
+        $activeWorksheet->setCellValue('D1', 'Serial Number');
+        $activeWorksheet->setCellValue('E1', 'Location');
+        $activeWorksheet->setCellValue('F1', 'Type');
+        $activeWorksheet->setCellValue('G1', 'Description');
+        $activeWorksheet->setCellValue('H1', 'Client');
+
+        $history = InventoryHistory::with([
+                'inventory.bin.storageArea',
+                'inventory.bin.storageRak',
+                'inventory.bin.storageLantai',
+                'inventory.client'
+            ])
+            ->when($request->query('serialNumber'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('serial_number', 'like', "%$value%");
+                });
+            })
+            ->when($request->query('partName'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('part_name', 'like', "%$value%");
+                });
+            })
+            ->when($request->query('client'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('client_id', $value);
+                });
+            })
+            ->when($request->query('type'), function ($query, $value) {
+                $query->where('type', 'like', "%$value%");
+            })
+            ->when($request->query('startDate'), function ($query, $value) {
+                $query->where('created_at', '>=', $value . ' 00:00:00');
+            })
+            ->when($request->query('endDate'), function ($query, $value) {
+                $query->where('created_at', '<=', $value . ' 23:59:59');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $column = 2;
+        foreach ($history as $item) {
+            $dateTime = \Carbon\Carbon::parse($item->created_at)->format('d M Y H:i:s');
+            $partName = $item->inventory ? $item->inventory->part_name : '-';
+            $partNumber = $item->inventory ? $item->inventory->part_number : '-';
+            $serialNumber = $item->inventory ? $item->inventory->serial_number : '-';
+            
+            $location = '-';
+            if ($item->inventory && $item->inventory->bin) {
+                $location = $item->inventory->bin->storageArea->name . ' - ' . 
+                            $item->inventory->bin->storageRak->name . ' - ' . 
+                            $item->inventory->bin->storageLantai->name . ' - ' . 
+                            $item->inventory->bin->name;
+            }
+            
+            $clientName = ($item->inventory && $item->inventory->client) ? $item->inventory->client->name : '-';
+
+            $activeWorksheet->setCellValue('A' . $column, $dateTime);
+            $activeWorksheet->setCellValue('B' . $column, $partName);
+            $activeWorksheet->setCellValue('C' . $column, $partNumber);
+            $activeWorksheet->setCellValue('D' . $column, $serialNumber);
+            $activeWorksheet->setCellValue('E' . $column, $location);
+            $activeWorksheet->setCellValue('F' . $column, $item->type);
+            $activeWorksheet->setCellValue('G' . $column, $item->description);
+            $activeWorksheet->setCellValue('H' . $column, $clientName);
+
+            $column++;
+        }
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, 'Report Cycle Count.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function cycleCountDownloadPDF(Request $request)
+    {
+        $history = InventoryHistory::with([
+                'inventory.bin.storageArea',
+                'inventory.bin.storageRak',
+                'inventory.bin.storageLantai',
+                'inventory.client'
+            ])
+            ->when($request->query('serialNumber'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('serial_number', 'like', "%$value%");
+                });
+            })
+            ->when($request->query('partName'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('part_name', 'like', "%$value%");
+                });
+            })
+            ->when($request->query('client'), function ($query, $value) {
+                $query->whereHas('inventory', function ($q) use ($value) {
+                    $q->where('client_id', $value);
+                });
+            })
+            ->when($request->query('type'), function ($query, $value) {
+                $query->where('type', 'like', "%$value%");
+            })
+            ->when($request->query('startDate'), function ($query, $value) {
+                $query->where('created_at', '>=', $value . ' 00:00:00');
+            })
+            ->when($request->query('endDate'), function ($query, $value) {
+                $query->where('created_at', '<=', $value . ' 23:59:59');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.cycle_count', compact('history'))->setPaper('A4', 'landscape');
+        $fileName = 'Report Cycle Count.pdf';
+        return $pdf->stream($fileName);
     }
 
     public function create(): View
@@ -197,7 +326,25 @@ class InventoryController extends Controller
         $activeWorksheet->setCellValue('H1', 'Status');
         $activeWorksheet->setCellValue('I1', 'Remarks');
 
-        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')->whereNot('qty', 0)->get();
+        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client', 'pic')
+            ->whereNot('qty', 0)
+            ->when($request->query('partName'), function ($query) use ($request) {
+                return $query->where('part_name', 'like', '%' . $request->query('partName') . '%');
+            })
+            ->when($request->query('partNumber'), function ($query) use ($request) {
+                return $query->where('part_number', 'like', '%' . $request->query('partNumber') . '%');
+            })
+            ->when($request->query('serialNumber'), function ($query) use ($request) {
+                return $query->where('serial_number', 'like', '%' . $request->query('serialNumber') . '%');
+            })
+            ->when($request->query('client'), function ($query) use ($request) {
+                return $query->where('client_id', $request->query('client'));
+            })
+            ->when($request->query('status'), function ($query) use ($request) {
+                return $query->where('status', 'like', '%' . $request->query('status') . '%');
+            })
+            ->get();
+
         $column = 2;
         foreach ($inventory as $product) {
             $activeWorksheet->setCellValue('A' . $column, $product->bin->storageArea->name . ' - ' . $product->bin->storageRak->name . ' - ' . $product->bin->storageLantai->name . ' - ' . $product->bin->name);
@@ -223,7 +370,24 @@ class InventoryController extends Controller
 
     public function downloadPDF(Request $request)
     {
-        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client')->whereNot('qty', 0)->get();
+        $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client', 'pic')
+            ->whereNot('qty', 0)
+            ->when($request->query('partName'), function ($query) use ($request) {
+                return $query->where('part_name', 'like', '%' . $request->query('partName') . '%');
+            })
+            ->when($request->query('partNumber'), function ($query) use ($request) {
+                return $query->where('part_number', 'like', '%' . $request->query('partNumber') . '%');
+            })
+            ->when($request->query('serialNumber'), function ($query) use ($request) {
+                return $query->where('serial_number', 'like', '%' . $request->query('serialNumber') . '%');
+            })
+            ->when($request->query('client'), function ($query) use ($request) {
+                return $query->where('client_id', $request->query('client'));
+            })
+            ->when($request->query('status'), function ($query) use ($request) {
+                return $query->where('status', 'like', '%' . $request->query('status') . '%');
+            })
+            ->get();
 
         $pdf = Pdf::loadView('pdf.inventory', compact('inventory'))->setPaper('A4', 'landscape');
         $fileName = 'Inventory.pdf';
