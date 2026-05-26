@@ -243,7 +243,7 @@
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td>{{ $product->inventory->part_name }}</td>
                         <td>{{ $product->inventory->part_description }}</td>
-                        <td class="text-center">{{ $product->inventory->qty ?? 1 }}</td>
+                        <td class="text-center">1</td>
                         <td>{{ $product->inventory->serial_number }}</td>
                     </tr>
                 @endforeach
