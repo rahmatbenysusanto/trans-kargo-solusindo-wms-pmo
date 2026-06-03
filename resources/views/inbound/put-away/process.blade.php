@@ -59,13 +59,18 @@
         <div class="col-lg-6">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-light-subtle py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0 me-2">
-                            <i class="ri-list-check-2 fs-20 text-info"></i>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-2">
+                                <i class="ri-list-check-2 fs-20 text-info"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-0">Products Ready to Put Away</h5>
+                            </div>
                         </div>
-                        <div class="flex-grow-1">
-                            <h5 class="card-title mb-0">Products Ready to Put Away</h5>
-                        </div>
+                        <button class="btn btn-info btn-label waves-effect waves-light btn-sm" onclick="moveAllProducts()">
+                            <i class="ri-arrow-right-double-line label-icon align-middle fs-16 me-1"></i> Move All
+                        </button>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -279,6 +284,46 @@
             localStorage.setItem('productPA', JSON.stringify(productPA));
             viewListProducts();
             viewProductPA();
+        }
+
+        function moveAllProducts() {
+            const products = JSON.parse(localStorage.getItem('products')) ?? [];
+            const productPA = JSON.parse(localStorage.getItem('productPA')) ?? [];
+            let moved = 0;
+
+            products.forEach((product, index) => {
+                if (product.select === 0) {
+                    productPA.push({ ...product });
+                    products[index].select = 1;
+                    moved++;
+                }
+            });
+
+            if (moved === 0) {
+                Swal.fire({
+                    title: 'Info',
+                    text: 'All products are already selected.',
+                    icon: 'info',
+                    customClass: { confirmButton: "btn btn-primary w-xs mt-2" },
+                    buttonsStyling: false
+                });
+                return;
+            }
+
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('productPA', JSON.stringify(productPA));
+            viewListProducts();
+            viewProductPA();
+
+            Swal.fire({
+                title: 'Moved',
+                text: moved + ' product(s) moved to selected list.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                customClass: { confirmButton: "btn btn-primary w-xs mt-2" },
+                buttonsStyling: false
+            });
         }
 
         function viewProductPA() {

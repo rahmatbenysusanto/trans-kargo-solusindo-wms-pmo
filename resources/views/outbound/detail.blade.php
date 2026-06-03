@@ -27,6 +27,9 @@
                         <div>
                             <h5 class="card-title mb-0 text-white">{{ $outbound->number }}</h5>
                             <span class="badge bg-white-subtle text-white">Outbound Transaction</span>
+                            @if ($outbound->delivery_note_number)
+                                <span class="badge bg-white-subtle text-white ms-1">DN: {{ $outbound->delivery_note_number }}</span>
+                            @endif
                         </div>
                     </div>
                     <div class="d-flex gap-2">

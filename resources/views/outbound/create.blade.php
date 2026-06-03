@@ -98,6 +98,15 @@
                             </div>
                         </div>
                         <div class="col-md-3">
+                            <label class="form-label text-muted small text-uppercase">Delivery Note Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-primary text-white border-primary"><i
+                                        class="ri-file-text-line"></i></span>
+                                <input type="text" class="form-control border-primary bg-primary-subtle fw-bold"
+                                    id="deliveryNoteNumber" value="Loading..." readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label text-muted small text-uppercase">Total Selected Items</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-primary text-white border-primary"><i
@@ -202,6 +211,7 @@
 
         $(document).ready(function() {
             fetchInventory();
+            fetchNextDNNumber();
 
             $('#searchInventory').on('keyup', function() {
                 searchQuery = $(this).val();
@@ -221,6 +231,19 @@
                 },
                 success: function(res) {
                     renderInventory(res);
+                }
+            });
+        }
+
+        function fetchNextDNNumber() {
+            $.ajax({
+                url: '{{ route('outbound.nextDNNumber') }}',
+                method: 'GET',
+                success: function(res) {
+                    document.getElementById('deliveryNoteNumber').value = res.delivery_note_number;
+                },
+                error: function() {
+                    document.getElementById('deliveryNoteNumber').value = 'Auto-generated';
                 }
             });
         }

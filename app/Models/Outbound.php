@@ -10,6 +10,7 @@ class Outbound extends Model
     protected $table = 'outbound';
     protected $fillable = [
         'number',
+        'delivery_note_number',
         'client_id',
         'site_location',
         'type',

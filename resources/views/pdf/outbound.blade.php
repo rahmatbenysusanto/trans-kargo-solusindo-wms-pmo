@@ -175,6 +175,10 @@
                             <td class="value">: {{ $outbound->number }}</td>
                         </tr>
                         <tr>
+                            <td class="label">DN No</td>
+                            <td class="value">: {{ $outbound->delivery_note_number ?? '-' }}</td>
+                        </tr>
+                        <tr>
                             <td class="label">Client Name</td>
                             <td class="value">: {{ $outbound->client->name }}</td>
                         </tr>

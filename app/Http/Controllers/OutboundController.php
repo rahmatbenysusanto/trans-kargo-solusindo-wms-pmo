@@ -67,6 +67,13 @@ class OutboundController extends Controller
         return view('outbound.create', compact('title', 'client'));
     }
 
+    public function nextDNNumber()
+    {
+        return response()->json([
+            'delivery_note_number' => $this->deliveryNoteNumber()
+        ]);
+    }
+
     public function searchInventory(Request $request)
     {
         $search = $request->query('search');
@@ -96,6 +103,21 @@ class OutboundController extends Controller
         return $prefix . $nextNumber;
     }
 
+    private function deliveryNoteNumber()
+    {
+        $month = date('m');
+        $year = date('y');
+        $prefix = 'DN/WH/PM/' . $month . '/' . $year;
+
+        $last = Outbound::where('delivery_note_number', 'like', '%/' . $prefix)
+            ->orderBy('delivery_note_number', 'desc')
+            ->first();
+
+        $nextNumber = $last ? (int)explode('/', $last->delivery_note_number)[0] + 1 : 1;
+
+        return str_pad($nextNumber, 5, '0', STR_PAD_LEFT) . '/' . $prefix;
+    }
+
     /**
      * @throws \Throwable
      */
@@ -105,8 +127,9 @@ class OutboundController extends Controller
             DB::beginTransaction();
 
             $outbound = Outbound::create([
-                'number'        => $this->outboundNumber(),
-                'client_id'     => $request->post('client'),
+                'number'              => $this->outboundNumber(),
+                'delivery_note_number' => $this->deliveryNoteNumber(),
+                'client_id'           => $request->post('client'),
                 'site_location' => $request->post('siteLocation'),
                 'type'          => 'outbound',
                 'qty'           => count($request->post('products')),

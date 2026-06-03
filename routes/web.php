@@ -89,6 +89,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::prefix('/outbound')->controller(OutboundController::class)->group(function () {
         Route::get('/', 'index')->name('outbound.index');
         Route::get('/create', 'create')->name('outbound.create');
+        Route::get('/next-dn-number', 'nextDNNumber')->name('outbound.nextDNNumber');
         Route::get('/inventory-search', 'searchInventory')->name('outbound.inventory.search');
         Route::post('/store', 'store')->name('outbound.store');
         Route::get('/detail', 'detail')->name('outbound.detail');

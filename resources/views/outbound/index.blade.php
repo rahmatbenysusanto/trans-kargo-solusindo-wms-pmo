@@ -83,6 +83,7 @@
                                 <tr>
                                     <th style="width: 50px;">#</th>
                                     <th>Transaction No</th>
+                                    <th>DN Number</th>
                                     <th>Client</th>
                                     <th>Destination</th>
                                     <th class="text-center">Items</th>
@@ -100,6 +101,9 @@
                                             <span class="text-primary fw-medium">{{ $item->number }}</span>
                                             <small
                                                 class="text-muted d-block">{{ $item->created_at->format('d M Y, H:i') }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary-subtle text-primary fs-12">{{ $item->delivery_note_number ?? '-' }}</span>
                                         </td>
                                         <td>
                                             <div class="fw-semibold text-dark">{{ $item->client->name }}</div>
@@ -162,7 +166,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="9" class="text-center py-5 text-muted">
+                                        <td colspan="10" class="text-center py-5 text-muted">
                                             <i class="bx bx-package fs-32 opacity-25 d-block mb-2"></i>
                                             No outbound transactions found.
                                         </td>
