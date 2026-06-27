@@ -26,42 +26,6 @@
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
 
-    <style>
-        /* Premium Pagination Styles */
-        .pagination {
-            gap: 5px;
-        }
-
-        .pagination .page-item .page-link {
-            border-radius: 8px !important;
-            border: 1px solid #e9ebec;
-            color: #405189;
-            font-weight: 500;
-            padding: 8px 14px;
-            transition: all 0.3s ease;
-            box-shadow: none;
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #405189;
-            border-color: #405189;
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(64, 81, 137, 0.2);
-        }
-
-        .pagination .page-item .page-link:hover {
-            background-color: #f3f6f9;
-            border-color: #dce1e6;
-            color: #405189;
-            transform: translateY(-1px);
-        }
-
-        .pagination .page-item.disabled .page-link {
-            background-color: #fafbfb;
-            color: #adb5bd;
-            border-color: #eff2f7;
-        }
-    </style>
 </head>
 
 <body>
@@ -566,13 +530,15 @@
                     <div id="two-column-menu"></div>
                     <ul class="navbar-nav" id="navbar-nav">
 
-                        <li class="menu-title"><span data-key="t-menu">Dashboard</span></li>
+                        {{-- ========== DASHBOARD SECTION ========== --}}
+                        <li class="menu-title"><span data-key="t-menu"><i class="mdi mdi-monitor-dashboard me-1"></i> Dashboard</span></li>
                         <li
                             class="nav-item {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor', 'Stock Monitoring']) ? 'active' : '' }}">
                             <a class="nav-link menu-link" href="#sidebarDashboard" data-bs-toggle="collapse"
                                 role="button" aria-expanded="false" aria-controls="sidebarDashboard">
                                 <i class="mdi mdi-view-dashboard-outline"></i>
                                 <span data-key="t-widgets">Dashboard</span>
+                                <span class="menu-arrow"></span>
                             </a>
 
                             <div class="collapse menu-dropdown {{ in_array($title, ['Dashboard', 'Dashboard stockAvailability', 'Dashboard Inbound vs Return Trend', 'Dashboard Top Devices by Client', 'Lifecycle Status Distributor', 'Stock Monitoring']) ? 'show' : '' }}"
@@ -581,38 +547,51 @@
                                     <li class="nav-item">
                                         <a href="{{ route('dashboard') }}"
                                             class="nav-link {{ $title == 'Dashboard' ? 'active' : '' }}"
-                                            data-key="t-analytics"> Main </a>
+                                            data-key="t-analytics">
+                                            <i class="mdi mdi-monitor-dashboard me-2"></i> Main Dashboard
+                                        </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('stockAvailability') }}"
                                             class="nav-link {{ $title == 'Dashboard stockAvailability' ? 'active' : '' }}"
-                                            data-key="t-analytics"> Stock Availability </a>
+                                            data-key="t-analytics">
+                                            <i class="mdi mdi-chart-bar me-2"></i> Stock Availability
+                                        </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('lifecycleStatusDistributor') }}"
                                             class="nav-link {{ $title == 'Lifecycle Status Distributor' ? 'active' : '' }}"
-                                            data-key="t-analytics"> Lifecycle Status </a>
+                                            data-key="t-analytics">
+                                            <i class="mdi mdi-lifebuoy me-2"></i> Lifecycle Status
+                                        </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('inboundVsReturn') }}"
                                             class="nav-link {{ $title == 'Dashboard Inbound vs Return Trend' ? 'active' : '' }}"
-                                            data-key="t-analytics"> Inbound vs Return Trend </a>
+                                            data-key="t-analytics">
+                                            <i class="mdi mdi-swap-horizontal-bold me-2"></i> Inbound vs Return
+                                        </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('topDevices') }}"
                                             class="nav-link {{ $title == 'Dashboard Top Devices by Client' ? 'active' : '' }}"
-                                            data-key="t-analytics"> Top Devices by Client </a>
+                                            data-key="t-analytics">
+                                            <i class="mdi mdi-trophy-variant me-2"></i> Top Devices
+                                        </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('stockMonitoring') }}"
                                             class="nav-link {{ $title == 'Stock Monitoring' ? 'active' : '' }}"
-                                            data-key="t-analytics"> Stock Monitoring </a>
+                                            data-key="t-analytics">
+                                            <i class="mdi mdi-package-variant-closed me-2"></i> Stock Monitoring
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
                         </li>
 
-                        <li class="menu-title"><span data-key="t-menu">Main Menu</span></li>
+                        {{-- ========== MAIN MENU SECTION ========== --}}
+                        <li class="menu-title"><span data-key="t-menu"><i class="mdi mdi-menu me-1"></i> Main Menu</span></li>
 
                         <!-- Inbound -->
                         <li class="nav-item">
@@ -621,6 +600,7 @@
                                 aria-controls="inbound">
                                 <i class="mdi mdi-truck-cargo-container"></i>
                                 <span data-key="t-widgets">Inbound</span>
+                                <span class="menu-arrow"></span>
                             </a>
                             <div class="collapse menu-dropdown {{ in_array($title, ['Purchase Order', 'Put Away']) ? 'show' : '' }}"
                                 id="inbound">
@@ -650,6 +630,7 @@
                                 aria-controls="inventory">
                                 <i class="mdi mdi-warehouse"></i>
                                 <span data-key="t-widgets">Inventory</span>
+                                <span class="menu-arrow"></span>
                             </a>
                             <div class="collapse menu-dropdown {{ in_array($title, ['Inventory List', 'Inventory History', 'Storage Inventory', 'Storage Inventory Detail', 'Stock Movement', 'Cycle Count']) ? 'show' : '' }}"
                                 id="inventory">
@@ -693,15 +674,6 @@
                             </div>
                         </li>
 
-                        <!-- Asset Lifecycle -->
-                        {{-- <li class="nav-item">
-                            <a class="nav-link menu-link {{ $title == 'Asset Lifecycle' ? 'active' : '' }}"
-                                href="{{ route('assetLifecycle.index') }}">
-                                <i class="mdi mdi-data-matrix-edit"></i>
-                                <span data-key="t-user"> Asset Lifecycle </span>
-                            </a>
-                        </li> --}}
-
                         <!-- Outbound -->
                         <li class="nav-item">
                             <a class="nav-link menu-link {{ $title == 'Outbound' ? 'active' : '' }}"
@@ -720,7 +692,8 @@
                             </a>
                         </li>
 
-                        <li class="menu-title"><span data-key="t-menu">Warehouse</span></li>
+                        {{-- ========== WAREHOUSE SECTION ========== --}}
+                        <li class="menu-title"><span data-key="t-menu"><i class="mdi mdi-store-outline me-1"></i> Warehouse</span></li>
 
                         <!-- Storage -->
                         <li class="nav-item">
@@ -729,6 +702,7 @@
                                 aria-controls="storage">
                                 <i class="mdi mdi-store"></i>
                                 <span data-key="t-widgets">Storage</span>
+                                <span class="menu-arrow"></span>
                             </a>
                             <div class="collapse menu-dropdown {{ in_array($title, ['Area', 'Rak', 'Lantai', 'Bin']) ? 'show' : '' }}"
                                 id="storage">

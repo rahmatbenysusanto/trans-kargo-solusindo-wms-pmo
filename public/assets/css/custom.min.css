@@ -1,2 +1,453 @@
+/* ============================================================
+   MODERN DASHBOARD STYLES — WMS PM Room
+   ============================================================ */
 
-/*# sourceMappingURL=custom.min.css.map */
+/* ---------- CSS Variables ---------- */
+:root {
+    --kpi-green: #28a745;
+    --kpi-green-light: rgba(40, 167, 69, 0.08);
+    --kpi-blue: #17a2b8;
+    --kpi-blue-light: rgba(23, 162, 184, 0.08);
+    --kpi-purple: #405189;
+    --kpi-purple-light: rgba(64, 81, 137, 0.08);
+    --kpi-orange: #f1c40f;
+    --kpi-orange-light: rgba(241, 196, 15, 0.08);
+    --card-radius: 16px;
+    --card-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+    --card-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Text Gradient ---------- */
+.text-gradient-primary {
+    background: linear-gradient(135deg, #405189 0%, #6c7ed8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============================================================
+   KPI CARDS
+   ============================================================ */
+.kpi-card {
+    position: relative;
+    border-radius: var(--card-radius);
+    background: #fff;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.kpi-card-body {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.kpi-icon-wrapper {
+    flex-shrink: 0;
+}
+
+.kpi-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    transition: var(--transition-smooth);
+}
+
+.kpi-card:hover .kpi-icon {
+    transform: scale(1.08);
+}
+
+.kpi-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #878a99;
+    letter-spacing: 0.6px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #2b2f3a;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.kpi-badge {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.kpi-glow {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: var(--transition-smooth);
+}
+
+.kpi-card-green .kpi-glow { background: linear-gradient(90deg, #28a745, #20c997); }
+.kpi-card-blue .kpi-glow { background: linear-gradient(90deg, #17a2b8, #6dc5d4); }
+.kpi-card-purple .kpi-glow { background: linear-gradient(90deg, #405189, #6c7ed8); }
+.kpi-card-orange .kpi-glow { background: linear-gradient(90deg, #f1c40f, #f7dc6f); }
+
+/* Green accent */
+.kpi-card-green { border-top: 3px solid var(--kpi-green); }
+.kpi-card-green .kpi-label { color: #28a745; }
+
+/* Blue accent */
+.kpi-card-blue { border-top: 3px solid var(--kpi-blue); }
+.kpi-card-blue .kpi-label { color: #17a2b8; }
+
+/* Purple accent */
+.kpi-card-purple { border-top: 3px solid var(--kpi-purple); }
+.kpi-card-purple .kpi-label { color: #405189; }
+
+/* Orange accent */
+.kpi-card-orange { border-top: 3px solid var(--kpi-orange); }
+.kpi-card-orange .kpi-label { color: #d4ac0d; }
+
+/* ============================================================
+   MODERN CARDS
+   ============================================================ */
+.modern-card {
+    border-radius: var(--card-radius);
+    background: #fff;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition-smooth);
+}
+
+.modern-card:hover {
+    box-shadow: var(--card-shadow-hover);
+}
+
+.card-header-modern {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid #f0f0f5;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* ============================================================
+   MODERN TABLE
+   ============================================================ */
+.modern-table thead th {
+    background: #fafbfc;
+    border-bottom: 2px solid #f0f0f5;
+    padding: 12px 16px;
+    letter-spacing: 0.4px;
+}
+
+.modern-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f5f5fa;
+    vertical-align: middle;
+}
+
+.modern-table .table-row-hover {
+    transition: var(--transition-smooth);
+}
+
+.modern-table .table-row-hover:hover {
+    background: #f8f9fe;
+}
+
+/* Rank badges */
+.rank-badge {
+    font-size: 22px;
+    display: inline-block;
+    line-height: 1;
+}
+
+.rank-number {
+    font-size: 13px;
+}
+
+/* Device avatar */
+.device-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+}
+
+.device-avatar-text {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+
+/* Part number code */
+.part-number-code {
+    background: #f5f6fa;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #405189;
+    font-weight: 500;
+}
+
+/* Stock progress bar */
+.stock-progress-bar {
+    background: #e9ecef;
+    border-radius: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* ============================================================
+   LEGEND DOTS
+   ============================================================ */
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+    padding: 20px;
+    text-align: center;
+}
+
+.empty-state i {
+    opacity: 0.4;
+}
+
+/* ============================================================
+   GRADIENT DARK BACKGROUND
+   ============================================================ */
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #2b3040 0%, #3b4058 50%, #1e2233 100%);
+}
+
+/* ============================================================
+   SIDEBAR IMPROVEMENTS
+   ============================================================ */
+
+/* Smooth sidebar transitions */
+.app-menu .navbar-nav .nav-link {
+    transition: all 0.25s ease;
+    border-radius: 8px;
+    margin: 2px 12px;
+    font-weight: 500;
+}
+
+.app-menu .navbar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    padding-left: 16px;
+}
+
+.app-menu .navbar-nav .nav-link.active,
+.app-menu .navbar-nav .nav-item.active > .nav-link.menu-link {
+    background: rgba(255, 255, 255, 0.12);
+    border-left: 3px solid #fff;
+    font-weight: 600;
+}
+
+/* Menu title styling */
+.app-menu .navbar-nav .menu-title {
+    padding: 12px 24px 6px;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    opacity: 0.5;
+    font-weight: 700;
+}
+
+/* Dropdown animation */
+.app-menu .menu-dropdown {
+    transition: all 0.3s ease;
+}
+
+.app-menu .menu-dropdown .nav-link {
+    padding: 8px 24px 8px 48px;
+    font-size: 13px;
+    border-radius: 6px;
+    margin: 1px 12px;
+}
+
+.app-menu .menu-dropdown .nav-link:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.app-menu .menu-dropdown .nav-link.active {
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+}
+
+/* Sidebar background with subtle gradient */
+[data-sidebar="dark"] .app-menu {
+    background: linear-gradient(180deg, #1e2130 0%, #252839 40%, #1a1d2b 100%) !important;
+}
+
+/* ============================================================
+   LIFECYCLE SUMMARY
+   ============================================================ */
+.lifecycle-summary h6 {
+    font-size: 16px;
+}
+
+/* ============================================================
+   BG-SUBTLE VARIANTS (complement existing Bootstrap)
+   ============================================================ */
+.bg-soft-primary { background: rgba(64, 81, 137, 0.08); }
+.bg-soft-success { background: rgba(40, 167, 69, 0.08); }
+.bg-soft-warning { background: rgba(241, 196, 15, 0.10); }
+.bg-soft-danger { background: rgba(231, 76, 60, 0.08); }
+.bg-soft-dark { background: rgba(52, 58, 64, 0.08); }
+.bg-soft-info { background: rgba(23, 162, 184, 0.08); }
+
+.bg-success-subtle { background: rgba(40, 167, 69, 0.12); }
+.bg-warning-subtle { background: rgba(241, 196, 15, 0.12); }
+.bg-primary-subtle { background: rgba(64, 81, 137, 0.10); }
+.bg-info-subtle { background: rgba(23, 162, 184, 0.10); }
+.bg-light-subtle { background: rgba(245, 246, 250, 0.6); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .kpi-value {
+        font-size: 22px;
+    }
+    .kpi-card-body {
+        padding: 16px;
+    }
+    .card-header-modern {
+        padding: 14px 16px;
+    }
+    .modern-table thead th,
+    .modern-table tbody td {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-modern .kpi-card {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.dashboard-modern .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.dashboard-modern .kpi-card:nth-child(2) { animation-delay: 0.12s; }
+.dashboard-modern .kpi-card:nth-child(3) { animation-delay: 0.19s; }
+.dashboard-modern .kpi-card:nth-child(4) { animation-delay: 0.26s; }
+
+/* ============================================================
+   PAGINATION MODERN
+   ============================================================ */
+.pagination .page-item .page-link {
+    border-radius: 8px !important;
+    border: 1px solid #e9ebec;
+    color: #405189;
+    font-weight: 500;
+    padding: 8px 14px;
+    transition: all 0.25s ease;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #405189, #515ea8);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(64, 81, 137, 0.25);
+}
+
+.pagination .page-item .page-link:hover {
+    background: #f3f6f9;
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   DATATABLE MODERN OVERRIDES
+   ============================================================ */
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 8px;
+    border: 1px solid #e0e3e8;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.dataTables_wrapper .dataTables_length select:focus,
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #405189;
+    box-shadow: 0 0 0 3px rgba(64, 81, 137, 0.1);
+    outline: none;
+}
+
+/* ============================================================
+   APEX CHARTS CONTAINER
+   ============================================================ */
+.apex-charts {
+    min-height: 280px;
+}
+
+.apexcharts-tooltip {
+    border-radius: 10px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+}
+
+/* ============================================================
+   BREADCRUMB MODERN
+   ============================================================ */
+.page-title-box {
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f5;
+    margin-bottom: 8px;
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d0d5dd;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #b0b5bd;
+}
