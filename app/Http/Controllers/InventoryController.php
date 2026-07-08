@@ -51,6 +51,37 @@ class InventoryController extends Controller
         return view('inventory.inventory-list.index', compact('title', 'inventory', 'client'));
     }
 
+    public function updatePartDescription(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:inventory,id',
+            'part_description' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $inventory = Inventory::findOrFail($request->post('id'));
+            $oldDescription = $inventory->part_description;
+            $inventory->update([
+                'part_description' => $request->post('part_description'),
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Part description updated successfully.',
+                'data' => [
+                    'old' => $oldDescription,
+                    'new' => $inventory->part_description,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Update Part Description Error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to update part description.',
+            ], 500);
+        }
+    }
+
     public function history(Request $request): View
     {
         $inventory = Inventory::with('inboundDetail.inbound', 'bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'pic')->where('id', $request->query('id'))->first();

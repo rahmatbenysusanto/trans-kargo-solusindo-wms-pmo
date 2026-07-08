@@ -74,6 +74,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
         Route::get('/download-excel', 'downloadExcel')->name('inventory.downloadExcel');
         Route::get('/download-pdf', 'downloadPDF')->name('inventory.downloadPDF');
+        Route::post('/update-part-description', 'updatePartDescription')->name('inventory.updatePartDescription');
     });
 
     Route::prefix('/asset-lifecycle')->controller(AssetLifecycleController::class)->group(function () {

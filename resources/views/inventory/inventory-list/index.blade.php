@@ -237,11 +237,21 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="d-flex gap-1 justify-content-center">
-                                                <button type="button" 
-                                                        class="btn btn-soft-primary btn-icon btn-sm btn-view-qr" 
-                                                        data-pn="{{ $product->part_number }}" 
+                                                <button type="button"
+                                                        class="btn btn-soft-info btn-icon btn-sm btn-edit-desc"
+                                                        data-id="{{ $product->id }}"
+                                                        data-pn="{{ $product->part_number }}"
                                                         data-sn="{{ $product->serial_number }}"
-                                                        data-bs-toggle="tooltip" 
+                                                        data-desc="{{ $product->part_description }}"
+                                                        data-bs-toggle="tooltip"
+                                                        title="Edit Description">
+                                                    <i class="bx bx-edit-alt fs-16"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-soft-primary btn-icon btn-sm btn-view-qr"
+                                                        data-pn="{{ $product->part_number }}"
+                                                        data-sn="{{ $product->serial_number }}"
+                                                        data-bs-toggle="tooltip"
                                                         title="View QR Label">
                                                     <i class="bx bx-qr-scan fs-16"></i>
                                                 </button>
@@ -324,6 +334,71 @@
             // QR Codes will render dynamically inside the modal when requested via the view button.
 
             var modalQr = null;
+
+            // ========== Edit Part Description ==========
+            $('.btn-edit-desc').on('click', function() {
+                var id = $(this).data('id');
+                var pn = $(this).data('pn');
+                var sn = $(this).data('sn');
+                var currentDesc = $(this).data('desc') || '';
+
+                Swal.fire({
+                    title: 'Edit Part Description',
+                    html: `
+                        <div class="text-start mb-3">
+                            <div class="small text-muted mb-1"><strong>PN:</strong> ${pn}</div>
+                            <div class="small text-muted mb-1"><strong>SN:</strong> ${sn}</div>
+                        </div>
+                        <textarea id="swal-part-desc" class="swal2-textarea" rows="4" placeholder="Enter part description ..." maxlength="500">${currentDesc}</textarea>
+                    `,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="bx bx-check"></i> Save',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#405189',
+                    customClass: {
+                        textarea: 'form-control'
+                    },
+                    preConfirm: function() {
+                        var newDesc = $('#swal-part-desc').val().trim();
+                        return $.ajax({
+                            url: '{{ route('inventory.updatePartDescription') }}',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            processData: false,
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            data: JSON.stringify({
+                                id: id,
+                                part_description: newDesc
+                            })
+                        }).then(function(res) {
+                            if (!res.status) {
+                                throw new Error(res.message || 'Update failed');
+                            }
+                            return res;
+                        }).catch(function(err) {
+                            Swal.showValidationMessage(
+                                'Error: ' + (err.responseJSON?.message || err.message || 'Request failed')
+                            );
+                        });
+                    }
+                }).then(function(result) {
+                    if (result.isConfirmed && result.value?.status) {
+                        Swal.fire({
+                            title: 'Success',
+                            text: 'Part description updated successfully.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(function() {
+                            location.reload();
+                        });
+                    }
+                });
+            });
+            // ========== End Edit Part Description ==========
 
             // Handle Click on QR Label Card
             $('.btn-view-qr').on('click', function() {

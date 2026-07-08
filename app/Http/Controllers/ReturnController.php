@@ -70,7 +70,7 @@ class ReturnController extends Controller
                     ->orWhere('part_number', 'LIKE', '%' . $search . '%')
                     ->orWhere('serial_number', 'LIKE', '%' . $search . '%');
             })
-            ->select('id', 'part_name', 'part_number', 'serial_number', 'inbound_detail_id', 'client_id')
+            ->select('id', 'part_name', 'part_number', 'part_description', 'serial_number', 'inbound_detail_id', 'client_id')
             ->paginate(15);
 
         return response()->json($inventory);
