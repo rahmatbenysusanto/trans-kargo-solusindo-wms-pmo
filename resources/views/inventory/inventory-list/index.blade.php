@@ -290,7 +290,57 @@
         </div>
     </div>
 
-    <!-- QR Code Modal -->
+    <!-- Edit Part Description Modal -->
+    <div class="modal fade" id="editDescModal" tabindex="-1" aria-labelledby="editDescModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-soft-info border-bottom-0 rounded-top">
+                    <h5 class="modal-title fw-bold text-dark" id="editDescModalLabel">
+                        <i class="bx bx-edit-alt align-middle me-2 text-info"></i>Edit Part Description
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <input type="hidden" id="edit-desc-id">
+                    <div class="bg-light rounded-3 p-3 mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="text-muted small text-uppercase fw-semibold">Part Number</div>
+                                <div class="fw-medium text-dark font-monospace" id="edit-desc-pn">-</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-muted small text-uppercase fw-semibold">Serial Number</div>
+                                <div class="fw-medium text-dark font-monospace" id="edit-desc-sn">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold text-dark">
+                            Part Description <span class="text-muted fw-normal">(max 500 characters)</span>
+                        </label>
+                        <textarea id="edit-desc-textarea"
+                            class="form-control border-2 bg-light-subtle"
+                            rows="4"
+                            placeholder="Enter part description here..."
+                            maxlength="500"
+                            style="resize: vertical; min-height: 100px; font-size: 14px;"></textarea>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">Describe the part clearly for easy identification.</small>
+                            <small class="text-muted"><span id="edit-desc-char-count">0</span>/500</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light fw-semibold px-4" data-bs-dismiss="modal">
+                        <i class="bx bx-x align-middle me-1"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-info fw-bold px-4" id="btn-save-desc">
+                        <i class="bx bx-check align-middle me-1"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
             <div class="modal-content border-0 shadow-lg">
@@ -336,67 +386,79 @@
             var modalQr = null;
 
             // ========== Edit Part Description ==========
+            var editDescModal = new bootstrap.Modal(document.getElementById('editDescModal'));
+
             $('.btn-edit-desc').on('click', function() {
                 var id = $(this).data('id');
                 var pn = $(this).data('pn');
                 var sn = $(this).data('sn');
                 var currentDesc = $(this).data('desc') || '';
 
-                Swal.fire({
-                    title: 'Edit Part Description',
-                    html: `
-                        <div class="text-start mb-3">
-                            <div class="small text-muted mb-1"><strong>PN:</strong> ${pn}</div>
-                            <div class="small text-muted mb-1"><strong>SN:</strong> ${sn}</div>
-                        </div>
-                        <textarea id="swal-part-desc" class="swal2-textarea" rows="4" placeholder="Enter part description ..." maxlength="500">${currentDesc}</textarea>
-                    `,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonText: '<i class="bx bx-check"></i> Save',
-                    cancelButtonText: 'Cancel',
-                    confirmButtonColor: '#405189',
-                    customClass: {
-                        textarea: 'form-control'
+                $('#edit-desc-id').val(id);
+                $('#edit-desc-pn').text(pn);
+                $('#edit-desc-sn').text(sn);
+                $('#edit-desc-textarea').val(currentDesc);
+                $('#edit-desc-char-count').text(currentDesc.length);
+
+                editDescModal.show();
+            });
+
+            $('#edit-desc-textarea').on('input', function() {
+                $('#edit-desc-char-count').text($(this).val().length);
+            });
+
+            $('#btn-save-desc').on('click', function() {
+                var id = $('#edit-desc-id').val();
+                var newDesc = $('#edit-desc-textarea').val().trim();
+                var $btn = $(this);
+
+                $btn.prop('disabled', true).html('<i class="bx bx-loader-alt bx-spin align-middle me-1"></i> Saving...');
+
+                $.ajax({
+                    url: '{{ route('inventory.updatePartDescription') }}',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    preConfirm: function() {
-                        var newDesc = $('#swal-part-desc').val().trim();
-                        return $.ajax({
-                            url: '{{ route('inventory.updatePartDescription') }}',
-                            method: 'POST',
-                            contentType: 'application/json',
-                            processData: false,
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            data: JSON.stringify({
-                                id: id,
-                                part_description: newDesc
-                            })
-                        }).then(function(res) {
-                            if (!res.status) {
-                                throw new Error(res.message || 'Update failed');
-                            }
-                            return res;
-                        }).catch(function(err) {
-                            Swal.showValidationMessage(
-                                'Error: ' + (err.responseJSON?.message || err.message || 'Request failed')
-                            );
-                        });
-                    }
-                }).then(function(result) {
-                    if (result.isConfirmed && result.value?.status) {
+                    data: JSON.stringify({
+                        id: id,
+                        part_description: newDesc
+                    })
+                }).then(function(res) {
+                    if (res.status) {
+                        editDescModal.hide();
                         Swal.fire({
-                            title: 'Success',
-                            text: 'Part description updated successfully.',
+                            title: 'Updated!',
+                            text: 'Part description has been saved.',
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
                         }).then(function() {
                             location.reload();
                         });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: res.message || 'Update failed',
+                            icon: 'error'
+                        });
                     }
+                }).catch(function(err) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: err.responseJSON?.message || 'Request failed. Please try again.',
+                        icon: 'error'
+                    });
+                }).always(function() {
+                    $btn.prop('disabled', false).html('<i class="bx bx-check align-middle me-1"></i> Save Changes');
                 });
+            });
+
+            // Reset char count when modal is closed
+            document.getElementById('editDescModal').addEventListener('hidden.bs.modal', function() {
+                $('#btn-save-desc').prop('disabled', false).html('<i class="bx bx-check align-middle me-1"></i> Save Changes');
             });
             // ========== End Edit Part Description ==========
 
