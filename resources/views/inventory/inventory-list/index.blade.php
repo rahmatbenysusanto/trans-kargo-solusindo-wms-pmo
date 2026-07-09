@@ -202,7 +202,7 @@
                                         </td>
                                         <td>
                                             <div class="small fw-medium">
-                                                {{ $product->inboundDetail->inbound->owner_status }}</div>
+                                                {{ $product->inboundDetail?->inbound?->owner_status ?? '-' }}</div>
                                             <div class="text-muted" style="font-size: 11px;">PIC:
                                                 {{ $product->pic->name ?? '-' }}</div>
                                         </td>
@@ -230,7 +230,7 @@
                                         </td>
                                         <td>
                                             <span
-                                                class="badge bg-light text-dark border">{{ $product->inboundDetail->inbound->client->name }}</span>
+                                                class="badge bg-light text-dark border">{{ $product->inboundDetail?->inbound?->client?->name ?? '-' }}</span>
                                         </td>
                                         <td>
                                             <small class="text-muted">{{ $product->remark ?: '-' }}</small>
@@ -246,6 +246,22 @@
                                                         data-bs-toggle="tooltip"
                                                         title="Edit Description">
                                                     <i class="bx bx-edit-alt fs-16"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-soft-warning btn-icon btn-sm btn-edit-sn"
+                                                        data-id="{{ $product->id }}"
+                                                        data-sn="{{ $product->serial_number }}"
+                                                        data-bs-toggle="tooltip"
+                                                        title="Edit Serial Number">
+                                                    <i class="bx bx-barcode fs-16"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-soft-success btn-icon btn-sm btn-edit-client"
+                                                        data-id="{{ $product->id }}"
+                                                        data-client-id="{{ $product->client_id }}"
+                                                        data-bs-toggle="tooltip"
+                                                        title="Edit Client">
+                                                    <i class="bx bx-buildings fs-16"></i>
                                                 </button>
                                                 <button type="button"
                                                         class="btn btn-soft-primary btn-icon btn-sm btn-view-qr"
@@ -335,6 +351,81 @@
                         <i class="bx bx-x align-middle me-1"></i> Cancel
                     </button>
                     <button type="button" class="btn btn-info fw-bold px-4" id="btn-save-desc">
+                        <i class="bx bx-check align-middle me-1"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Serial Number Modal -->
+    <div class="modal fade" id="editSnModal" tabindex="-1" aria-labelledby="editSnModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-soft-warning border-bottom-0 rounded-top">
+                    <h5 class="modal-title fw-bold text-dark" id="editSnModalLabel">
+                        <i class="bx bx-barcode align-middle me-2 text-warning"></i>Edit Serial Number
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <input type="hidden" id="edit-sn-id">
+                    <div class="bg-light rounded-3 p-3 mb-3">
+                        <div class="text-muted small text-uppercase fw-semibold">Current Serial Number</div>
+                        <div class="fw-medium text-dark font-monospace" id="edit-sn-current">-</div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold text-dark">
+                            New Serial Number <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="edit-sn-input"
+                            class="form-control border-2 bg-light-subtle font-monospace"
+                            placeholder="Enter new serial number..."
+                            maxlength="255"
+                            style="font-size: 14px;">
+                        <small class="text-muted">Serial number must be unique and is required.</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light fw-semibold px-4" data-bs-dismiss="modal">
+                        <i class="bx bx-x align-middle me-1"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning fw-bold px-4" id="btn-save-sn">
+                        <i class="bx bx-check align-middle me-1"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Client Modal -->
+    <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-soft-success border-bottom-0 rounded-top">
+                    <h5 class="modal-title fw-bold text-dark" id="editClientModalLabel">
+                        <i class="bx bx-buildings align-middle me-2 text-success"></i>Edit Client
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <input type="hidden" id="edit-client-id">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">
+                            Client <span class="text-danger">*</span>
+                        </label>
+                        <select id="edit-client-select" class="form-select border-2 bg-light-subtle">
+                            <option value="">-- Select Client --</option>
+                            @foreach ($client as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Select the client/owner for this inventory item.</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light fw-semibold px-4" data-bs-dismiss="modal">
+                        <i class="bx bx-x align-middle me-1"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-success fw-bold px-4" id="btn-save-client">
                         <i class="bx bx-check align-middle me-1"></i> Save Changes
                     </button>
                 </div>
@@ -461,6 +552,159 @@
                 $('#btn-save-desc').prop('disabled', false).html('<i class="bx bx-check align-middle me-1"></i> Save Changes');
             });
             // ========== End Edit Part Description ==========
+
+            // ========== Edit Serial Number ==========
+            var editSnModal = new bootstrap.Modal(document.getElementById('editSnModal'));
+
+            $('.btn-edit-sn').on('click', function() {
+                var id = $(this).data('id');
+                var sn = $(this).data('sn');
+
+                $('#edit-sn-id').val(id);
+                $('#edit-sn-current').text(sn);
+                $('#edit-sn-input').val(sn);
+
+                editSnModal.show();
+            });
+
+            $('#btn-save-sn').on('click', function() {
+                var id = $('#edit-sn-id').val();
+                var newSn = $('#edit-sn-input').val().trim();
+                var $btn = $(this);
+
+                if (!newSn) {
+                    Swal.fire({
+                        title: 'Validation',
+                        text: 'Serial number cannot be empty.',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+
+                $btn.prop('disabled', true).html('<i class="bx bx-loader-alt bx-spin align-middle me-1"></i> Saving...');
+
+                $.ajax({
+                    url: '{{ route('inventory.updateSerialNumber') }}',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        id: id,
+                        serial_number: newSn
+                    })
+                }).then(function(res) {
+                    if (res.status) {
+                        editSnModal.hide();
+                        Swal.fire({
+                            title: 'Updated!',
+                            text: 'Serial number has been saved.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(function() {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: res.message || 'Update failed',
+                            icon: 'error'
+                        });
+                    }
+                }).catch(function(err) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: err.responseJSON?.message || 'Request failed. Please try again.',
+                        icon: 'error'
+                    });
+                }).always(function() {
+                    $btn.prop('disabled', false).html('<i class="bx bx-check align-middle me-1"></i> Save Changes');
+                });
+            });
+
+            document.getElementById('editSnModal').addEventListener('hidden.bs.modal', function() {
+                $('#btn-save-sn').prop('disabled', false).html('<i class="bx bx-check align-middle me-1"></i> Save Changes');
+            });
+            // ========== End Edit Serial Number ==========
+
+            // ========== Edit Client ==========
+            var editClientModal = new bootstrap.Modal(document.getElementById('editClientModal'));
+
+            $('.btn-edit-client').on('click', function() {
+                var id = $(this).data('id');
+                var clientId = $(this).data('client-id');
+
+                $('#edit-client-id').val(id);
+                $('#edit-client-select').val(clientId);
+
+                editClientModal.show();
+            });
+
+            $('#btn-save-client').on('click', function() {
+                var id = $('#edit-client-id').val();
+                var clientId = $('#edit-client-select').val();
+                var $btn = $(this);
+
+                if (!clientId) {
+                    Swal.fire({
+                        title: 'Validation',
+                        text: 'Please select a client.',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+
+                $btn.prop('disabled', true).html('<i class="bx bx-loader-alt bx-spin align-middle me-1"></i> Saving...');
+
+                $.ajax({
+                    url: '{{ route('inventory.updateClient') }}',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        id: id,
+                        client_id: clientId
+                    })
+                }).then(function(res) {
+                    if (res.status) {
+                        editClientModal.hide();
+                        Swal.fire({
+                            title: 'Updated!',
+                            text: 'Client has been updated.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(function() {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: res.message || 'Update failed',
+                            icon: 'error'
+                        });
+                    }
+                }).catch(function(err) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: err.responseJSON?.message || 'Request failed. Please try again.',
+                        icon: 'error'
+                    });
+                }).always(function() {
+                    $btn.prop('disabled', false).html('<i class="bx bx-check align-middle me-1"></i> Save Changes');
+                });
+            });
+
+            document.getElementById('editClientModal').addEventListener('hidden.bs.modal', function() {
+                $('#btn-save-client').prop('disabled', false).html('<i class="bx bx-check align-middle me-1"></i> Save Changes');
+            });
+            // ========== End Edit Client ==========
 
             // Handle Click on QR Label Card
             $('.btn-view-qr').on('click', function() {

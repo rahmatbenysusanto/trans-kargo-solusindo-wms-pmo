@@ -463,7 +463,7 @@
     <script>
         // Load existing products from database into localStorage
         localStorage.clear();
-        const existingProducts = @json($inboundDetail->map(function($d) {
+        const existingProducts = {!! json_encode($inboundDetail->map(function($d) {
             return [
                 "partName"         => $d->part_name,
                 "partNumber"       => $d->part_number,
@@ -475,7 +475,7 @@
                 "eosDate"          => $d->eos_date,
                 "remarks"          => $d->remarks,
             ];
-        })->values());
+        })->values()) !!};
         localStorage.setItem('products', JSON.stringify(existingProducts));
 
         const hasPutAway = {{ $hasPutAway ? 'true' : 'false' }};

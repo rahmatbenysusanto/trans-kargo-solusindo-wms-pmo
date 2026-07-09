@@ -82,6 +82,71 @@ class InventoryController extends Controller
         }
     }
 
+    public function updateSerialNumber(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:inventory,id',
+            'serial_number' => 'required|string|max:255',
+        ]);
+
+        try {
+            $inventory = Inventory::findOrFail($request->post('id'));
+            $oldSerialNumber = $inventory->serial_number;
+            $inventory->update([
+                'serial_number' => $request->post('serial_number'),
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Serial number updated successfully.',
+                'data' => [
+                    'old' => $oldSerialNumber,
+                    'new' => $inventory->serial_number,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Update Serial Number Error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to update serial number.',
+            ], 500);
+        }
+    }
+
+    public function updateClient(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:inventory,id',
+            'client_id' => 'required|integer|exists:client,id',
+        ]);
+
+        try {
+            $inventory = Inventory::findOrFail($request->post('id'));
+            $oldClientId = $inventory->client_id;
+            $inventory->update([
+                'client_id' => $request->post('client_id'),
+            ]);
+
+            $newClient = Client::find($request->post('client_id'));
+            $oldClient = Client::find($oldClientId);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Client updated successfully.',
+                'data' => [
+                    'old' => $oldClient?->name ?? '-',
+                    'new' => $newClient?->name ?? '-',
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Update Client Error: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to update client.',
+            ], 500);
+        }
+    }
+
     public function history(Request $request): View
     {
         $inventory = Inventory::with('inboundDetail.inbound', 'bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'pic')->where('id', $request->query('id'))->first();
