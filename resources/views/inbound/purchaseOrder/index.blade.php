@@ -177,13 +177,14 @@
                                                             href="{{ route('inbound.receiving.detail', ['number' => $item->number]) }}"><i
                                                                 class="bx bx-show align-middle me-2 text-muted"></i> View
                                                             Detail</a></li>
-                                                    @if ($item->status == 'new')
+                                                    @if ($item->status != 'cancel')
                                                         <li>
                                                             <hr class="dropdown-divider">
                                                         </li>
                                                         <li><a class="dropdown-item text-warning"
                                                                 href="{{ route('inbound.receiving.edit', ['number' => $item->number]) }}"><i
                                                                     class="bx bx-pencil align-middle me-2"></i> Edit</a></li>
+                                                        @if ($item->status == 'new')
                                                         <li><a class="dropdown-item text-primary"
                                                                 href="javascript:void(0);"
                                                                 onclick="processPO('{{ $item->number }}')"><i
@@ -195,6 +196,7 @@
                                                                 onclick="cancelPO('{{ $item->number }}')"><i
                                                                     class="bx bx-x-circle align-middle me-2"></i>
                                                                 Cancel PO</a></li>
+                                                        @endif
                                                     @endif
                                                 </ul>
                                             </div>

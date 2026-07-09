@@ -74,8 +74,8 @@ class InboundController extends Controller
             return redirect()->route('inbound.receiving.index')->with('error', 'Inbound record not found.');
         }
 
-        if ($inbound->status !== 'new') {
-            return redirect()->route('inbound.receiving.index')->with('error', 'Only records with status "new" can be edited.');
+        if (!in_array($inbound->status, ['new', 'open', 'close'])) {
+            return redirect()->route('inbound.receiving.index')->with('error', 'Only records with status "new", "open", or "close" can be edited.');
         }
 
         $inboundDetail = InboundDetail::where('inbound_id', $inbound->id)->get();
@@ -331,8 +331,8 @@ class InboundController extends Controller
             return response()->json(['status' => false, 'message' => 'Record not found.']);
         }
 
-        if ($inbound->status !== 'new') {
-            return response()->json(['status' => false, 'message' => 'Cannot edit a record that is not in "new" status.']);
+        if (!in_array($inbound->status, ['new', 'open', 'close'])) {
+            return response()->json(['status' => false, 'message' => 'Cannot edit a record with this status.']);
         }
 
         try {
@@ -345,55 +345,49 @@ class InboundController extends Controller
                 'site_location' => $request->post('siteLocation'),
                 'inbound_type'  => $request->post('inboundType'),
                 'owner_status'  => $request->post('ownershipStatus'),
-                'quantity'      => count($request->post('products')),
                 'remarks'       => $request->post('remarks'),
                 'received_at'   => $request->post('receivingDate'),
             ]);
 
-            // Safety check: confirm no details have been put away
+            // Check if any products have been put away
             $hasPutAway = InboundDetail::where('inbound_id', $inbound->id)
                 ->where('qty_pa', '>', 0)
                 ->exists();
 
-            if ($hasPutAway) {
-                DB::rollBack();
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Cannot edit: some products have already been put away.'
-                ]);
-            }
+            if (!$hasPutAway) {
+                // Safe to update products: delete old + re-insert new
+                $inbound->update(['quantity' => count($request->post('products'))]);
 
-            // Delete old InboundDetail records
-            InboundDetail::where('inbound_id', $inbound->id)->delete();
+                InboundDetail::where('inbound_id', $inbound->id)->delete();
 
-            // Re-insert products
-            foreach ($request->post('products') as $product) {
-                $checkProduct = Product::where('part_name', $product['partName'])->first();
-                if ($checkProduct != null) {
-                    $productId = $checkProduct->id;
-                } else {
-                    $createProduct = Product::create([
-                        'part_name'        => $product['partName'],
-                        'part_description' => $product['partDescription'] ?? null
+                foreach ($request->post('products') as $product) {
+                    $checkProduct = Product::where('part_name', $product['partName'])->first();
+                    if ($checkProduct != null) {
+                        $productId = $checkProduct->id;
+                    } else {
+                        $createProduct = Product::create([
+                            'part_name'        => $product['partName'],
+                            'part_description' => $product['partDescription'] ?? null
+                        ]);
+                        $productId = $createProduct->id;
+                    }
+
+                    InboundDetail::create([
+                        'inbound_id'         => $inbound->id,
+                        'product_id'         => $productId,
+                        'qty'                => 1,
+                        'qty_pa'             => 0,
+                        'part_name'          => $product['partName'],
+                        'part_number'        => $product['partNumber'],
+                        'part_description'   => $product['partDescription'] ?? null,
+                        'serial_number'      => $product['serialNumber'],
+                        'condition'          => $product['condition'] ?? null,
+                        'manufacture_date'   => $product['manufactureDate'] ?? null,
+                        'warranty_end_date'  => $product['warrantyEndDate'] ?? null,
+                        'eos_date'           => $product['eosDate'] ?? null,
+                        'remarks'            => $product['remarks'] ?? null,
                     ]);
-                    $productId = $createProduct->id;
                 }
-
-                InboundDetail::create([
-                    'inbound_id'         => $inbound->id,
-                    'product_id'         => $productId,
-                    'qty'                => 1,
-                    'qty_pa'             => 0,
-                    'part_name'          => $product['partName'],
-                    'part_number'        => $product['partNumber'],
-                    'part_description'   => $product['partDescription'] ?? null,
-                    'serial_number'      => $product['serialNumber'],
-                    'condition'          => $product['condition'] ?? null,
-                    'manufacture_date'   => $product['manufactureDate'] ?? null,
-                    'warranty_end_date'  => $product['warrantyEndDate'] ?? null,
-                    'eos_date'           => $product['eosDate'] ?? null,
-                    'remarks'            => $product['remarks'] ?? null,
-                ]);
             }
 
             DB::commit();

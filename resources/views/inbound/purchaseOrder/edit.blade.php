@@ -233,8 +233,15 @@
                     <div class="row align-items-center">
                         <div class="col-sm">
                             <h4 class="card-title mb-0">Product Inbound List</h4>
+                            @php
+                                $hasPutAway = $inboundDetail->where('qty_pa', '>', 0)->count() > 0;
+                            @endphp
+                            @if ($hasPutAway)
+                                <span class="badge bg-info ms-2">Read-only — products already in inventory</span>
+                            @endif
                         </div>
                         <div class="col-sm-auto">
+                            @if (!$hasPutAway)
                             <div class="d-flex flex-wrap gap-2">
                                 <a href="{{ asset('assets/Template Inbound.xlsx') }}" download
                                     class="btn btn-soft-success btn-sm"><i
@@ -245,6 +252,7 @@
                                 <button class="btn btn-primary btn-sm" onclick="addProductModal()"><i
                                         class="ri-add-line align-bottom me-1"></i> Add Product</button>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -274,7 +282,9 @@
                                     <th>Warranty End Date</th>
                                     <th>EOS Date</th>
                                     <th>Remarks</th>
+                                    @if(!$hasPutAway)
                                     <th>Action</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody id="listProducts">
@@ -468,6 +478,7 @@
         })->values());
         localStorage.setItem('products', JSON.stringify(existingProducts));
 
+        const hasPutAway = {{ $hasPutAway ? 'true' : 'false' }};
         let currentPage = 1;
         const itemsPerPage = 10;
         let searchTerm = '';
@@ -580,7 +591,7 @@
             let html = '';
 
             if (paginatedProducts.length === 0) {
-                html = `<tr><td colspan="11" class="text-center py-4">
+                html = `<tr><td colspan="${hasPutAway ? '10' : '11'}" class="text-center py-4">
                     <div class="text-muted">
                         <i class="ri-search-line fs-24"></i>
                         <p class="mt-2">No products found matching your search</p>
@@ -627,6 +638,7 @@
                             <td>${ product.warrantyEndDate || '-' }</td>
                             <td>${ product.eosDate || '-' }</td>
                             <td>${ product.remarks || '-' }</td>
+                            ${!hasPutAway ? `
                             <td>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-soft-info btn-sm" onclick="editProductModal(${originalIndex})">
@@ -637,6 +649,7 @@
                                     </button>
                                 </div>
                             </td>
+                            ` : ''}
                         </tr>
                     `;
                 });
@@ -839,7 +852,7 @@
         function updateInbound() {
             const products = JSON.parse(localStorage.getItem('products')) ?? [];
 
-            if (products.length === 0) {
+            if (!hasPutAway && products.length === 0) {
                 Swal.fire({
                     title: 'Warning',
                     text: 'Please add at least one product.',
@@ -862,6 +875,17 @@
                 showCloseButton: true
             }).then(async (t) => {
                 if (t.value) {
+                    const postData = {
+                        inbound_id: {{ $inbound->id }},
+                        client: document.getElementById('client').value,
+                        pic: document.getElementById('pic').value,
+                        inboundType: document.getElementById('inbound_type').value,
+                        ownershipStatus: document.getElementById('ownership_status').value,
+                        siteLocation: document.getElementById('site_location').value,
+                        remarks: document.getElementById('remarks').value,
+                        receivingDate: document.getElementById('receiving_date').value,
+                        products: products
+                    };
 
                     $.ajax({
                         url: '{{ route('inbound.receiving.update') }}',
@@ -871,22 +895,12 @@
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        data: JSON.stringify({
-                            inbound_id: {{ $inbound->id }},
-                            client: document.getElementById('client').value,
-                            pic: document.getElementById('pic').value,
-                            inboundType: document.getElementById('inbound_type').value,
-                            ownershipStatus: document.getElementById('ownership_status').value,
-                            siteLocation: document.getElementById('site_location').value,
-                            remarks: document.getElementById('remarks').value,
-                            receivingDate: document.getElementById('receiving_date').value,
-                            products: products
-                        }),
+                        data: JSON.stringify(postData),
                         success: (res) => {
                             if (res.status) {
                                 Swal.fire({
                                     title: 'Success',
-                                    text: 'Inbound Updated Successfully',
+                                    text: hasPutAway ? 'Header Updated Successfully (products unchanged)' : 'Inbound Updated Successfully',
                                     icon: 'success'
                                 }).then(() => {
                                     window.location.href = '{{ route('inbound.receiving.detail', ['number' => $inbound->number]) }}';
