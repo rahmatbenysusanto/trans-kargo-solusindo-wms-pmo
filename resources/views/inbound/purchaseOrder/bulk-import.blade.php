@@ -43,7 +43,7 @@
                                     <li>Column D: <strong>SN#</strong> (Serial Number)</li>
                                     <li>Column E: <strong>Alokasi dari Site</strong> (Site Location)</li>
                                     <li>Column F: <strong>PIC</strong> (PIC Name)</li>
-                                    <li>Column G: <strong>By</strong> (Client Name)</li>
+                                    <li>Column G: <strong>By</strong> or <strong>By Client</strong> (Client Name)</li>
                                     <li>Column I: <strong>Remarks</strong> (Detail Remarks)</li>
                                     <li>Column J: <strong>Part Description</strong> (Optional Description)</li>
                                 </ul>

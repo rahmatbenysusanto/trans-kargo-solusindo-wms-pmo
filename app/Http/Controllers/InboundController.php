@@ -114,33 +114,50 @@ class InboundController extends Controller
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
 
+            // Read header row (row 0) and build column index mapping
+            $headers = $rows[0] ?? [];
+            $columnMap = $this->buildColumnMap($headers);
+
             // Skip header (row 1)
             $data = array_slice($rows, 1);
 
             $groups = [];
 
             foreach ($data as $row) {
-                if (empty($row[1]) || empty($row[6])) continue; // Need Date and Client ("By")
+                // Get column indices from the header map
+                $clientCol = $columnMap['client'] ?? 6;     // "By" or "By Client"
+                $dateCol    = $columnMap['date'] ?? 1;
+                $pnCol      = $columnMap['part_name'] ?? 2;
+                $snCol      = $columnMap['serial_number'] ?? 3;
+                $siteCol    = $columnMap['site'] ?? 4;
+                $picCol     = $columnMap['pic'] ?? 5;
+                $awbCol     = $columnMap['awb'] ?? 7;
+                $remarksCol = $columnMap['remarks'] ?? 8;
+                $descCol    = $columnMap['part_description'] ?? 9;
 
-                // Handle Date (Column B - Index 1)
-                $dateValue = $row[1];
-                if (is_numeric($dateValue)) {
-                    $receivedAt = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateValue)->format('Y-m-d');
+                $clientName = $row[$clientCol] ?? null;
+                $dateRaw    = $row[$dateCol] ?? null;
+
+                if (empty($dateRaw) || empty($clientName)) continue; // Need Date and Client
+
+                // Handle Date
+                if (is_numeric($dateRaw)) {
+                    $receivedAt = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateRaw)->format('Y-m-d');
                 } else {
                     try {
-                        $receivedAt = Carbon::parse($dateValue)->format('Y-m-d');
+                        $receivedAt = Carbon::parse($dateRaw)->format('Y-m-d');
                     } catch (\Exception $e) {
                         $receivedAt = now()->format('Y-m-d');
                     }
                 }
 
-                $partName = $row[2] ?? '-';    // Column C - Index 2
-                $sn = $row[3] ?? '-';          // Column D - Index 3
-                $site = $row[4] ?? '';         // Column E - Index 4
-                $picName = $row[5] ?? 'System'; // Column F - Index 5
-                $clientName = $row[6] ?? 'Telkomsel';     // Column G - Client ("By")
-                $awb = $row[7] ?? '';          // Column H - Index 7
-                $remarks = $row[8] ?? '';       // Column I - Index 8
+                $partName = $row[$pnCol] ?? '-';
+                $sn = $row[$snCol] ?? '-';
+                $site = $row[$siteCol] ?? '';
+                $picName = $row[$picCol] ?? 'System';
+                $awb = $row[$awbCol] ?? '';
+                $remarks = $row[$remarksCol] ?? '';
+                $partDescription = $row[$descCol] ?? '';
 
                 // Group only by Date, Site Location, and PIC as requested
                 $groupKey = "{$receivedAt}|{$picName}|{$site}";
@@ -159,7 +176,7 @@ class InboundController extends Controller
                 $groups[$groupKey]['products'][] = [
                     'part_name' => $partName,
                     'sn' => $sn,
-                    'part_description' => $row[9] ?? '', // Column J - Index 9
+                    'part_description' => $partDescription,
                     'remarks' => $remarks
                 ];
             }
@@ -241,6 +258,58 @@ class InboundController extends Controller
             Log::error('Bulk Import Confirm Error: ' . $e->getMessage());
             return redirect()->route('inbound.receiving.bulkImport')->with('error', 'Error during bulk import processing: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Build a column index map from the header row.
+     * Supports flexible header names like "By" or "By Client" for client column.
+     */
+    private function buildColumnMap(array $headers): array
+    {
+        $map = [];
+
+        foreach ($headers as $index => $header) {
+            $normalized = strtolower(trim((string) $header));
+
+            // Client column: "By", "By Client", "Client"
+            if (in_array($normalized, ['by', 'by client', 'client'], true)) {
+                $map['client'] = $index;
+            }
+            // Date column
+            elseif (in_array($normalized, ['date', 'date in', 'received at', 'received_at', 'tanggal'], true)) {
+                $map['date'] = $index;
+            }
+            // Part Name / PN#
+            elseif (in_array($normalized, ['pn#', 'pn', 'part name', 'part_name', 'material'], true)) {
+                $map['part_name'] = $index;
+            }
+            // Serial Number / SN#
+            elseif (in_array($normalized, ['sn#', 'sn', 'serial number', 'serial_number', 's/n'], true)) {
+                $map['serial_number'] = $index;
+            }
+            // Site / Location
+            elseif (in_array($normalized, ['alokasi dari site', 'site', 'site location', 'location', 'lokasi'], true)) {
+                $map['site'] = $index;
+            }
+            // PIC
+            elseif (in_array($normalized, ['pic', 'pic name', 'pic_name', 'penanggung jawab'], true)) {
+                $map['pic'] = $index;
+            }
+            // AWB
+            elseif (in_array($normalized, ['awb', 'awb#', 'airway bill'], true)) {
+                $map['awb'] = $index;
+            }
+            // Remarks
+            elseif (in_array($normalized, ['remarks', 'remark', 'keterangan', 'notes'], true)) {
+                $map['remarks'] = $index;
+            }
+            // Part Description
+            elseif (in_array($normalized, ['part description', 'part_description', 'description', 'desc', 'deskripsi'], true)) {
+                $map['part_description'] = $index;
+            }
+        }
+
+        return $map;
     }
 
     private function inboundNumber()
