@@ -38,6 +38,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
             Route::post('/bulk-import/preview', [InboundController::class, 'bulkImportPreview'])->name('inbound.receiving.bulkImport.preview');
             Route::post('/bulk-import/confirm', [InboundController::class, 'bulkImportConfirm'])->name('inbound.receiving.bulkImport.confirm');
             Route::get('/detail', 'detail')->name('inbound.receiving.detail');
+            Route::get('/edit', 'edit')->name('inbound.receiving.edit');
+            Route::post('/update', 'update')->name('inbound.receiving.update');
 
             Route::post('/change-status', 'changeStatus')->name('inbound.receiving.changeStatus');
 

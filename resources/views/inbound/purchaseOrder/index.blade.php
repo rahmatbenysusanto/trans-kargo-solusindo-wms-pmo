@@ -181,6 +181,9 @@
                                                         <li>
                                                             <hr class="dropdown-divider">
                                                         </li>
+                                                        <li><a class="dropdown-item text-warning"
+                                                                href="{{ route('inbound.receiving.edit', ['number' => $item->number]) }}"><i
+                                                                    class="bx bx-pencil align-middle me-2"></i> Edit</a></li>
                                                         <li><a class="dropdown-item text-primary"
                                                                 href="javascript:void(0);"
                                                                 onclick="processPO('{{ $item->number }}')"><i

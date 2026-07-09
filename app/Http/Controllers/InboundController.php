@@ -66,6 +66,26 @@ class InboundController extends Controller
         return view('inbound.purchaseOrder.detail', compact('title', 'inbound', 'inboundDetail'));
     }
 
+    public function edit(Request $request): View|\Illuminate\Http\RedirectResponse
+    {
+        $inbound = Inbound::with('pic')->where('number', $request->query('number'))->first();
+
+        if (!$inbound) {
+            return redirect()->route('inbound.receiving.index')->with('error', 'Inbound record not found.');
+        }
+
+        if ($inbound->status !== 'new') {
+            return redirect()->route('inbound.receiving.index')->with('error', 'Only records with status "new" can be edited.');
+        }
+
+        $inboundDetail = InboundDetail::where('inbound_id', $inbound->id)->get();
+        $client = Client::all();
+        $pic = Pic::all();
+
+        $title = 'Edit Purchase Order';
+        return view('inbound.purchaseOrder.edit', compact('title', 'inbound', 'inboundDetail', 'client', 'pic'));
+    }
+
     public function create(): View
     {
         $client = Client::all();
@@ -297,6 +317,91 @@ class InboundController extends Controller
             return response()->json([
                 'status' => false
             ]);
+        }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function update(Request $request)
+    {
+        $inbound = Inbound::find($request->post('inbound_id'));
+
+        if (!$inbound) {
+            return response()->json(['status' => false, 'message' => 'Record not found.']);
+        }
+
+        if ($inbound->status !== 'new') {
+            return response()->json(['status' => false, 'message' => 'Cannot edit a record that is not in "new" status.']);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Update header fields (preserve number, created_by, status)
+            $inbound->update([
+                'client_id'     => $request->post('client'),
+                'pic_id'        => $request->post('pic'),
+                'site_location' => $request->post('siteLocation'),
+                'inbound_type'  => $request->post('inboundType'),
+                'owner_status'  => $request->post('ownershipStatus'),
+                'quantity'      => count($request->post('products')),
+                'remarks'       => $request->post('remarks'),
+                'received_at'   => $request->post('receivingDate'),
+            ]);
+
+            // Safety check: confirm no details have been put away
+            $hasPutAway = InboundDetail::where('inbound_id', $inbound->id)
+                ->where('qty_pa', '>', 0)
+                ->exists();
+
+            if ($hasPutAway) {
+                DB::rollBack();
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Cannot edit: some products have already been put away.'
+                ]);
+            }
+
+            // Delete old InboundDetail records
+            InboundDetail::where('inbound_id', $inbound->id)->delete();
+
+            // Re-insert products
+            foreach ($request->post('products') as $product) {
+                $checkProduct = Product::where('part_name', $product['partName'])->first();
+                if ($checkProduct != null) {
+                    $productId = $checkProduct->id;
+                } else {
+                    $createProduct = Product::create([
+                        'part_name'        => $product['partName'],
+                        'part_description' => $product['partDescription'] ?? null
+                    ]);
+                    $productId = $createProduct->id;
+                }
+
+                InboundDetail::create([
+                    'inbound_id'         => $inbound->id,
+                    'product_id'         => $productId,
+                    'qty'                => 1,
+                    'qty_pa'             => 0,
+                    'part_name'          => $product['partName'],
+                    'part_number'        => $product['partNumber'],
+                    'part_description'   => $product['partDescription'] ?? null,
+                    'serial_number'      => $product['serialNumber'],
+                    'condition'          => $product['condition'] ?? null,
+                    'manufacture_date'   => $product['manufactureDate'] ?? null,
+                    'warranty_end_date'  => $product['warrantyEndDate'] ?? null,
+                    'eos_date'           => $product['eosDate'] ?? null,
+                    'remarks'            => $product['remarks'] ?? null,
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['status' => true]);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::info($e->getMessage());
+            return response()->json(['status' => false, 'message' => $e->getMessage()]);
         }
     }
 
