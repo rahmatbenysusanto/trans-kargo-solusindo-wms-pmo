@@ -118,7 +118,7 @@ class InboundController extends Controller
                 $sn = $row[3] ?? '-';          // Column D - Index 3
                 $site = $row[4] ?? '';         // Column E - Index 4
                 $picName = $row[5] ?? 'System'; // Column F - Index 5
-                $clientName = 'Telkomsel';     // Forced as per user request
+                $clientName = $row[6] ?? 'Telkomsel';     // Column G - Client ("By")
                 $awb = $row[7] ?? '';          // Column H - Index 7
                 $remarks = $row[8] ?? '';       // Column I - Index 8
 
