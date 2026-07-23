@@ -171,7 +171,39 @@
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <!-- BULK SN INPUT -->
+                    <div class="p-3 border-bottom bg-warning-subtle" id="bulkSnSection">
+                        <div class="d-flex align-items-center mb-0">
+                            <div class="d-flex align-items-center flex-shrink-0">
+                                <i class="ri-barcode-line fs-16 me-2 text-warning"></i>
+                                <h6 class="mb-0 fw-bold" style="cursor:pointer" onclick="toggleBulkSn()">Bulk SN Input</h6>
+                            </div>
+                            <div class="ms-auto d-flex align-items-center gap-2">
+                                <small class="text-muted" id="bulkSnCount">0 SN</small>
+                                <button class="btn btn-sm btn-link p-0 text-muted" type="button" onclick="toggleBulkSn()">
+                                    <i class="ri-arrow-up-s-line fs-18" id="bulkSnToggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="bulkSnContent" class="mt-2">
+                            <textarea class="form-control form-control-sm font-monospace" id="bulkSnTextarea" rows="4"
+                                placeholder="Paste serial numbers here (one per line)&#10;Example:&#10;SN-00123&#10;SN-00124&#10;SN-00125"></textarea>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div>
+                                    <button class="btn btn-sm btn-soft-info me-1" onclick="clearBulkSn()">
+                                        <i class="ri-eraser-line"></i> Clear
+                                    </button>
+                                    <span id="bulkSnDuplicateInfo" class="small text-muted" style="display:none;"></span>
+                                </div>
+                                <button class="btn btn-success btn-sm" onclick="processBulkSn(this)">
+                                    <i class="ri-add-line me-1"></i> Add to List
+                                </button>
+                            </div>
+                            <div id="bulkSnResult" class="mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                         <table id="tableProductsOutbound" class="table table-hover table-nowrap align-middle mb-0">
                             <thead class="bg-light text-muted text-success">
                                 <tr>
@@ -247,6 +279,130 @@
                 }
             });
         }
+
+        // ===== BULK SN INPUT =====
+        $('#bulkSnTextarea').on('input', function() {
+            const sns = getSerialNumbersFromTextarea();
+            $('#bulkSnCount').text(sns.length + ' SN');
+
+            // Check for duplicates in textarea
+            const unique = new Set(sns);
+            if (unique.size < sns.length) {
+                $('#bulkSnDuplicateInfo').text(sns.length - unique.size + ' duplicate(s) found').show();
+            } else {
+                $('#bulkSnDuplicateInfo').hide();
+            }
+        });
+
+        function getSerialNumbersFromTextarea() {
+            const text = document.getElementById('bulkSnTextarea').value;
+            if (!text.trim()) return [];
+            return text.split('\n')
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+        }
+
+        function toggleBulkSn() {
+            const content = document.getElementById('bulkSnContent');
+            const icon = document.getElementById('bulkSnToggleIcon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.className = 'ri-arrow-up-s-line fs-18';
+            } else {
+                content.style.display = 'none';
+                icon.className = 'ri-arrow-down-s-line fs-18';
+            }
+        }
+
+        function clearBulkSn() {
+            document.getElementById('bulkSnTextarea').value = '';
+            $('#bulkSnCount').text('0 SN');
+            $('#bulkSnDuplicateInfo').hide();
+            $('#bulkSnResult').hide();
+        }
+
+        function processBulkSn(btn) {
+            const sns = getSerialNumbersFromTextarea();
+            if (sns.length === 0) {
+                Swal.fire('Error', 'Please enter at least 1 Serial Number', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
+
+            $.ajax({
+                url: '{{ route('outbound.inventory.searchBySN') }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    serial_numbers: sns
+                },
+                success: function(res) {
+                    const found = res.found || [];
+                    const notFound = res.not_found || [];
+
+                    if (found.length > 0) {
+                        const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];
+                        const existingIds = new Set(productsOutbound.map(p => p.id));
+                        let addedCount = 0;
+
+                        found.forEach(product => {
+                            if (!existingIds.has(product.id)) {
+                                productsOutbound.push({
+                                    id: product.id,
+                                    partName: product.part_name,
+                                    partNumber: product.part_number,
+                                    partDescription: product.part_description,
+                                    serialNumber: product.serial_number,
+                                    client: product.client ? product.client.name : '-'
+                                });
+                                addedCount++;
+                                existingIds.add(product.id);
+                            }
+                        });
+
+                        localStorage.setItem('productsOutbound', JSON.stringify(productsOutbound));
+                        viewProductsOutbound();
+                        fetchInventory(currentPage);
+                    }
+
+                    // Show result feedback
+                    let resultHtml = '';
+                    if (found.length > 0) {
+                        const added = found.length;
+                        resultHtml += `<div class="alert alert-success py-2 mb-1 small"><i class="ri-check-line me-1"></i>${added} SN(s) ditemukan & ditambahkan</div>`;
+                    }
+                    if (notFound.length > 0) {
+                        resultHtml += `<div class="alert alert-warning py-2 mb-1 small"><i class="ri-error-warning-line me-1"></i>Tidak ditemukan: <strong>${notFound.join(', ')}</strong></div>`;
+                    }
+
+                    const resultDiv = document.getElementById('bulkSnResult');
+                    resultDiv.innerHTML = resultHtml;
+                    resultDiv.style.display = 'block';
+
+                    // Clear textarea jika semua ditemukan
+                    if (notFound.length === 0) {
+                        document.getElementById('bulkSnTextarea').value = '';
+                        $('#bulkSnCount').text('0 SN');
+                        $('#bulkSnDuplicateInfo').hide();
+                    }
+
+                    // Auto-hide result after 8s
+                    setTimeout(() => {
+                        resultDiv.style.display = 'none';
+                    }, 8000);
+                },
+                error: function() {
+                    Swal.fire('Error', 'Gagal memproses serial number', 'error');
+                },
+                complete: function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="ri-add-line me-1"></i> Add to List';
+                }
+            });
+        }
+        // ===== END BULK SN =====
 
         function renderInventory(res) {
             const productsOutbound = JSON.parse(localStorage.getItem('productsOutbound')) ?? [];

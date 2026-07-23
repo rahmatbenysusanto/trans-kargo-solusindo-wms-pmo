@@ -90,6 +90,34 @@ class OutboundController extends Controller
         return response()->json($inventory);
     }
 
+    public function searchBySerialNumbers(Request $request)
+    {
+        $serialNumbers = $request->post('serial_numbers', []);
+
+        if (empty($serialNumbers)) {
+            return response()->json([
+                'found'    => [],
+                'not_found' => [],
+            ]);
+        }
+
+        $serialNumbers = array_values(array_filter(array_map('trim', $serialNumbers)));
+
+        $found = Inventory::with('client:id,name')
+            ->where('qty', '>', 0)
+            ->whereIn('serial_number', $serialNumbers)
+            ->select('id', 'part_name', 'part_number', 'part_description', 'serial_number', 'inbound_detail_id', 'client_id')
+            ->get();
+
+        $foundSNs = $found->pluck('serial_number')->toArray();
+        $notFound = array_values(array_diff($serialNumbers, $foundSNs));
+
+        return response()->json([
+            'found'    => $found,
+            'not_found' => $notFound,
+        ]);
+    }
+
     private function outboundNumber()
     {
         $prefix = 'OUT-' . date('Ym') . '-';

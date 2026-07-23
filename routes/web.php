@@ -96,6 +96,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::get('/create', 'create')->name('outbound.create');
         Route::get('/next-dn-number', 'nextDNNumber')->name('outbound.nextDNNumber');
         Route::get('/inventory-search', 'searchInventory')->name('outbound.inventory.search');
+        Route::post('/search-by-sn', 'searchBySerialNumbers')->name('outbound.inventory.searchBySN');
         Route::post('/store', 'store')->name('outbound.store');
         Route::get('/detail', 'detail')->name('outbound.detail');
 

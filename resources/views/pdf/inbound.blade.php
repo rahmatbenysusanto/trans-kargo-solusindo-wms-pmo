@@ -159,7 +159,6 @@
                     <h1 class="report-title">Inbound Report</h1>
                 </td>
                 <td class="company-info">
-                    <img src="{{ public_path('assets/images/ntt.png') }}" alt="Logo" style="height: 40px; margin-bottom: 5px;"><br>
                     TRANS KARGO SOLUSINDO<br>
                     <span style="font-size: 9px; font-weight: normal;">Warehouse Management System</span>
                 </td>
