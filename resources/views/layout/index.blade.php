@@ -692,6 +692,15 @@
                             </a>
                         </li>
 
+                        <!-- Back To WH -->
+                        <li class="nav-item">
+                            <a class="nav-link menu-link {{ $title == 'Back To WH' ? 'active' : '' }}"
+                                href="{{ route('backToWh.index') }}">
+                                <i class="mdi mdi-archive-arrow-down"></i>
+                                <span data-key="t-user"> Back To WH </span>
+                            </a>
+                        </li>
+
                         {{-- ========== WAREHOUSE SECTION ========== --}}
                         <li class="menu-title"><span data-key="t-menu"><i class="mdi mdi-store-outline me-1"></i> Warehouse</span></li>
 

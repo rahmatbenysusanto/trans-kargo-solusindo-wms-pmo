@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssetLifecycleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BackToWhController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InboundController;
@@ -113,6 +114,18 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
         Route::get('/download-excel', 'downloadExcel')->name('return.downloadExcel');
         Route::get('/download-pdf', 'downloadPDF')->name('return.downloadPDF');
+    });
+
+    Route::prefix('/back-to-wh')->controller(BackToWhController::class)->group(function () {
+        Route::get('/', 'index')->name('backToWh.index');
+        Route::get('/create', 'create')->name('backToWh.create');
+        Route::get('/inventory-search', 'searchInventory')->name('backToWh.inventory.search');
+        Route::post('/search-by-sn', 'searchBySerialNumbers')->name('backToWh.inventory.searchBySN');
+        Route::post('/store', 'store')->name('backToWh.store');
+        Route::get('/detail', 'detail')->name('backToWh.detail');
+
+        Route::get('/download-excel', 'downloadExcel')->name('backToWh.downloadExcel');
+        Route::get('/download-pdf', 'downloadPDF')->name('backToWh.downloadPDF');
     });
 
     Route::prefix('/storage')->controller(StorageController::class)->group(function () {
