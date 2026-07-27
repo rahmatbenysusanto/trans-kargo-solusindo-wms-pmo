@@ -200,6 +200,63 @@ class OutboundController extends Controller
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
+    public function addProductsStore(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $outbound = Outbound::findOrFail($request->post('outbound_id'));
+            $products = $request->post('products', []);
+
+            foreach ($products as $product) {
+                $exists = OutboundDetail::where('outbound_id', $outbound->id)
+                    ->where('inventory_id', $product['id'])
+                    ->exists();
+
+                if ($exists) {
+                    continue;
+                }
+
+                Inventory::where('id', $product['id'])->update([
+                    'qty'       => 0,
+                    'status'    => 'in use'
+                ]);
+
+                InventoryHistory::create([
+                    'inventory_id'  => $product['id'],
+                    'type'          => 'Outbound',
+                    'description'   => 'Additional outbound to number ' . $outbound->number,
+                ]);
+
+                OutboundDetail::create([
+                    'outbound_id'   => $outbound->id,
+                    'inventory_id'  => $product['id'],
+                ]);
+            }
+
+            // Update total qty on outbound header
+            $totalDetails = OutboundDetail::where('outbound_id', $outbound->id)->count();
+            $outbound->update(['qty' => $totalDetails]);
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => count($products) . ' product(s) added successfully',
+            ]);
+        } catch (\Throwable $err) {
+            DB::rollBack();
+            Log::info($err->getMessage());
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to add products: ' . $err->getMessage(),
+            ]);
+        }
+    }
+
     public function downloadExcel(Request $request)
     {
         $outbound = Outbound::with('client', 'user')->where('id', $request->query('id'))->first();

@@ -100,6 +100,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::post('/search-by-sn', 'searchBySerialNumbers')->name('outbound.inventory.searchBySN');
         Route::post('/store', 'store')->name('outbound.store');
         Route::get('/detail', 'detail')->name('outbound.detail');
+        Route::post('/add-products', 'addProductsStore')->name('outbound.addProducts');
 
         Route::get('/download-excel', 'downloadExcel')->name('outbound.downloadExcel');
         Route::get('/download-pdf', 'downloadPDF')->name('outbound.downloadPDF');
