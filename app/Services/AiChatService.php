@@ -891,7 +891,7 @@ class AiChatService
                         ['role' => 'user', 'content' => $userMessage],
                     ],
                     'temperature' => 0.7,
-                    'max_tokens'  => 500,
+                    'max_tokens'  => 1000,
                 ]);
 
             if ($response->successful()) {
@@ -951,7 +951,7 @@ class AiChatService
                         ['role' => 'user', 'content' => "Pertanyaan user: \"{$userMessage}\"\n\nData hasil query:\n{$dataContext}\n\nTolong jawab pertanyaan user berdasarkan data di atas dalam Bahasa Indonesia yang natural dan mudah dipahami. TAMPILKAN SEMUA data yang tersedia — inbound, outbound, inventory, dan history. Jika ada bagian yang kosong/tidak ditemukan, sebutkan dengan jelas (misal: 'Data outbound tidak ditemukan untuk SN ini')."],
                     ],
                     'temperature' => 0.5,
-                    'max_tokens'  => 900,
+                    'max_tokens'  => 4000,
                 ]);
 
             if ($response->successful()) {
