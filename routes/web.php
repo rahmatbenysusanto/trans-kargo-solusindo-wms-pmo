@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiChatController;
 use App\Http\Controllers\AssetLifecycleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BackToWhController;
@@ -177,5 +178,12 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::post('/store', 'store')->name('pic.store');
         Route::post('/update/{id}', 'update')->name('pic.update');
         Route::post('/destroy/{id}', 'destroy')->name('pic.destroy');
+    });
+
+    Route::prefix('/ai-chat')->controller(AiChatController::class)->group(function () {
+        Route::post('/send', 'sendMessage');
+        Route::get('/conversations', 'conversations');
+        Route::get('/messages/{conversationId}', 'messages');
+        Route::delete('/conversation/{conversationId}', 'deleteConversation');
     });
 });
