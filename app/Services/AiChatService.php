@@ -100,6 +100,12 @@ class AiChatService
      */
     private function classifyIntent(string $userMessage, ChatConversation $conversation): array
     {
+        // If no API key, skip the AI classification call entirely
+        if (empty($this->apiKey)) {
+            $fallback = $this->detectFollowUpIntent($userMessage, $conversation);
+            return $fallback ?: ['intent' => 'general_chat', 'params' => []];
+        }
+
         $systemPrompt = $this->getIntentClassificationPrompt();
 
         // Get recent conversation for context
@@ -865,6 +871,11 @@ class AiChatService
 
     private function generateGeneralChatReply(string $userMessage, ChatConversation $conversation): string
     {
+        // If no API key is configured, return fallback immediately
+        if (empty($this->apiKey)) {
+            return 'Maaf, API key DeepSeek belum dikonfigurasi. Silakan isi DEEPSEEK_API_KEY di file .env';
+        }
+
         $systemPrompt = $this->getGeneralChatPrompt();
 
         try {
@@ -884,8 +895,12 @@ class AiChatService
                 ]);
 
             if ($response->successful()) {
-                return $response->json('choices.0.message.content')
-                    ?? 'Maaf, saya tidak bisa menjawab pertanyaan itu saat ini.';
+                $content = $response->json('choices.0.message.content');
+                // Guard against empty/null responses
+                if (!empty(trim($content ?? ''))) {
+                    return $content;
+                }
+                Log::warning('DeepSeek general chat returned empty content');
             }
         } catch (\Exception $e) {
             Log::error('DeepSeek general chat error: ' . $e->getMessage());
@@ -901,6 +916,11 @@ class AiChatService
         array $data,
         ChatConversation $conversation
     ): string {
+        // If no API key, skip the AI call and use fallback directly
+        if (empty($this->apiKey)) {
+            return $this->formatDataFallback($intent, $params, $data);
+        }
+
         $systemPrompt = $this->getDataFormattingPrompt($intent);
 
         $dataContext = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -935,8 +955,12 @@ class AiChatService
                 ]);
 
             if ($response->successful()) {
-                return $response->json('choices.0.message.content')
-                    ?? 'Maaf, saya tidak bisa memproses data ini.';
+                $content = $response->json('choices.0.message.content');
+                // Guard against empty/null responses — fall back to structured data
+                if (!empty(trim($content ?? ''))) {
+                    return $content;
+                }
+                Log::warning('DeepSeek data formatting returned empty content, using fallback');
             }
         } catch (\Exception $e) {
             Log::error('DeepSeek data formatting error: ' . $e->getMessage());
