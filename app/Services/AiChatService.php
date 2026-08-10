@@ -57,15 +57,19 @@ class AiChatService
             $conversation->save();
         }
 
-        // Step 2: Classify intent + extract params via DeepSeek
-        $classification = $this->classifyIntent($userMessage, $conversation);
-        $intent         = $classification['intent'] ?? 'general_chat';
-        $params         = $classification['params'] ?? [];
-
-        Log::info('AI Chat intent classified', [
-            'intent' => $intent,
-            'params' => $params,
-        ]);
+        // Step 2: Try local intent detection first (fast & reliable)
+        $localIntent = $this->detectLocalIntent($userMessage);
+        if ($localIntent) {
+            $intent = $localIntent['intent'];
+            $params = $localIntent['params'];
+            Log::info('AI Chat intent detected locally', ['intent' => $intent, 'params' => $params]);
+        } else {
+            // Fall back to AI classification
+            $classification = $this->classifyIntent($userMessage, $conversation);
+            $intent         = $classification['intent'] ?? 'general_chat';
+            $params         = $classification['params'] ?? [];
+            Log::info('AI Chat intent classified via AI', ['intent' => $intent, 'params' => $params]);
+        }
 
         // Step 3: Execute query if it's a data intent
         $queryResult = null;
@@ -225,6 +229,119 @@ class AiChatService
             'intent' => $lastIntent,
             'params' => $mergedParams,
         ];
+    }
+
+    /**
+     * Detect intent locally from clear patterns in the user message.
+     * This bypasses AI classification for fast, reliable data queries.
+     * Returns null if no clear pattern is detected (falls back to AI).
+     */
+    private function detectLocalIntent(string $userMessage): ?array
+    {
+        $msg = strtolower($userMessage);
+
+        // --- Serial Number Lookup ---
+        // Match common SN patterns: FOC2427N5MD, ABC12345678, etc.
+        $serialNumber = null;
+
+        // Pattern 1: Explicit "serial number" mention followed by an identifier
+        if (preg_match('/serial\s*number\s*(?:ini|itu|nya|adalah|:|#)?\s*([A-Z0-9][\w\-]{4,30}[A-Z0-9])/iu', $userMessage, $m)) {
+            $serialNumber = strtoupper(trim($m[1]));
+        }
+        // Pattern 2: "SN:" or "SN-" prefix
+        elseif (preg_match('/\bSN[:\-\s#]+([A-Z0-9][\w\-]{3,30})\b/iu', $userMessage, $m)) {
+            $serialNumber = strtoupper(trim($m[1]));
+        }
+        // Pattern 3: Standalone alphanumeric identifier (mixed letters+digits, 6-30 chars)
+        elseif (preg_match('/\b(?=[A-Z]*\d)(?=\d*[A-Z])[A-Z0-9][A-Z0-9\-_]{5,30}\b/iu', $userMessage, $m)) {
+            $candidate = strtoupper($m[0]);
+            // Filter out common words that happen to be alphanumeric
+            $nonSerials = ['WMS', 'TKS', 'API', 'JSON', 'PDF', 'EXCEL', 'CSV', 'HTML', 'CSS', 'PO', 'DN'];
+            if (!in_array($candidate, $nonSerials) && strlen($candidate) >= 6) {
+                $serialNumber = $candidate;
+            }
+        }
+        // Pattern 4: The original extractParamsLocally regex (flexible)
+        if (!$serialNumber) {
+            if (preg_match('/\b([A-Z]{2,5}\d{4,12}[A-Z]?\d*[A-Z]*)\b/iu', $userMessage, $m)) {
+                $serialNumber = strtoupper($m[1]);
+            }
+        }
+
+        // If we found a serial number and user is asking about data, force serial_number_lookup
+        if ($serialNumber && strlen($serialNumber) >= 5) {
+            $dataKeywords = [
+                'data', 'info', 'informasi', 'cek', 'cari', 'lihat', 'tolong',
+                'berikan', 'tampilkan', 'detail', 'lacak', 'track', 'history',
+                'riwayat', 'inbound', 'outbound', 'return', 'status', 'lokasi',
+                'ada', 'dimana', 'mana', 'bagaimana', 'apa', 'inventory',
+                'semua', 'lengkap', 'full', 'bagi', 'kasih', 'bantu',
+            ];
+
+            $hasDataKeyword = false;
+            foreach ($dataKeywords as $word) {
+                if (str_contains($msg, $word)) {
+                    $hasDataKeyword = true;
+                    break;
+                }
+            }
+
+            if ($hasDataKeyword) {
+                return [
+                    'intent' => 'serial_number_lookup',
+                    'params' => ['serial_number' => $serialNumber],
+                ];
+            }
+        }
+
+        // --- Stock Check ---
+        if (preg_match('/\b(stok|stock|stoknya|tersedia)\b/i', $msg) && !$serialNumber) {
+            $params = $this->extractParamsLocally($userMessage, 'stock_check');
+            // Only return if there's at least a part name or part number
+            if (!empty($params['part_name']) || !empty($params['part_number'])) {
+                return ['intent' => 'stock_check', 'params' => $params];
+            }
+            // If user says "cek stok" without specifics, still return stock_check with empty params
+            if (preg_match('/\b(cek\s*stok|stok\s*apa\s*aja|list\s*stok|semua\s*stok)\b/i', $msg)) {
+                return ['intent' => 'inventory_summary', 'params' => []];
+            }
+        }
+
+        // --- Aging Check ---
+        if (preg_match('/\b(aging|lama|tua|90\s*hari|6\s*bulan|setahun|tidak\s*bergerak|stuck|ngendap)\b/i', $msg)) {
+            $params = $this->extractParamsLocally($userMessage, 'aging_check');
+            if (empty($params['days'])) {
+                $params['days'] = 90;
+            }
+            return ['intent' => 'aging_check', 'params' => $params];
+        }
+
+        // --- Inbound Status ---
+        if (preg_match('/\b(?:inbound|po|purchase\s*order|barang\s*masuk|receiving)\b.*\b(?:status|nomor|number|no)\b/i', $msg)) {
+            $params = $this->extractParamsLocally($userMessage, 'inbound_status');
+            if (!empty($params['inbound_number'])) {
+                return ['intent' => 'inbound_status', 'params' => $params];
+            }
+        }
+
+        // --- Outbound Summary ---
+        if (preg_match('/\b(outbound|pengiriman|pengeluaran)\b.*\b(?:ringkasan|summary|rekap|bulan|month|semua)\b/i', $msg)) {
+            $params = $this->extractParamsLocally($userMessage, 'outbound_summary');
+            return ['intent' => 'outbound_summary', 'params' => $params];
+        }
+
+        // --- Location Status ---
+        if (preg_match('/\b(?:lokasi|area|rak|bin|lantai|simpan|tempat)\b.*\b(?:status|isi|barang|item|apa|ada)\b/i', $msg)) {
+            $params = $this->extractParamsLocally($userMessage, 'location_status');
+            return ['intent' => 'location_status', 'params' => $params];
+        }
+
+        // --- Inventory Summary ---
+        if (preg_match('/\b(ringkasan|summary|rekap|total|keseluruhan)\s*(inventori|inventory|stok|stock)\b/i', $msg)) {
+            return ['intent' => 'inventory_summary', 'params' => []];
+        }
+
+        return null; // No local pattern detected, fall back to AI
     }
 
     /**
