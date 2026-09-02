@@ -90,6 +90,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        @include('components.serial-number-multi-search')
                     </form>
 
                     <div class="table-responsive">

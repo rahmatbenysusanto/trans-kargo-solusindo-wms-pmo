@@ -19,6 +19,9 @@ class BackToWhController extends Controller
 {
     public function index(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $backToWh = BackToWh::with('user')
             ->withCount('details')
             ->when($request->query('received_at'), function ($query) use ($request) {
@@ -30,12 +33,18 @@ class BackToWhController extends Controller
             ->when($request->query('reason'), function ($query) use ($request) {
                 return $query->where('reason', 'LIKE', '%' . $request->query('reason') . '%');
             })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                $query->whereHas('details', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
+                });
+            })
             ->latest()
             ->paginate(10)
             ->appends([
                 'received_at'  => $request->query('received_at'),
                 'received_by'  => $request->query('received_by'),
                 'reason'       => $request->query('reason'),
+                'serialNumbers' => $serialNumbers,
             ]);
 
         $title = 'Back To WH';

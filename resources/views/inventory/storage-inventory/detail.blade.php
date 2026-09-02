@@ -47,6 +47,23 @@
         </div>
         @endif
 
+        <div class="col-12 mb-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form action="{{ url()->current() }}" method="GET">
+                        <div class="row g-3">
+                            @include('components.serial-number-multi-search')
+                            <div class="col-12 d-flex justify-content-end">
+                                <a href="{{ url()->current() }}" class="btn btn-soft-danger px-3">
+                                    <i class="bx bx-refresh me-1"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <div class="col-12">
             <div class="card shadow-sm border-0 border-top border-primary border-3">
                 <div class="card-header bg-light-subtle py-3 border-bottom d-flex justify-content-between align-items-center">

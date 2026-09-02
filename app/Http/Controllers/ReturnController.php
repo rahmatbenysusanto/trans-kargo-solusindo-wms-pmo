@@ -20,6 +20,9 @@ class ReturnController extends Controller
 {
     public function index(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $outbound = Outbound::with('client', 'user')
             ->where('type', 'return')
             ->when($request->query('client'), function ($query) use ($request) {
@@ -37,6 +40,11 @@ class ReturnController extends Controller
             ->when($request->query('received_by'), function ($query) use ($request) {
                 return $query->where('received_by', $request->query('received_by'));
             })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                $query->whereHas('details.inventory', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
+                });
+            })
             ->latest()
             ->paginate(10)
             ->appends([
@@ -45,6 +53,7 @@ class ReturnController extends Controller
                 'courier'       => $request->query('courier'),
                 'awb'           => $request->query('awb'),
                 'received_by'   => $request->query('received_by'),
+                'serialNumbers' => $serialNumbers,
             ]);
 
         $client = Client::all();

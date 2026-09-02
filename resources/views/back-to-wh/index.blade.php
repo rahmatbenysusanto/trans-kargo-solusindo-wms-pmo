@@ -44,6 +44,8 @@
                                 </a>
                             </div>
                         </div>
+
+                        @include('components.serial-number-multi-search')
                     </form>
                 </div>
             </div>

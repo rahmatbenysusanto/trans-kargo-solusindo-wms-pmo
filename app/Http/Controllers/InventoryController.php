@@ -20,6 +20,9 @@ class InventoryController extends Controller
 {
     public function index(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client', 'pic')
             ->when($request->query('partName'), function ($query) use ($request) {
                 return $query->where('part_name', 'like', '%' . $request->query('partName') . '%');
@@ -29,6 +32,9 @@ class InventoryController extends Controller
             })
             ->when($request->query('serialNumber'), function ($query) use ($request) {
                 return $query->where('serial_number', 'like', '%' . $request->query('serialNumber') . '%');
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                return $query->whereIn('serial_number', $serialNumbers);
             })
             ->when($request->query('client'), function ($query) use ($request) {
                 return $query->where('client_id', $request->query('client'));
@@ -41,6 +47,7 @@ class InventoryController extends Controller
                 'partName'      => $request->query('partName'),
                 'partNumber'    => $request->query('partNumber'),
                 'serialNumber'  => $request->query('serialNumber'),
+                'serialNumbers' => $serialNumbers,
                 'client'        => $request->query('client'),
                 'status'        => $request->query('status'),
             ]);
@@ -158,10 +165,18 @@ class InventoryController extends Controller
 
     public function inventoryHistory(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $history = OutboundDetail::with(['inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai', 'outbound.client'])
             ->when($request->query('serialNumber'), function ($query) use ($request) {
                 return $query->whereHas('inventory', function ($q) use ($request) {
                     $q->where('serial_number', 'LIKE', '%' . $request->query('serialNumber') . '%');
+                });
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                return $query->whereHas('inventory', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
                 });
             })
             ->latest()
@@ -174,6 +189,9 @@ class InventoryController extends Controller
 
     public function stockMovement(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $history = InventoryHistory::with('inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai', 'inventory.inboundDetail.inbound.client')
             ->where('type', 'stock movement')
             ->when($request->query('serialNumber'), function ($query) use ($request) {
@@ -181,8 +199,14 @@ class InventoryController extends Controller
                     $q->where('serial_number', 'LIKE', '%' . $request->query('serialNumber') . '%');
                 });
             })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                return $query->whereHas('inventory', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
+                });
+            })
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->paginate(15)
+            ->appends($request->query());
 
         $title = 'Stock Movement';
         return view('inventory.stock-movement.index', compact('title', 'history'));
@@ -190,10 +214,18 @@ class InventoryController extends Controller
 
     public function cycleCount(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $history = InventoryHistory::with('inventory.bin.storageArea', 'inventory.bin.storageRak', 'inventory.bin.storageLantai', 'inventory.inboundDetail.inbound.client')
             ->when($request->query('serialNumber'), function ($query, $value) {
                 $query->whereHas('inventory', function ($q) use ($value) {
                     $q->where('serial_number', 'like', "%$value%");
+                });
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                $query->whereHas('inventory', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
                 });
             })
             ->when($request->query('partName'), function ($query, $value) {
@@ -226,6 +258,9 @@ class InventoryController extends Controller
 
     public function cycleCountDownloadExcel(Request $request)
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $spreadsheet = new Spreadsheet();
         $activeWorksheet = $spreadsheet->getActiveSheet();
         $activeWorksheet->setCellValue('A1', 'Date & Time');
@@ -246,6 +281,11 @@ class InventoryController extends Controller
             ->when($request->query('serialNumber'), function ($query, $value) {
                 $query->whereHas('inventory', function ($q) use ($value) {
                     $q->where('serial_number', 'like', "%$value%");
+                });
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                $query->whereHas('inventory', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
                 });
             })
             ->when($request->query('partName'), function ($query, $value) {
@@ -309,6 +349,9 @@ class InventoryController extends Controller
 
     public function cycleCountDownloadPDF(Request $request)
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $history = InventoryHistory::with([
                 'inventory.bin.storageArea',
                 'inventory.bin.storageRak',
@@ -318,6 +361,11 @@ class InventoryController extends Controller
             ->when($request->query('serialNumber'), function ($query, $value) {
                 $query->whereHas('inventory', function ($q) use ($value) {
                     $q->where('serial_number', 'like', "%$value%");
+                });
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                $query->whereHas('inventory', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
                 });
             })
             ->when($request->query('partName'), function ($query, $value) {
@@ -410,6 +458,9 @@ class InventoryController extends Controller
 
     public function downloadExcel(Request $request)
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $spreadsheet = new Spreadsheet();
         $activeWorksheet = $spreadsheet->getActiveSheet();
         $activeWorksheet->setCellValue('A1', 'Storage');
@@ -432,6 +483,9 @@ class InventoryController extends Controller
             })
             ->when($request->query('serialNumber'), function ($query) use ($request) {
                 return $query->where('serial_number', 'like', '%' . $request->query('serialNumber') . '%');
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                return $query->whereIn('serial_number', $serialNumbers);
             })
             ->when($request->query('client'), function ($query) use ($request) {
                 return $query->where('client_id', $request->query('client'));
@@ -466,6 +520,9 @@ class InventoryController extends Controller
 
     public function downloadPDF(Request $request)
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $inventory = Inventory::with('bin', 'bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'inboundDetail.inbound.client', 'pic')
             ->whereNot('qty', 0)
             ->when($request->query('partName'), function ($query) use ($request) {
@@ -476,6 +533,9 @@ class InventoryController extends Controller
             })
             ->when($request->query('serialNumber'), function ($query) use ($request) {
                 return $query->where('serial_number', 'like', '%' . $request->query('serialNumber') . '%');
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                return $query->whereIn('serial_number', $serialNumbers);
             })
             ->when($request->query('client'), function ($query) use ($request) {
                 return $query->where('client_id', $request->query('client'));
@@ -505,8 +565,14 @@ class InventoryController extends Controller
     public function storageInventoryDetail(Request $request): View
     {
         $binId = $request->query('bin_id');
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $inventory = Inventory::with(['bin.storageArea', 'bin.storageRak', 'bin.storageLantai', 'client', 'pic'])
             ->where('bin_id', $binId)
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                return $query->whereIn('serial_number', $serialNumbers);
+            })
             ->get();
 
         $title = 'Storage Inventory Detail';

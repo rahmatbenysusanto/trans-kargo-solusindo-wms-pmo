@@ -25,6 +25,9 @@ class InboundController extends Controller
 {
     public function index(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $inbound = Inbound::with('client', 'user', 'pic')
             ->when($request->query('number'), function ($query, $value) {
                 $query->where('number', $value);
@@ -37,6 +40,11 @@ class InboundController extends Controller
             })
             ->when($request->query('received'), function ($query, $value) {
                 $query->whereDate('received_at', $value);
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                $query->whereHas('inboundDetail', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
+                });
             })
             ->whereHas('client', function ($query) use ($request) {
                 if ($request->query('client') != null) {
@@ -51,6 +59,7 @@ class InboundController extends Controller
                 'inbound_type'  => $request->query('inbound_type'),
                 'received'      => $request->query('received'),
                 'client'        => $request->query('client'),
+                'serialNumbers' => $serialNumbers,
             ]);
 
         $title = 'Purchase Order';
@@ -481,6 +490,9 @@ class InboundController extends Controller
 
     public function putAway(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $inbound = Inbound::with('client', 'user')
             ->when($request->query('number'), function ($query, $value) {
                 $query->where('number', $value);
@@ -493,6 +505,11 @@ class InboundController extends Controller
             })
             ->when($request->query('received'), function ($query, $value) {
                 $query->whereDate('received_at', $value);
+            })
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                $query->whereHas('inboundDetail', function ($q) use ($serialNumbers) {
+                    $q->whereIn('serial_number', $serialNumbers);
+                });
             })
             ->whereHas('client', function ($query) use ($request) {
                 if ($request->query('client') != null) {
@@ -508,6 +525,7 @@ class InboundController extends Controller
                 'inbound_type'  => $request->query('inbound_type'),
                 'received'      => $request->query('received'),
                 'client'        => $request->query('client'),
+                'serialNumbers' => $serialNumbers,
             ]);
 
         $title = 'Put Away';

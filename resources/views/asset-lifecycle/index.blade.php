@@ -39,14 +39,17 @@
                                 <label class="form-label text-muted small text-uppercase">Lifecycle Status</label>
                                 <select class="form-select border-light bg-light" name="lifecycleStatus">
                                     <option value="">All Statuses</option>
-                                    <option value="Active"
-                                        {{ request()->get('lifecycleStatus') == 'Active' ? 'selected' : '' }}>Active
+                                    <option value="active"
+                                        {{ request()->get('lifecycleStatus') == 'active' ? 'selected' : '' }}>Active
                                     </option>
-                                    <option value="Near EOS"
-                                        {{ request()->get('lifecycleStatus') == 'Near EOS' ? 'selected' : '' }}>Near EOS
+                                    <option value="near_eos"
+                                        {{ request()->get('lifecycleStatus') == 'near_eos' ? 'selected' : '' }}>Near EOS
                                     </option>
-                                    <option value="EOS"
-                                        {{ request()->get('lifecycleStatus') == 'EOS' ? 'selected' : '' }}>EOS</option>
+                                    <option value="eos"
+                                        {{ request()->get('lifecycleStatus') == 'eos' ? 'selected' : '' }}>EOS</option>
+                                    <option value="unknown"
+                                        {{ request()->get('lifecycleStatus') == 'unknown' ? 'selected' : '' }}>Unknown
+                                    </option>
                                 </select>
                             </div>
                             <div class="col-md-3 d-flex align-items-end gap-2">
@@ -62,6 +65,8 @@
                                 </a>
                             </div>
                         </div>
+
+                        @include('components.serial-number-multi-search')
                     </form>
                 </div>
             </div>

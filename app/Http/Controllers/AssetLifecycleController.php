@@ -15,6 +15,9 @@ class AssetLifecycleController extends Controller
 {
     public function index(Request $request): View
     {
+        $serialNumbers = collect($request->query('serialNumbers', []))
+            ->map(fn($s) => trim($s))->filter()->unique()->values()->all();
+
         $inventory = Inventory::whereNot('qty', 0)
             ->when($request->query('partName'), function ($query) use ($request) {
                 return $query->where('part_name', $request->query('partName'));
@@ -25,8 +28,11 @@ class AssetLifecycleController extends Controller
             ->when($request->query('serialNumber'), function ($query) use ($request) {
                 return $query->where('serial_number', $request->query('serialNumber'));
             })
-            ->when($request->query('status'), function ($query) use ($request) {
-                $status = $request->query('status');
+            ->when($serialNumbers, function ($query) use ($serialNumbers) {
+                return $query->whereIn('serial_number', $serialNumbers);
+            })
+            ->when($request->query('lifecycleStatus'), function ($query) use ($request) {
+                $status = $request->query('lifecycleStatus');
                 $now = Carbon::now();
                 $sixMonthsLater = $now->copy()->addMonths(6);
 
@@ -45,7 +51,8 @@ class AssetLifecycleController extends Controller
                     return $query->whereNull('eos_date');
                 }
             })
-            ->paginate(10);
+            ->paginate(10)
+            ->appends($request->query());
 
         $title = "Asset Lifecycle";
         return view('asset-lifecycle.index', compact('title', 'inventory'));
